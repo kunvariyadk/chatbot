@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Bots - ChatBot Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bots.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-container">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="8" fill="url(#grad2)"/>
+                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>ChatBot Builder</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <a href="/dashboard" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Workspace</div>
+
+                <!-- Bots nav item — active on this page -->
+                <a href="/bots" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span>Bots</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2">
+
+                    </svg>
+                </a><br>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item" id="accountMenu">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>My Account</span>
+                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                    <div class="submenu" id="accountSubmenu">
+                        <a href="/edit/" class="submenu-item">
+                            <span class="dot"></span><span>Edit Profile</span>
+                        </a>
+                        <a href="" class="submenu-item">
+                            <span class="dot"></span><span>Change Password</span>
+                        </a>
+                        <a href="/subscription/manage" class="submenu-item">
+                            <span class="dot"></span><span>Subscription</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar">{{ user.username[0].upper() }}</div>
+                <div class="user-details">
+                    <div class="user-name">{{ user.username }}</div>
+                    <div class="user-email">{{ user.email }}</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout-btn" title="Logout">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <div>
+                <h1>All Bots</h1>
+                <p>All your chatbots in one place</p>
+            </div>
+            <a href="/chatbot/create" class="btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Create New Chatbot
+            </a>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <label for="searchInput"></label>
+                <input type="text" id="searchInput" placeholder="Search chatbots...">
+                <button type="button" class="clear-search" id="clearSearch" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="inactive">Inactive</button>
+            </div>
+            <div class="sort-dropdown">
+                <label for="sortSelect"></label>
+                <select id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="count-label" id="countLabel"></div>
+
+        <!-- Bot cards — Jinja renders them; JS filters/sorts -->
+        <div class="content-section">
+            <h2>Your Chatbots</h2>
+
+            {% if chatbots %}
+            <div class="chatbots-grid" id="chatbotsGrid">
+                {% for chatbot in chatbots %}
+                <div class="chatbot-card"
+                     data-name="{{ chatbot.name|lower }}"
+                     data-desc="{{ (chatbot.description or '')|lower }}"
+                     data-active="{{ 'true' if chatbot.is_active else 'false' }}"
+                     data-created-at="{{ chatbot.created_at.isoformat() }}">
+
+                    <div class="chatbot-header">
+                        <div class="chatbot-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <span class="status-badge {{ 'active' if chatbot.is_active else 'inactive' }}">
+                            {{ 'Active' if chatbot.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+
+                    <h3>{{ chatbot.name }}</h3>
+                    <p class="chatbot-description">{{ chatbot.description or 'No description provided' }}</p>
+
+                    <div class="chatbot-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            {{ chatbot.created_at.strftime('%b %d, %Y') }}
+                        </span>
+                    </div>
+
+                    <div class="chatbot-actions">
+                        <a href="{{ url_for('edit_chatbot', chatbot_id=chatbot.id) }}" class="action-btn edit"
+                           title="Edit">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                        </a>
+                        <a href="{{ url_for('train_chatbot', chatbot_id=chatbot.id) }}" class="action-btn train"
+                           title="Train">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        </a>
+                        <a href="{{ url_for('preview_chatbot', chatbot_id=chatbot.id) }}" class="action-btn preview"
+                           title="Preview">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </a>
+                        <a href="{{ url_for('deploy_chatbot', chatbot_id=chatbot.id) }}" class="action-btn deploy"
+                           title="Deploy">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <polyline points="16 16 12 12 8 16"/>
+                                <line x1="12" y1="12" x2="12" y2="21"/>
+                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                            </svg>
+                        </a>
+                        <a href="{{ url_for('delete_chatbot', chatbot_id=chatbot.id) }}"
+                           class="action-btn delete" title="Delete"
+                           onclick="return confirm('Are you sure you want to delete this chatbot? This action cannot be undone.');">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <h3>No chatbots yet</h3>
+                <p>Create your first chatbot to get started</p>
+                <a href="/chatbot/create" class="btn-primary">Create Chatbot</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+</button>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ── Mobile sidebar ── */
+        document.getElementById('mobileMenuToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        /* ── Account submenu toggle ── */
+        document.getElementById('accountMenu').addEventListener('click', function (e) {
+            e.preventDefault();
+            this.classList.toggle('expanded');
+            document.getElementById('accountSubmenu').classList.toggle('open');
+        });
+
+        /* ── Filter + Sort state ── */
+        var currentFilter = 'all';
+
+        /* ── applyFilters: search + filter + sort + count label ── */
+        function applyFilters() {
+            var q = document.getElementById('searchInput').value.toLowerCase().trim();
+            var sort = document.getElementById('sortSelect').value;
+            var grid = document.getElementById('chatbotsGrid');
+            var countLabel = document.getElementById('countLabel');
+
+            /* If no grid rendered (no chatbots at all), just clear the label */
+            if (!grid) {
+                if (countLabel) countLabel.textContent = '';
+                return;
+            }
+
+            /* All real bot cards */
+            var allCards = Array.from(grid.querySelectorAll('.chatbot-card[data-name]'));
+            var totalCount = allCards.length;
+
+            /* 1 — Filter */
+            var visible = allCards.filter(function (card) {
+                var isActive = card.getAttribute('data-active') === 'true';
+                var name = card.getAttribute('data-name') || '';
+                var desc = card.getAttribute('data-desc') || '';
+
+                if (currentFilter === 'active' && !isActive) return false;
+                if (currentFilter === 'inactive' && isActive) return false;
+                if (q && !name.includes(q) && !desc.includes(q)) return false;
+                return true;
+            });
+
+            /* 2 — Sort */
+            visible.sort(function (a, b) {
+                var dateA = new Date(a.getAttribute('data-created-at'));
+                var dateB = new Date(b.getAttribute('data-created-at'));
+                var nameA = a.getAttribute('data-name') || '';
+                var nameB = b.getAttribute('data-name') || '';
+
+                if (sort === 'newest') return dateB - dateA;
+                if (sort === 'oldest') return dateA - dateB;
+                if (sort === 'name') return nameA.localeCompare(nameB);
+                if (sort === 'name-desc') return nameB.localeCompare(nameA);
+                return 0;
+            });
+
+            /* 3 — Show / hide + reorder in DOM */
+            allCards.forEach(function (c) {
+                c.style.display = 'none';
+            });
+            visible.forEach(function (c) {
+                c.style.display = '';
+                grid.appendChild(c);
+            });
+
+            /* 4 — Count label */
+            if (countLabel) {
+                countLabel.textContent = 'Showing ' + visible.length + ' of ' + totalCount +
+                    ' chatbot' + (totalCount !== 1 ? 's' : '');
+            }
+
+            /* 5 — No-results message */
+            var noResults = document.getElementById('noResultsMsg');
+            if (!noResults) {
+                noResults = document.createElement('div');
+                noResults.id = 'noResultsMsg';
+                noResults.className = 'empty-state';
+                noResults.innerHTML =
+                    '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+                    '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
+                    '<h3>No results found</h3>' +
+                    '<p>Try a different search term or filter</p>';
+                grid.parentNode.insertBefore(noResults, grid.nextSibling);
+            }
+
+            if (visible.length === 0 && totalCount > 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+            } else {
+                grid.style.display = '';
+                noResults.style.display = 'none';
+            }
+        }
+
+        /* ── Search input ── */
+        document.getElementById('searchInput').addEventListener('input', function () {
+            document.getElementById('clearSearch').style.display =
+                this.value.length > 0 ? 'flex' : 'none';
+            applyFilters();
+        });
+
+        /* ── Clear (×) button ── */
+        document.getElementById('clearSearch').addEventListener('click', function () {
+            document.getElementById('searchInput').value = '';
+            this.style.display = 'none';
+            document.getElementById('searchInput').focus();
+            applyFilters();
+        });
+
+        /* ── Filter buttons: All / Active / Inactive ── */
+        document.querySelectorAll('.filter-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                currentFilter = this.getAttribute('data-filter');
+                document.querySelectorAll('.filter-btn').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                applyFilters();
+            });
+        });
+
+        /* ── Sort dropdown ── */
+        document.getElementById('sortSelect').addEventListener('change', applyFilters);
+
+        /* ── Run once on load to set count label ── */
+        applyFilters();
+
+    }); /* end DOMContentLoaded */
+</script>
+</body>
+</html>
