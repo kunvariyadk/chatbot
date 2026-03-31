@@ -53,6 +53,7 @@ const previewCanvas = document.getElementById('previewCanvas');
 // ========== GLOBAL STATE ==========
 let uploadedAvatarUrl = null;
 let originalAvatarUrl = null;
+let existingAvatarIsFromDB = false;  // FIX: track if avatar came from DB
 let welcomeButtons = [];
 let buttonIdCounter = 0;
 let submenuIdCounter = 0;
@@ -66,13 +67,41 @@ let dragStartY = 0;
 const CIRCLE_SIZE = 180;
 const PREVIEW_SIZE = 100;
 
-// Get existing avatar from page load
+// =====================================================================
+// FIX 1: On page load, if there's an existing DB avatar in the preview,
+// fetch it as base64 and pre-fill bot_avatar_data so the backend always
+// receives it — even if the user makes no changes to the avatar.
+// =====================================================================
 const existingAvatarImg = avatarPreview.querySelector('img');
-if (existingAvatarImg) {
+if (existingAvatarImg && existingAvatarImg.src) {
     uploadedAvatarUrl = existingAvatarImg.src;
     originalAvatarUrl = existingAvatarImg.src;
-    console.log('Found existing avatar from database:', uploadedAvatarUrl);
+    existingAvatarIsFromDB = true;
+
+    // Convert the existing avatar URL to base64 and store in the hidden input
+    // so the Flask route receives it and keeps (or re-saves) the image.
+    fetch(existingAvatarImg.src)
+        .then(res => res.blob())
+        .then(blob => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (botAvatarDataInput && removeAvatarFlag.value !== 'true') {
+                    botAvatarDataInput.value = e.target.result;
+                }
+            };
+            reader.readAsDataURL(blob);
+        })
+        .catch(() => {
+            // If fetch fails (e.g. CORS), leave empty — Flask will keep existing value
+            console.warn('Could not pre-load existing avatar as base64.');
+        });
 }
+
+// =====================================================================
+// FIX 2: Ensure the welcome_buttons hidden input is always in sync with
+// the rendered buttons array, including on first load before any edits.
+// Call updateHiddenInput() once after loadExistingButtons() finishes.
+// =====================================================================
 
 // ========== HELPER FUNCTIONS ==========
 function getValueLabel(type) {
@@ -131,29 +160,16 @@ function isValidUrl(string) {
 // ========== AVATAR FUNCTIONS ==========
 function updatePreviewAvatars() {
     const themeColor = themeColorInput?.value || '#4F46E5';
-    const file = avatarInput?.files?.[0];
-
     const headerAvatar = document.getElementById('previewIcon');
     const messageAvatar = document.getElementById('previewAvatar');
 
     if (uploadedAvatarUrl) {
-        const img = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        const img = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
         headerAvatar.innerHTML = img;
         messageAvatar.innerHTML = img;
         headerAvatar.style.background = 'white';
         messageAvatar.style.background = 'white';
         messageAvatar.style.border = '2px solid #e2e8f0';
-    } else if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const img = `<img src="${e.target.result}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            headerAvatar.innerHTML = img;
-            messageAvatar.innerHTML = img;
-            headerAvatar.style.background = 'white';
-            messageAvatar.style.background = 'white';
-            messageAvatar.style.border = '2px solid #e2e8f0';
-        };
-        reader.readAsDataURL(file);
     } else {
         headerAvatar.innerHTML = getModernRobotIconSVG(themeColor);
         messageAvatar.innerHTML = getModernRobotIconSVG(themeColor);
@@ -174,7 +190,7 @@ function updateUploadAvatar() {
 }
 
 updatePreviewAvatars();
-updateUploadAvatar();
+if (!existingAvatarImg) updateUploadAvatar();
 
 // ========== LOAD EXISTING BUTTONS WITH SUBMENUS ==========
 function loadExistingButtons() {
@@ -208,7 +224,6 @@ function loadExistingButtons() {
                 submenu_items: []
             };
 
-            // Add submenu items
             if (hasSubmenu && Array.isArray(submenuItems)) {
                 submenuItems.forEach((submenuItem) => {
                     const submenuId = submenuIdCounter++;
@@ -225,6 +240,9 @@ function loadExistingButtons() {
             renderButton(buttonData);
         });
 
+        // FIX 2: Sync hidden input immediately after loading so a save
+        // without any edits still sends the correct button data.
+        updateHiddenInput();
         updatePreviewButtons();
 
     } catch (e) {
@@ -311,7 +329,6 @@ function renderButton(buttonData) {
 
     welcomeButtonsList.appendChild(buttonItem);
 
-    // Add event listeners
     const textInput = buttonItem.querySelector('.button-text');
     const typeSelect = buttonItem.querySelector('.button-type');
     const valueInput = buttonItem.querySelector('.button-value');
@@ -339,7 +356,6 @@ function renderButton(buttonData) {
         toggleSubmenu(buttonData.id, this.checked);
     });
 
-    // Render existing submenu items
     if (buttonData.has_submenu && buttonData.submenu_items.length > 0) {
         buttonData.submenu_items.forEach((submenuItem) => {
             renderSubmenuItem(buttonData.id, submenuItem);
@@ -394,7 +410,6 @@ window.addSubmenuItem = function(buttonId) {
     button.submenu_items.push(submenuItem);
     renderSubmenuItem(buttonId, submenuItem);
 
-    // Remove empty state if exists
     const emptyState = document.querySelector(`#submenu-list-${buttonId} .submenu-empty-state`);
     if (emptyState) emptyState.remove();
 
@@ -402,7 +417,7 @@ window.addSubmenuItem = function(buttonId) {
     updatePreviewButtons();
 };
 
-// ========== RENDER SUBMENU ITEM - FIXED WITH REMOVE BUTTON ==========
+// ========== RENDER SUBMENU ITEM ==========
 function renderSubmenuItem(buttonId, submenuItem) {
     const submenuList = document.getElementById(`submenu-list-${buttonId}`);
     if (!submenuList) return;
@@ -443,7 +458,6 @@ function renderSubmenuItem(buttonId, submenuItem) {
 
     submenuList.appendChild(submenuItemEl);
 
-    // Add event listeners
     const textInput = submenuItemEl.querySelector('.submenu-text');
     const typeSelect = submenuItemEl.querySelector('.submenu-type');
     const valueInput = submenuItemEl.querySelector('.submenu-value');
@@ -479,13 +493,11 @@ window.removeSubmenuItem = function(buttonId, submenuId) {
         const submenuItemEl = document.querySelector(`.submenu-item[data-submenu-id="${submenuId}"]`);
         if (submenuItemEl) submenuItemEl.remove();
 
-        // Update numbering
         const submenuList = document.getElementById(`submenu-list-${buttonId}`);
         submenuList.querySelectorAll('.submenu-item-number').forEach((el, index) => {
             el.textContent = `Sub-item ${index + 1}`;
         });
 
-        // Show empty state if no items
         if (button.submenu_items.length === 0) {
             submenuList.innerHTML = '<div class="submenu-empty-state">No submenu items yet. Click "Add Item" below.</div>';
         }
@@ -566,7 +578,6 @@ window.removeWelcomeButton = function(buttonId) {
         const buttonItem = document.querySelector(`.button-item[data-button-id="${buttonId}"]`);
         if (buttonItem) buttonItem.remove();
 
-        // Update numbering
         document.querySelectorAll('.button-number').forEach((el, index) => {
             const submenuBadge = el.querySelector('.submenu-badge');
             const badgeHTML = submenuBadge ? submenuBadge.outerHTML : '';
@@ -615,17 +626,15 @@ function updateHiddenInput() {
         });
 
     welcomeButtonsDataInput.value = JSON.stringify(buttonData);
-    console.log('Updated buttons data:', buttonData);
 }
 
-// ========== UPDATE PREVIEW BUTTONS WITH SUBMENU - FIXED VERSION ==========
+// ========== UPDATE PREVIEW BUTTONS ==========
 function updatePreviewButtons() {
     if (previewButtonsContainer) {
         previewButtonsContainer.innerHTML = '';
     }
 
     const validButtons = welcomeButtons.filter(b => b.text.trim() !== '');
-
     if (validButtons.length === 0) return;
 
     const themeColor = themeColorInput ? themeColorInput.value : '#4F46E5';
@@ -642,7 +651,6 @@ function updatePreviewButtons() {
         previewBtn.style.background = 'white';
         previewBtn.type = 'button';
 
-        // Add submenu dropdown if has submenu
         if (button.has_submenu && button.submenu_items.length > 0) {
             const dropdown = document.createElement('div');
             dropdown.className = 'preview-submenu-dropdown';
@@ -654,14 +662,8 @@ function updatePreviewButtons() {
                 submenuBtn.style.color = themeColor;
                 submenuBtn.type = 'button';
 
-                submenuBtn.addEventListener('mouseenter', function() {
-                    this.style.background = '#f7fafc';
-                });
-
-                submenuBtn.addEventListener('mouseleave', function() {
-                    this.style.background = 'white';
-                });
-
+                submenuBtn.addEventListener('mouseenter', function() { this.style.background = '#f7fafc'; });
+                submenuBtn.addEventListener('mouseleave', function() { this.style.background = 'white'; });
                 submenuBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     if (submenuItem.type === 'message' && submenuItem.value.trim()) {
@@ -675,40 +677,27 @@ function updatePreviewButtons() {
 
             wrapper.appendChild(dropdown);
 
-            // Toggle dropdown on main button click
             previewBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-
-                // Close other dropdowns
                 document.querySelectorAll('.preview-submenu-dropdown.active').forEach(d => {
                     if (d !== dropdown) d.classList.remove('active');
                 });
-
                 dropdown.classList.toggle('active');
             });
 
-            // Hover effect for submenu button
-            previewBtn.addEventListener('mouseenter', function() {
-                this.style.background = '#f7fafc';
-            });
-
-            previewBtn.addEventListener('mouseleave', function() {
-                this.style.background = 'white';
-            });
+            previewBtn.addEventListener('mouseenter', function() { this.style.background = '#f7fafc'; });
+            previewBtn.addEventListener('mouseleave', function() { this.style.background = 'white'; });
 
         } else {
-            // Hover effects for non-submenu buttons
             previewBtn.addEventListener('mouseenter', function() {
                 this.style.background = themeColor;
                 this.style.color = 'white';
             });
-
             previewBtn.addEventListener('mouseleave', function() {
                 this.style.background = 'white';
                 this.style.color = themeColor;
             });
 
-            // Regular message button
             if (button.type === 'message' && button.value.trim()) {
                 previewBtn.addEventListener('click', function() {
                     showMessagePreview(button.value);
@@ -717,13 +706,11 @@ function updatePreviewButtons() {
         }
 
         wrapper.appendChild(previewBtn);
-
         if (previewButtonsContainer) {
             previewButtonsContainer.appendChild(wrapper);
         }
     });
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.preview-button-wrapper')) {
             document.querySelectorAll('.preview-submenu-dropdown.active').forEach(d => {
@@ -746,11 +733,11 @@ function showMessagePreview(messageText) {
 
     const themeColor = themeColorInput?.value || '#4F46E5';
     const avatarContent = uploadedAvatarUrl
-        ? `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+        ? `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
         : getModernRobotIconSVG(themeColor);
 
     botMsg.innerHTML = `
-        <div class="message-avatar" style="background: white; border: 2px solid ${uploadedAvatarUrl ? '#e2e8f0' : themeColor};">${avatarContent}</div>
+        <div class="message-avatar" style="background:white;border:2px solid ${uploadedAvatarUrl ? '#e2e8f0' : themeColor};">${avatarContent}</div>
         <div class="message-wrapper">
             <div class="message-content bot-message">Thank you for your message: "${messageText}". Our team will respond shortly!</div>
         </div>
@@ -776,9 +763,7 @@ if (themeColorInput && colorValue) {
         colorValue.textContent = color;
         previewHeader.style.background = color;
         previewSendBtn.style.background = color;
-        if (userMessageContent) {
-            userMessageContent.style.background = color;
-        }
+        if (userMessageContent) userMessageContent.style.background = color;
         updatePreviewButtons();
         updatePreviewAvatars();
         updateUploadAvatar();
@@ -788,39 +773,29 @@ if (themeColorInput && colorValue) {
 // ========== COLOR UPDATES ==========
 if (chatBgColor && colorValueBg) {
     chatBgColor.addEventListener('input', function() {
-        const color = this.value;
-        colorValueBg.textContent = color;
-        previewBody.style.background = color;
+        colorValueBg.textContent = this.value;
+        previewBody.style.background = this.value;
     });
 }
 
 if (botMsgColor && colorValueBotBg) {
     botMsgColor.addEventListener('input', function() {
-        const color = this.value;
-        colorValueBotBg.textContent = color;
-        if (botMessageContent) {
-            botMessageContent.style.background = color;
-        }
+        colorValueBotBg.textContent = this.value;
+        if (botMessageContent) botMessageContent.style.background = this.value;
     });
 }
 
 if (botTextColor && colorValueBotText) {
     botTextColor.addEventListener('input', function() {
-        const color = this.value;
-        colorValueBotText.textContent = color;
-        if (botMessageContent) {
-            botMessageContent.style.color = color;
-        }
+        colorValueBotText.textContent = this.value;
+        if (botMessageContent) botMessageContent.style.color = this.value;
     });
 }
 
 if (userTextColor && colorValueUserText) {
     userTextColor.addEventListener('input', function() {
-        const color = this.value;
-        colorValueUserText.textContent = color;
-        if (userMessageContent) {
-            userMessageContent.style.color = color;
-        }
+        colorValueUserText.textContent = this.value;
+        if (userMessageContent) userMessageContent.style.color = this.value;
     });
 }
 
@@ -831,49 +806,46 @@ welcomeMessageInput.addEventListener('input', function() {
 
 // ========== BOT NAME ==========
 botNameInput.addEventListener('input', function() {
-    const name = this.value || 'AI Assistant';
-    previewBotName.textContent = name;
+    previewBotName.textContent = this.value || 'AI Assistant';
 });
 
 // ========== AVATAR UPLOAD ==========
 avatarInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
+    if (!file) return;
 
-    if (file) {
-        if (file.size > 2 * 1024 * 1024) {
-            alert('File size must be less than 2MB');
-            this.value = '';
-            return;
-        }
-
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Please upload a valid image file (PNG, JPG, GIF, or SVG)');
-            this.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            uploadedAvatarUrl = event.target.result;
-            botAvatarDataInput.value = event.target.result;
-            originalAvatarUrl = event.target.result;
-
-            avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            updatePreviewAvatars();
-
-            removeAvatarBtn.style.display = 'inline-flex';
-            adjustAvatarBtn.style.display = 'inline-flex';
-            if (removeAvatarFlag) {
-                removeAvatarFlag.value = 'false';
-            }
-
-            currentZoom = 100;
-            currentX = 0;
-            currentY = 0;
-        };
-        reader.readAsDataURL(file);
+    if (file.size > 2 * 1024 * 1024) {
+        alert('File size must be less than 2MB');
+        this.value = '';
+        return;
     }
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a valid image file (PNG, JPG, GIF, or SVG)');
+        this.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        uploadedAvatarUrl = event.target.result;
+        botAvatarDataInput.value = event.target.result;   // Store base64 in hidden input
+        originalAvatarUrl = event.target.result;
+        existingAvatarIsFromDB = false;
+
+        avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        updatePreviewAvatars();
+
+        removeAvatarBtn.style.display = 'inline-flex';
+        adjustAvatarBtn.style.display = 'inline-flex';
+        if (removeAvatarFlag) removeAvatarFlag.value = 'false';
+
+        currentZoom = 100;
+        currentX = 0;
+        currentY = 0;
+    };
+    reader.readAsDataURL(file);
 });
 
 // ========== REMOVE AVATAR ==========
@@ -881,6 +853,7 @@ if (removeAvatarBtn) {
     removeAvatarBtn.addEventListener('click', function() {
         uploadedAvatarUrl = null;
         originalAvatarUrl = null;
+        existingAvatarIsFromDB = false;
         avatarInput.value = '';
 
         updateUploadAvatar();
@@ -889,12 +862,8 @@ if (removeAvatarBtn) {
         this.style.display = 'none';
         adjustAvatarBtn.style.display = 'none';
 
-        if (removeAvatarFlag) {
-            removeAvatarFlag.value = 'true';
-        }
-        if (botAvatarDataInput) {
-            botAvatarDataInput.value = '';
-        }
+        if (removeAvatarFlag) removeAvatarFlag.value = 'true';
+        if (botAvatarDataInput) botAvatarDataInput.value = '';
     });
 }
 
@@ -918,6 +887,7 @@ function updateAvatarSliderValues() {
 function renderAvatarPreview() {
     const ctx = previewCanvas.getContext('2d');
     const img = new Image();
+    img.crossOrigin = 'anonymous';  // FIX: needed for DB-served images
 
     img.onload = function() {
         previewCanvas.width = CIRCLE_SIZE;
@@ -1001,11 +971,9 @@ window.resetAvatarImage = function() {
     currentX = 0;
     currentY = 0;
     currentZoom = 100;
-
     zoomSlider.value = 100;
     xSlider.value = 0;
     ySlider.value = 0;
-
     updateAvatarSliderValues();
     renderAvatarPreview();
 };
@@ -1015,6 +983,7 @@ window.saveAvatarImage = function() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
+    img.crossOrigin = 'anonymous';  // FIX: needed for DB-served images
 
     img.onload = function() {
         canvas.width = PREVIEW_SIZE;
@@ -1041,9 +1010,8 @@ window.saveAvatarImage = function() {
             botAvatarDataInput.value = uploadedAvatarUrl;
         }
 
-        avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
         updatePreviewAvatars();
-
         closeAvatarEditor();
     };
 
@@ -1056,9 +1024,7 @@ window.saveAvatarImage = function() {
 
 if (avatarEditorModal) {
     avatarEditorModal.addEventListener('click', function(e) {
-        if (e.target === avatarEditorModal) {
-            closeAvatarEditor();
-        }
+        if (e.target === avatarEditorModal) closeAvatarEditor();
     });
 }
 
@@ -1129,23 +1095,9 @@ if (form) {
         const botName = document.getElementById('bot_name').value.trim();
         const welcomeMessage = document.getElementById('welcome_message').value.trim();
 
-        if (!name) {
-            e.preventDefault();
-            alert('Please enter a chatbot name');
-            return;
-        }
-
-        if (!botName) {
-            e.preventDefault();
-            alert('Please enter a bot display name');
-            return;
-        }
-
-        if (!welcomeMessage) {
-            e.preventDefault();
-            alert('Please enter a welcome message');
-            return;
-        }
+        if (!name) { e.preventDefault(); alert('Please enter a chatbot name'); return; }
+        if (!botName) { e.preventDefault(); alert('Please enter a bot display name'); return; }
+        if (!welcomeMessage) { e.preventDefault(); alert('Please enter a welcome message'); return; }
 
         const buttons = JSON.parse(welcomeButtonsDataInput.value || '[]');
         for (let i = 0; i < buttons.length; i++) {
@@ -1156,13 +1108,9 @@ if (form) {
                 return;
             }
 
-            // Validate main button value if not a submenu
             if (!button.has_submenu && !button.value.trim()) {
                 e.preventDefault();
-                let fieldName = 'value';
-                if (button.type === 'url') fieldName = 'URL';
-                else if (button.type === 'intent') fieldName = 'Intent name';
-                else if (button.type === 'message') fieldName = 'Message text';
+                let fieldName = button.type === 'url' ? 'URL' : button.type === 'intent' ? 'Intent name' : 'Message text';
                 alert(`Button ${i + 1}: Please enter ${fieldName}`);
                 return;
             }
@@ -1173,28 +1121,21 @@ if (form) {
                 return;
             }
 
-            // Validate submenu items if has submenu
             if (button.has_submenu && button.submenu_items) {
                 for (let j = 0; j < button.submenu_items.length; j++) {
-                    const submenuItem = button.submenu_items[j];
-
-                    if (!submenuItem.text.trim()) {
+                    const sub = button.submenu_items[j];
+                    if (!sub.text.trim()) {
                         e.preventDefault();
                         alert(`Button ${i + 1} - Submenu item ${j + 1}: Please enter text`);
                         return;
                     }
-
-                    if (!submenuItem.value.trim()) {
+                    if (!sub.value.trim()) {
                         e.preventDefault();
-                        let fieldName = 'value';
-                        if (submenuItem.type === 'url') fieldName = 'URL';
-                        else if (submenuItem.type === 'intent') fieldName = 'Intent name';
-                        else if (submenuItem.type === 'message') fieldName = 'Message text';
+                        let fieldName = sub.type === 'url' ? 'URL' : sub.type === 'intent' ? 'Intent name' : 'Message text';
                         alert(`Button ${i + 1} - Submenu item ${j + 1}: Please enter ${fieldName}`);
                         return;
                     }
-
-                    if (submenuItem.type === 'url' && !isValidUrl(submenuItem.value)) {
+                    if (sub.type === 'url' && !isValidUrl(sub.value)) {
                         e.preventDefault();
                         alert(`Button ${i + 1} - Submenu item ${j + 1}: Please enter a valid URL`);
                         return;
@@ -1205,59 +1146,16 @@ if (form) {
     });
 }
 
-// ===== DYNAMIC CSS FOR SUBMENU STYLING =====
+// ========== DYNAMIC CSS ==========
 const style = document.createElement('style');
 style.textContent = `
-    .submenu-message {
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .welcome-button.has-submenu {
-        position: relative;
-        padding-right: 30px;
-    }
-
-    .submenu-arrow {
-        font-size: 10px;
-        margin-left: 5px;
-        transition: transform 0.3s ease;
-    }
-
-    .welcome-button.back-button {
-        width: 100%;
-        margin-bottom: 12px;
-        background: #f8fafc !important;
-        border-color: #64748b !important;
-        color: #64748b !important;
-        font-weight: 600;
-    }
-
-    .welcome-button.back-button:hover {
-        background: #64748b !important;
-        color: white !important;
-    }
-
-    .submenu-item-button {
-        transition: all 0.2s ease;
-    }
-
-    .submenu-buttons {
-        border-top: 1px solid #e2e8f0;
-        padding-top: 12px;
-        margin-top: 8px;
-    }
+    .submenu-message { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .welcome-button.has-submenu { position:relative; padding-right:30px; }
+    .submenu-arrow { font-size:10px; margin-left:5px; transition:transform 0.3s ease; }
+    .welcome-button.back-button { width:100%; margin-bottom:12px; background:#f8fafc !important; border-color:#64748b !important; color:#64748b !important; font-weight:600; }
+    .welcome-button.back-button:hover { background:#64748b !important; color:white !important; }
+    .submenu-item-button { transition:all 0.2s ease; }
+    .submenu-buttons { border-top:1px solid #e2e8f0; padding-top:12px; margin-top:8px; }
 `;
 document.head.appendChild(style);
-
-

@@ -1,0 +1,283 @@
+{
+  "intents": [
+    {
+      "tag": "qa_1",
+      "patterns": [
+        "What is algebra?"
+      ],
+      "responses": [
+        "Algebra is a branch of mathematics that uses symbols and letters to represent numbers and solve problems."
+      ]
+    },
+    {
+      "tag": "qa_2",
+      "patterns": [
+        "What is a variable?"
+      ],
+      "responses": [
+        "A variable is a symbol, usually a letter, that represents an unknown value."
+      ]
+    },
+    {
+      "tag": "qa_3",
+      "patterns": [
+        "What is a constant?"
+      ],
+      "responses": [
+        "A constant is a fixed value that does not change."
+      ]
+    },
+    {
+      "tag": "qa_4",
+      "patterns": [
+        "What is an expression?"
+      ],
+      "responses": [
+        "An expression is a combination of numbers, variables, and operations."
+      ]
+    },
+    {
+      "tag": "qa_5",
+      "patterns": [
+        "What is an equation?"
+      ],
+      "responses": [
+        "An equation is a statement that shows two expressions are equal."
+      ]
+    },
+    {
+      "tag": "qa_6",
+      "patterns": [
+        "How do you simplify expressions?"
+      ],
+      "responses": [
+        "Combine like terms and apply arithmetic operations."
+      ]
+    },
+    {
+      "tag": "qa_7",
+      "patterns": [
+        "What are like terms?"
+      ],
+      "responses": [
+        "Like terms are terms that have the same variables raised to the same power."
+      ]
+    },
+    {
+      "tag": "qa_8",
+      "patterns": [
+        "Simplify 4x - 2x + 7"
+      ],
+      "responses": [
+        "2x + 7"
+      ]
+    },
+    {
+      "tag": "qa_9",
+      "patterns": [
+        "What is a linear equation?"
+      ],
+      "responses": [
+        "A linear equation is an equation of degree 1."
+      ]
+    },
+    {
+      "tag": "qa_10",
+      "patterns": [
+        "Solve x + 5 = 10"
+      ],
+      "responses": [
+        "x = 5"
+      ]
+    },
+    {
+      "tag": "qa_11",
+      "patterns": [
+        "Solve 2x = 8"
+      ],
+      "responses": [
+        "x = 4"
+      ]
+    },
+    {
+      "tag": "qa_12",
+      "patterns": [
+        "Solve 3x - 6 = 0"
+      ],
+      "responses": [
+        "x = 2"
+      ]
+    },
+    {
+      "tag": "qa_13",
+      "patterns": [
+        "How do you solve linear equations?"
+      ],
+      "responses": [
+        "Isolate the variable by performing inverse operations."
+      ]
+    },
+    {
+      "tag": "qa_14",
+      "patterns": [
+        "Solve 2x + 3 = 11"
+      ],
+      "responses": [
+        "x = 4"
+      ]
+    },
+    {
+      "tag": "qa_15",
+      "patterns": [
+        "Solve 3x - 4 = 5"
+      ],
+      "responses": [
+        "x = 3"
+      ]
+    },
+    {
+      "tag": "qa_16",
+      "patterns": [
+        "Solve 5x + 2 = 17"
+      ],
+      "responses": [
+        "x = 3"
+      ]
+    },
+    {
+      "tag": "qa_17",
+      "patterns": [
+        "What is a quadratic equation?"
+      ],
+      "responses": [
+        "A quadratic equation is an equation of degree 2."
+      ]
+    },
+    {
+      "tag": "qa_18",
+      "patterns": [
+        "What is the standard form of a quadratic equation?"
+      ],
+      "responses": [
+        "ax^2 + bx + c = 0"
+      ]
+    },
+    {
+      "tag": "qa_19",
+      "patterns": [
+        "Solve x^2 - 4 = 0"
+      ],
+      "responses": [
+        "x = 2 or x = -2"
+      ]
+    },
+    {
+      "tag": "qa_20",
+      "patterns": [
+        "Solve x^2 - 5x + 6 = 0"
+      ],
+      "responses": [
+        "x = 2 or x = 3"
+      ]
+    },
+    {
+      "tag": "qa_21",
+      "patterns": [
+        "How do you solve quadratic equations?"
+      ],
+      "responses": [
+        "By factoring, using the quadratic formula, or completing the square."
+      ]
+    },
+    {
+      "tag": "qa_22",
+      "patterns": [
+        "What is an exponent?"
+      ],
+      "responses": [
+        "An exponent shows how many times a number is multiplied by itself."
+      ]
+    },
+    {
+      "tag": "qa_23",
+      "patterns": [
+        "What is x^0?"
+      ],
+      "responses": [
+        "1 (for x \u2260 0)"
+      ]
+    },
+    {
+      "tag": "qa_24",
+      "patterns": [
+        "What is a polynomial?"
+      ],
+      "responses": [
+        "A polynomial is an expression made of variables, coefficients, and exponents."
+      ]
+    },
+    {
+      "tag": "qa_25",
+      "patterns": [
+        "What is the degree of a polynomial?"
+      ],
+      "responses": [
+        "The highest exponent of the variable."
+      ]
+    },
+    {
+      "tag": "qa_26",
+      "patterns": [
+        "Add (2x + 3) + (4x + 5)"
+      ],
+      "responses": [
+        "6x + 8"
+      ]
+    },
+    {
+      "tag": "qa_27",
+      "patterns": [
+        "If x + 3 = 7, what is x?"
+      ],
+      "responses": [
+        "x = 4"
+      ]
+    },
+    {
+      "tag": "qa_28",
+      "patterns": [
+        "What is the slope of a line?"
+      ],
+      "responses": [
+        "The slope measures the steepness of a line."
+      ]
+    },
+    {
+      "tag": "qa_29",
+      "patterns": [
+        "What is the slope-intercept form?"
+      ],
+      "responses": [
+        "y = mx + b"
+      ]
+    },
+    {
+      "tag": "qa_30",
+      "patterns": [
+        "What does m represent in y = mx + b?"
+      ],
+      "responses": [
+        "The slope"
+      ]
+    },
+    {
+      "tag": "qa_31",
+      "patterns": [
+        "What does b represent in y = mx + b?"
+      ],
+      "responses": [
+        "The y-intercept"
+      ]
+    }
+  ]
+}

@@ -20,9 +20,8 @@ from base.com.vo.user_vo import User
 from base.com.vo.subscription_vo import SubscriptionPlan, Subscription
 from base.com.dao.user_dao import (
     get_user_by_email,
-    get_user_by_username,
     create_user,
-    get_user_by_id, get_all_users, get_user_by_username
+    get_user_by_id, get_user_by_username
 )
 from base.com.dao.chat_dao import (
     get_chatbots_by_user,
@@ -35,9 +34,6 @@ from base.com.dao.subscription_dao import (
 )
 from base.com.service.file_service import ensure_user_folder
 from flask_mail import Message
-
-# Create Blueprint
-
 
 # Email validation regex
 EMAIL_REGEX = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
@@ -67,7 +63,7 @@ def index():
 def login():
     """User login with Remember Me functionality"""
     if 'user_id' in session:
-        return redirect(url_for('auth.dashboard'))
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
@@ -259,6 +255,7 @@ def register():
 
 
 @app.route('/dashboard',methods=['GET'])
+@login_required
 def dashboard():
     """User dashboard - shows chatbots and subscription info"""
     user = get_user_by_id(session['user_id'])
@@ -295,6 +292,7 @@ def dashboard():
 
 
 @app.route('/bots')
+@login_required
 def bots():
     """Chatbot listing page"""
     user = get_user_by_id(session['user_id'])
@@ -310,7 +308,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/forgot-password', methods=['GET', 'POST'])
+@app.route( '/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     """Handle forgot password request"""
     if 'user_id' in session:
@@ -419,7 +417,7 @@ ChatBot Builder Team
             # Don't reveal if email exists or not for security
             flash('If that email exists, a password reset link has been sent', 'info')
 
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('login'))
 
     return render_template('forgot_password.html')
 

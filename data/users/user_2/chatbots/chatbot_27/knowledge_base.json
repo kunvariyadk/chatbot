@@ -1,0 +1,309 @@
+[
+  {
+    "intent": "qa_1",
+    "tag": "qa_1",
+    "patterns": [
+      "Hello"
+    ],
+    "responses": [
+      "Hello there! I'm glad you are here. How can I help you today?"
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_2",
+    "tag": "qa_2",
+    "patterns": [
+      "Hi, how are you?"
+    ],
+    "responses": [
+      "I'm doing great, thank you for asking! How can I assist you today?"
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_3",
+    "tag": "qa_3",
+    "patterns": [
+      "What is your name?"
+    ],
+    "responses": [
+      "I am a virtual assistant chatbot designed to answer questions and help users."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_4",
+    "tag": "qa_4",
+    "patterns": [
+      "What can you do?"
+    ],
+    "responses": [
+      "I can answer questions, provide information, help with learning topics, and have friendly conversations."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_5",
+    "tag": "qa_5",
+    "patterns": [
+      "Can you help me with technology questions?"
+    ],
+    "responses": [
+      "Yes, I can help answer questions related to programming, technology, and general knowledge."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_6",
+    "tag": "qa_6",
+    "patterns": [
+      "Tell me a joke"
+    ],
+    "responses": [
+      "Sure! Why did the computer show up at work late? Because it had a hard drive."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_7",
+    "tag": "qa_7",
+    "patterns": [
+      "I'm feeling bored"
+    ],
+    "responses": [
+      "Maybe we can talk about something interesting or learn something new together."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_8",
+    "tag": "qa_8",
+    "patterns": [
+      "Thank you"
+    ],
+    "responses": [
+      "You're welcome! I'm always happy to help."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_9",
+    "tag": "qa_9",
+    "patterns": [
+      "Goodbye"
+    ],
+    "responses": [
+      "Goodbye! Have a wonderful day and feel free to come back anytime."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_10",
+    "tag": "qa_10",
+    "patterns": [
+      "Technology consultation",
+      "Need software consultation",
+      "Talk to your development team",
+      "Can we schedule a meeting"
+    ],
+    "responses": [
+      "Our experts can help evaluate your project requirements and suggest the best technology approach."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_11",
+    "tag": "qa_11",
+    "patterns": [
+      "Employee management software",
+      "Attendance tracking system",
+      "HR management system",
+      "Leave management software"
+    ],
+    "responses": [
+      "Our HRMS system helps companies manage employees, attendance, leave, and HR workflows."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_12",
+    "tag": "qa_12",
+    "patterns": [
+      "Money transfer system",
+      "Banking software platform",
+      "Fintech software development",
+      "Digital wallet system"
+    ],
+    "responses": [
+      "We build fintech platforms including digital wallets, merchant payments, and financial transaction systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_13",
+    "tag": "qa_13",
+    "patterns": [
+      "Payment gateway integration",
+      "Financial technology platform"
+    ],
+    "responses": [
+      "We build fintech platforms including digital wallets, merchant payments, and financial transaction systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_14",
+    "tag": "qa_14",
+    "patterns": [
+      "I want to discuss my project"
+    ],
+    "responses": [
+      "Our experts can help evaluate your project requirements and suggest the best technology approach."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_15",
+    "tag": "qa_15",
+    "patterns": [
+      "HRMS platform"
+    ],
+    "responses": [
+      "Our HRMS system helps companies manage employees, attendance, leave, and HR workflows."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_16",
+    "tag": "qa_16",
+    "patterns": [
+      "Build a business website",
+      "Website development service",
+      "Create a web portal",
+      "Need a web application"
+    ],
+    "responses": [
+      "TD Tech Solutions develops scalable web applications including portals, dashboards, and SaaS platforms."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_17",
+    "tag": "qa_17",
+    "patterns": [
+      "Do you build websites",
+      "Can you build a SaaS platform",
+      "Develop a dashboard system"
+    ],
+    "responses": [
+      "TD Tech Solutions develops scalable web applications including portals, dashboards, and SaaS platforms."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_18",
+    "tag": "qa_18",
+    "patterns": [
+      "Marketing campaign manager",
+      "Email marketing platform",
+      "WhatsApp marketing tool",
+      "Bulk SMS system"
+    ],
+    "responses": [
+      "Our Campaign Manager platform allows businesses to run Email, SMS, and WhatsApp marketing campaigns."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_19",
+    "tag": "qa_19",
+    "patterns": [
+      "Campaign automation software"
+    ],
+    "responses": [
+      "Our Campaign Manager platform allows businesses to run Email, SMS, and WhatsApp marketing campaigns."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_24",
+    "tag": "qa_24",
+    "patterns": [
+      "Custom web development"
+    ],
+    "responses": [
+      "TD Tech Solutions develops scalable web applications including portals, dashboards, and SaaS platforms."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_25",
+    "tag": "qa_25",
+    "patterns": [
+      "Payroll and HR system"
+    ],
+    "responses": [
+      "Our HRMS system helps companies manage employees, attendance, leave, and HR workflows."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_36",
+    "tag": "qa_36",
+    "patterns": [
+      "Build a mobile application",
+      "Do you develop mobile apps",
+      "Need a cross platform mobile app",
+      "Android app development"
+    ],
+    "responses": [
+      "We design and develop Android and iOS mobile apps with modern UI and scalable backend systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_41",
+    "tag": "qa_41",
+    "patterns": [
+      "Mobile payment solution"
+    ],
+    "responses": [
+      "We build fintech platforms including digital wallets, merchant payments, and financial transaction systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_44",
+    "tag": "qa_44",
+    "patterns": [
+      "Create an app for my business"
+    ],
+    "responses": [
+      "We design and develop Android and iOS mobile apps with modern UI and scalable backend systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_47",
+    "tag": "qa_47",
+    "patterns": [
+      "iOS app development"
+    ],
+    "responses": [
+      "We design and develop Android and iOS mobile apps with modern UI and scalable backend systems."
+    ],
+    "chatbot_id": 27
+  },
+  {
+    "intent": "qa_56",
+    "tag": "qa_56",
+    "patterns": [
+      "Mobile app development service"
+    ],
+    "responses": [
+      "We design and develop Android and iOS mobile apps with modern UI and scalable backend systems."
+    ],
+    "chatbot_id": 27
+  }
+]

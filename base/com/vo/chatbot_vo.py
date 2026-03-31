@@ -30,6 +30,7 @@ class Chatbot(db.Model):
     bot_avatar = db.Column(db.String(500))
     welcome_button_text = db.Column(db.String(100))
     welcome_button_url = db.Column(db.String(500))
+    flow_data = db.Column(db.Text, nullable=True, default='[]')
     chat_background_color = db.Column(db.String(7), default='#F7FAFC')
     user_message_color = db.Column(db.String(7))
     bot_message_color = db.Column(db.String(7), default='#FFFFFF')
@@ -62,46 +63,70 @@ class Chatbot(db.Model):
             return []
 
     def set_welcome_buttons_dict(self, buttons_list):
-        """Set welcome_buttons from a Python list"""
+        """
+        Set welcome_buttons from a Python list.
+        Supports infinite recursive branching (nested_buttons) and
+        automatically migrates legacy 'submenu_items'.
+        """
         if not isinstance(buttons_list, list):
             self.welcome_buttons = '[]'
             return False
 
-        valid_types = ['url', 'intent', 'message', 'submenu']
-        validated_buttons = []
+        valid_types = ['url', 'intent', 'message']
 
-        for button in buttons_list:
-            if not isinstance(button, dict):
-                continue
+        def clean_node(btn):
+            if not isinstance(btn, dict):
+                return None
 
-            button_data = {
-                'text': button.get('text', '').strip(),
-                'type': button.get('type', 'url').strip(),
-                'value': button.get('value', '').strip(),
-                'has_submenu': button.get('has_submenu', False),
-                'submenu_items': []
+            text = str(btn.get('text', '')).strip()
+            if not text:
+                return None
+
+            b_type = str(btn.get('type', 'message')).strip()
+            if b_type not in valid_types:
+                b_type = 'message'
+
+            cleaned = {
+                'id': str(btn.get('id', '')),
+                'text': text,
+                'type': b_type,
+                'value': str(btn.get('value', '')).strip(),
+                'nested_buttons': []
             }
 
-            if button_data['type'] not in valid_types:
-                button_data['type'] = 'url'
+            # 1. Gracefully migrate legacy 'submenu_items' if they exist
+            legacy_subs = btn.get('submenu_items', [])
+            if isinstance(legacy_subs, list):
+                for sub in legacy_subs:
+                    if isinstance(sub, dict) and str(sub.get('text', '')).strip():
+                        s_type = str(sub.get('type', 'url')).strip()
+                        if s_type not in valid_types:
+                            s_type = 'url'
 
-            if button_data['has_submenu'] and 'submenu_items' in button:
-                submenu_items = button.get('submenu_items', [])
-                if isinstance(submenu_items, list):
-                    for sub_item in submenu_items:
-                        if isinstance(sub_item, dict) and sub_item.get('text', '').strip():
-                            sub_type = sub_item.get('type', 'url').strip()
-                            if sub_type not in valid_types:
-                                sub_type = 'url'
+                        cleaned['nested_buttons'].append({
+                            'id': str(sub.get('id', '')),
+                            'text': str(sub.get('text', '')).strip(),
+                            'type': s_type,
+                            'value': str(sub.get('value', '')).strip(),
+                            'nested_buttons': []
+                        })
 
-                            button_data['submenu_items'].append({
-                                'text': sub_item.get('text', '').strip(),
-                                'type': sub_type,
-                                'value': sub_item.get('value', '').strip()
-                            })
+            # 2. Process infinite nested_buttons recursively
+            nested = btn.get('nested_buttons', [])
+            if isinstance(nested, list):
+                for n_btn in nested:
+                    valid_nested = clean_node(n_btn)  # Recursive call
+                    if valid_nested:
+                        cleaned['nested_buttons'].append(valid_nested)
 
-            if button_data['text']:
-                validated_buttons.append(button_data)
+            return cleaned
+
+        # Process all top-level buttons
+        validated_buttons = []
+        for button in buttons_list:
+            valid_btn = clean_node(button)
+            if valid_btn:
+                validated_buttons.append(valid_btn)
 
         self.welcome_buttons = json.dumps(validated_buttons)
         return True

@@ -3,438 +3,1115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Chatbot - Chatbot Panel</title>
+    <title>Create Chatbot — ChatBot Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/create.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    /* ── Flow Section Header ── */
+    .flow-section-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+    .flow-section-header h2 { margin-bottom: 2px; }
+    .flow-section-desc {
+        font-size: 13px;
+        color: #718096;
+        margin: 0;
+        max-width: 380px;
+        line-height: 1.5;
+    }
+
+    /* ── Add Step Button ── */
+    .btn-add-flow-step {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #4F46E5;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .2s, transform .15s;
+        flex-shrink: 0;
+    }
+    .btn-add-flow-step:hover { background: #4338ca; transform: translateY(-1px); }
+
+    /* ── Empty State ── */
+    .flow-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 40px 20px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 12px;
+        text-align: center;
+        color: #a0aec0;
+    }
+    .flow-empty-state p  { margin: 4px 0 0; font-size: 14px; font-weight: 600; color: #718096; }
+    .flow-empty-state span { font-size: 13px; }
+
+    /* ── Flow Step Card ── */
+    .flow-step-card {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 14px;
+        background: #fff;
+        overflow: hidden;
+        transition: box-shadow .2s;
+    }
+    .flow-step-card:hover { box-shadow: 0 4px 16px rgba(79,70,229,.08); }
+
+    .flow-step-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        cursor: pointer;
+        user-select: none;
+    }
+    .flow-step-header-left { display: flex; align-items: center; gap: 10px; }
+    .flow-step-badge {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        background: #4F46E5;
+        color: #fff;
+        font-size: 11px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .flow-step-title  { font-size: 13px; font-weight: 600; color: #2d3748; }
+    .flow-step-subtitle { font-size: 11.5px; color: #a0aec0; margin-top: 1px; }
+    .flow-step-actions { display: flex; align-items: center; gap: 6px; }
+
+    .flow-step-toggle {
+        width: 28px; height: 28px;
+        border: none; background: transparent;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 6px; color: #718096;
+        transition: background .15s;
+    }
+    .flow-step-toggle:hover { background: #e2e8f0; }
+    .flow-step-toggle svg { transition: transform .2s; }
+    .flow-step-toggle.collapsed svg { transform: rotate(-90deg); }
+
+    .btn-step-remove {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 10px;
+        background: #fff0f0; color: #e53e3e;
+        border: 1px solid #fed7d7; border-radius: 6px;
+        font-size: 11.5px; font-weight: 600;
+        cursor: pointer; transition: background .15s;
+    }
+    .btn-step-remove:hover { background: #fed7d7; }
+
+    /* ── Step Body ── */
+    .flow-step-body { padding: 16px; }
+    .flow-step-body.collapsed { display: none; }
+
+    /* ── Connector arrow ── */
+    .flow-step-connector {
+        display: flex; align-items: center; justify-content: center;
+        padding: 2px 0; color: #cbd5e0;
+    }
+
+    /* ── Message field ── */
+    .flow-msg-field { margin-bottom: 14px; }
+    .flow-msg-field label {
+        display: block; font-size: 12.5px; font-weight: 600;
+        color: #4a5568; margin-bottom: 6px;
+    }
+    .flow-msg-field textarea {
+        width: 100%; padding: 9px 12px;
+        border: 1.5px solid #e2e8f0; border-radius: 8px;
+        font-size: 13px; color: #2d3748;
+        resize: vertical; min-height: 70px;
+        font-family: inherit; transition: border-color .2s;
+        box-sizing: border-box;
+    }
+    .flow-msg-field textarea:focus { outline: none; border-color: #4F46E5; }
+
+    /* ── Final toggle ── */
+    .flow-final-toggle {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 14px; padding: 10px 12px;
+        background: #f0fff4; border: 1px solid #c6f6d5;
+        border-radius: 8px; font-size: 12.5px; color: #276749;
+        font-weight: 500; cursor: pointer; user-select: none;
+    }
+    .flow-final-toggle input[type=checkbox] {
+        accent-color: #38a169; width: 15px; height: 15px; cursor: pointer;
+    }
+
+    /* ── Step buttons ── */
+    .flow-btn-section-label {
+        font-size: 12.5px; font-weight: 600; color: #4a5568;
+        margin-bottom: 8px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .btn-add-step-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px;
+        background: #EEF2FF; color: #4F46E5;
+        border: 1px solid #c7d2fe; border-radius: 6px;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-add-step-btn:hover { background: #e0e7ff; }
+
+    .step-btn-item {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 8px; align-items: center;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0; border-radius: 8px;
+        margin-bottom: 7px;
+    }
+    .step-btn-item input,
+    .step-btn-item select {
+        padding: 7px 10px;
+        border: 1.5px solid #e2e8f0; border-radius: 7px;
+        font-size: 12.5px; color: #2d3748;
+        font-family: inherit; background: #fff;
+        transition: border-color .2s;
+        width: 100%; box-sizing: border-box;
+    }
+    .step-btn-item input:focus,
+    .step-btn-item select:focus { outline: none; border-color: #4F46E5; }
+
+    .btn-remove-step-btn {
+        width: 28px; height: 28px;
+        border: 1px solid #fed7d7; background: #fff0f0;
+        color: #e53e3e; border-radius: 6px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: background .15s;
+    }
+    .btn-remove-step-btn:hover { background: #fed7d7; }
+
+    .step-btn-empty {
+        font-size: 12.5px; color: #a0aec0; text-align: center;
+        padding: 10px; border: 1.5px dashed #e2e8f0;
+        border-radius: 8px; margin-bottom: 8px;
+    }
+
+    /* ── Final card style ── */
+    .flow-step-card.is-final { border-color: #c6f6d5; }
+    .flow-step-card.is-final .flow-step-badge { background: #38a169; }
+    .flow-step-card.is-final .flow-step-header { background: #f0fff4; border-bottom-color: #c6f6d5; }
+
+    /* ── Preset Themes UI ── */
+    .theme-presets-container {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 16px;
+    }
+    .theme-presets-header {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+    .theme-presets-grid {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .theme-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    .theme-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .theme-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: white;
+        font-size: 9px;
+        padding: 3px 5px;
+        border-radius: 4px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        z-index: 10;
+    }
+    .theme-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+    </style>
 </head>
 <body>
-    <div class="dashboard-container"><!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-                        <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
-                        <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                        <defs>
-                            <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
-                                <stop offset="0%" stop-color="#667eea"/>
-                                <stop offset="100%" stop-color="#764ba2"/>
-                            </linearGradient>
-                        </defs>
+<div class="dashboard-container">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="8" fill="url(#lg)"/>
+                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="lg" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>ChatBot Builder</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
                     </svg>
-                    <span>ChatBot Builder</span>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Workspace</div>
+                <a href="{{ url_for('bots') }}" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span>Bots</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item" id="accountMenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>My Account</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+                <div class="submenu" id="accountSubmenu">
+                    <a href="{{ url_for('edit_profile') }}"        class="submenu-item"><span class="dot"></span><span>Edit Profile</span></a>
+                    <a href="{{ url_for('change_password') }}"     class="submenu-item"><span class="dot"></span><span>Change Password</span></a>
+                    <a href="{{ url_for('manage_subscription') }}" class="submenu-item"><span class="dot"></span><span>Subscription</span></a>
                 </div>
             </div>
-
-            <nav class="nav-menu">
-                <div class="nav-section">
-                    <a href="/dashboard" class="nav-item active" data-page="dashboard">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                        <span>Dashboard</span>
-                    </a>
+        </nav>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar">{{ session.username[0].upper() }}</div>
+                <div class="user-details">
+                    <div class="user-name">{{ session.username }}</div>
+                    <div class="user-email">{{ session.email }}</div>
                 </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </a>
+        </div>
+    </aside>
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Workspace</div>
-                    <a href="#" class="nav-item" id="botsMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>Bots</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                    <div class="submenu" id="botsSubmenu">
-                        {% if chatbots %}
-                            {% for chatbot in chatbots %}
-                            <a href="{{ url_for('preview_chatbot', chatbot_id=chatbot.id) }}" class="submenu-item" data-chatbot-id="{{ chatbot.id }}">
-                                <span class="dot"></span>
-                                <span>{{ chatbot.name }}</span>
-                                <span class="status-indicator {{ 'active' if chatbot.is_active else 'inactive' }}"></span>
-                            </a>
-                            {% endfor %}
-                        {% else %}
-                            <div class="submenu-item empty">
-                                <span class="dot"></span>
-                                <span>No chatbots created yet</span>
+    <main class="main-content">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+            {% if category == 'success' %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {% elif category in ['error','danger'] %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {% else %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>{% endif %}
+            <span>{{ message }}</span>
+            <button class="alert-close" type="button" onclick="this.closest('.alert').remove()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div class="page-header">
+            <div>
+                <h1>Create Chatbot</h1>
+                <p>Configure your new chatbot settings</p>
+            </div>
+            <a href="{{ url_for('bots') }}" class="btn-secondary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Back to Bots
+            </a>
+        </div>
+
+        <div class="form-container">
+        <form method="POST" action="{{ url_for('create_chatbot_route') }}"
+              id="createChatbotForm" class="chatbot-form" enctype="multipart/form-data">
+
+            <div class="two-column-layout">
+
+                <div class="form-column">
+                    <div id="alerts" style="padding:12px 22px 0;"></div>
+
+                    <div class="form-section">
+                        <h2>Basic Information</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Chatbot Name <span class="required">*</span></label>
+                                <input type="text" id="name" name="name" required placeholder="e.g., Customer Support Bot">
                             </div>
-                        {% endif %}
+                            <div class="form-group">
+                                <label for="bot_name">Display Name <span class="required">*</span></label>
+                                <input type="text" id="bot_name" name="bot_name" value="AI Assistant" required
+                                       placeholder="e.g., Sarah" oninput="updatePreviewBotName(this.value)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" rows="2"
+                                      placeholder="Describe what your chatbot does…"></textarea>
+                            <span class="field-hint">Optional — helps you identify this bot later</span>
+                        </div>
                     </div>
 
-                    <!--<a href="#" class="nav-item" data-page="analytics">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="20" x2="12" y2="10"></line>
-                            <line x1="18" y1="20" x2="18" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="16"></line>
-                        </svg>
-                        <span>Analytics</span>
-                    </a>
+                    <div class="form-section">
+                        <h2>Avatar &amp; Appearance</h2>
+                        <div class="avatar-colors-row">
 
-                    <a href="#" class="nav-item" data-page="integration">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M12 1v6m0 6v6m-6-6H1m6 0h6"></path>
-                        </svg>
-                        <span>Integration</span>
-                    </a>
-                </div>-->
+                            <div class="avatar-pane">
+                                <span class="avatar-pane-label">Bot Avatar</span>
+                                <div class="avatar-circle" id="avatarPreview">
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <input type="file" id="bot_avatar" name="bot_avatar" accept="image/*"
+                                       style="display:none" onchange="handleAvatarUpload(this)">
+                                <input type="hidden" id="bot_avatar_data" name="bot_avatar_data" value="">
+                                <input type="hidden" id="remove_avatar_flag" name="remove_avatar" value="false">
+                                <div class="avatar-btn-group">
+                                    <button type="button" class="btn-av choose"
+                                            onclick="document.getElementById('bot_avatar').click()">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                                        </svg>
+                                        Choose
+                                    </button>
+                                    <button type="button" class="btn-av adjust" id="adjustAvatarBtn"
+                                            onclick="openAvatarEditor()" style="display:none;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="1"/>
+                                            <path d="M4.6 4.6l2.8 2.8M19.4 19.4l-2.8-2.8M4.6 19.4l2.8-2.8M19.4 4.6l-2.8 2.8M12 2v3m0 12v3M2 12h3m12 0h3"/>
+                                        </svg>
+                                        Adjust
+                                    </button>
+                                    <button type="button" class="btn-av remove" id="removeAvatar"
+                                            style="display:none" onclick="removeAvatarImage()">
+                                        Remove
+                                    </button>
+                                </div>
+                                <span class="avatar-hint">PNG or JPG · Max 2MB</span>
+                            </div>
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item" id="accountMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>My Account</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                    <div class="submenu" id="accountSubmenu">
-                        <a href="/edit" class="submenu-item">
-                            <span class="dot"></span>
-                            <span>Edit Profile</span>
-                        </a>
-                        <a href="" class="submenu-item">
-                            <span class="dot"></span>
-                            <span>Change Password</span>
-                        </a>
-                        <a href="/subscription/manage" class="submenu-item">
-                            <span class="dot"></span>
-                            <span>Subscription</span>
-                        </a>
-                    </div>
-                </div>
-                </div>
-            </nav>
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-avatar">{{ session.username[0].upper() }}</div>
-                    <div class="user-details">
-                        <div class="user-name">{{ session.username }}</div>
-                        <div class="user-email">{{ session.email }}</div>
-                    </div>
-                </div>
-                <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </a>
-            </div>
-        </aside>
+                            <div class="colors-pane">
+                                <span class="colors-pane-label">Theme Colors</span>
 
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="page-header">
-                <div>
-                    <h1>Create Chatbot</h1>
-                    <p>Configure your chatbot settings</p>
-                </div>
-                <a href="{{ url_for('dashboard') }}" class="btn-secondary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Back to Dashboard
-                </a>
-            </div>
-
-            <div class="form-container">
-                <form method="POST" id="createChatbotForm" class="chatbot-form" enctype="multipart/form-data">
-
-                    <!-- Two Column Layout -->
-                    <div class="two-column-layout">
-
-                        <!-- Left Column: Form Sections -->
-                        <div class="form-column">
-
-                            <!-- Basic Information -->
-                            <div class="form-section compact">
-                                <h2>Basic Information</h2>
-
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="name">Chatbot Name <span class="required">*</span></label>
-                                        <input type="text" id="name" name="name" required placeholder="e.g., Customer Support Bot">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="bot_name">Bot Display Name <span class="required">*</span></label>
-                                        <input type="text" id="bot_name" name="bot_name" value="AI Assistant" required placeholder="e.g., Sarah">
+                                <div class="theme-presets-container">
+                                    <div class="theme-presets-header">Preset Themes</div>
+                                    <div class="theme-presets-grid">
+                                        <button type="button" class="theme-btn" data-title="Indigo" style="background: linear-gradient(135deg, #4F46E5 50%, #F7FAFC 50%);" onclick="applyTheme('#4F46E5', '#F7FAFC', '#FFFFFF', '#1A202C', '#FFFFFF')"></button>
+                                        <button type="button" class="theme-btn" data-title="Emerald" style="background: linear-gradient(135deg, #10b981 50%, #f0fdf4 50%);" onclick="applyTheme('#10b981', '#f0fdf4', '#ffffff', '#064e3b', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Pro Slate" style="background: linear-gradient(135deg, #1e293b 50%, #f8fafc 50%);" onclick="applyTheme('#1e293b', '#f8fafc', '#f1f5f9', '#334155', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Ocean" style="background: linear-gradient(135deg, #0ea5e9 50%, #f0f9ff 50%);" onclick="applyTheme('#0ea5e9', '#f0f9ff', '#ffffff', '#0c4a6e', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Blossom" style="background: linear-gradient(135deg, #fb7185 50%, #fff1f2 50%);" onclick="applyTheme('#fb7185', '#fff1f2', '#ffffff', '#881337', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Midnight" style="background: linear-gradient(135deg, #3b82f6 50%, #0f172a 50%);" onclick="applyTheme('#3b82f6', '#0f172a', '#1e293b', '#f8fafc', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Dark Mode" style="background: linear-gradient(135deg, #374151 50%, #111827 50%);" onclick="applyTheme('#374151', '#111827', '#1f2937', '#f9fafb', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Synthwave" style="background: linear-gradient(135deg, #d946ef 50%, #170229 50%);" onclick="applyTheme('#d946ef', '#170229', '#2e1065', '#fdf4ff', '#ffffff')"></button>
+                                        <button type="button" class="theme-btn" data-title="Mint" style="background: linear-gradient(135deg, #14b8a6 50%, #f0fdfa 50%);" onclick="applyTheme('#14b8a6', '#f0fdfa', '#ffffff', '#134e4a', '#ffffff')"></button>
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea id="description" name="description" rows="2" placeholder="Describe what your chatbot does..."></textarea>
-                                </div>
-                            </div>
-
-                           <!-- Bot Avatar -->
-                            <div class="form-section compact">
-                                <h2>Bot Avatar</h2>
-                                <div class="avatar-section">
-                                    <!-- AVATAR WRAPPER -->
-                                    <div class="avatar-upload-wrapper">
-
-                                        <div class="avatar-preview-container">
-                                            <div class="avatar-preview small" id="avatarPreview">
-                                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                        <circle cx="12" cy="7" r="4"></circle>
-                                                    </svg>
-                                            </div>
+                                <span class="colors-pane-label" style="margin-top: 10px;">Custom Colors</span>
+                                <input type="hidden" id="user_message_color" name="user_message_color" value="#4F46E5">
+                                <div class="color-grid">
+                                    <div class="color-item">
+                                        <span class="color-item-label">Theme</span>
+                                        <div class="color-picker-row">
+                                            <input type="color" id="theme_color" name="theme_color" value="#4F46E5" oninput="onColor('theme',this.value)">
+                                            <span class="color-hex-val" id="cv_theme">#4F46E5</span>
                                         </div>
+                                    </div>
+                                    <div class="color-item">
+                                        <span class="color-item-label">Chat BG</span>
+                                        <div class="color-picker-row">
+                                            <input type="color" id="chat_background_color" name="chat_background_color" value="#F7FAFC" oninput="onColor('chatBg',this.value)">
+                                            <span class="color-hex-val" id="cv_chatBg">#F7FAFC</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-item">
+                                        <span class="color-item-label">Bot Bubble</span>
+                                        <div class="color-picker-row">
+                                            <input type="color" id="bot_message_color" name="bot_message_color" value="#FFFFFF" oninput="onColor('botBg',this.value)">
+                                            <span class="color-hex-val" id="cv_botBg">#FFFFFF</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-item">
+                                        <span class="color-item-label">Bot Text</span>
+                                        <div class="color-picker-row">
+                                            <input type="color" id="bot_text_color" name="bot_text_color" value="#1A202C" oninput="onColor('botText',this.value)">
+                                            <span class="color-hex-val" id="cv_botText">#1A202C</span>
+                                        </div>
+                                    </div>
+                                    <div class="color-item">
+                                        <span class="color-item-label">User Text</span>
+                                        <div class="color-picker-row">
+                                            <input type="color" id="user_text_color" name="user_text_color" value="#FFFFFF" oninput="onColor('userText',this.value)">
+                                            <span class="color-hex-val" id="cv_userText">#FFFFFF</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-            <div class="avatar-controls-group">
-                <input type="file" id="bot_avatar" name="bot_avatar" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+<div class="form-section">
+                        <h2>Welcome Message &amp; Buttons</h2>
+                        <div class="welcome-section">
+                            <div class="form-group">
+                                <label for="welcome_message">Welcome Message <span class="required">*</span></label>
+                                <textarea id="welcome_message" name="welcome_message" rows="3" required
+                                          placeholder="Hello! How can I help you?"
+                                          oninput="updatePreviewWelcome(this.value)">Hello! How can I help you?</textarea>
+                                <span class="field-hint">This is the first message users see when they open the chat</span>
+                            </div>
 
-                <button type="button" class="btn-upload small" onclick="document.getElementById('bot_avatar').click()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </div>
+                    </div>
+
+
+                </div><div class="preview-column">
+                    <div class="preview-sticky">
+                        <h2>Live Preview</h2>
+                        <div class="chatbot-preview">
+
+                            <div class="preview-header" id="previewHeader" style="background:#4F46E5;">
+                                <div class="preview-bot-icon" id="previewIcon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                </div>
+                                <span id="previewBotName">AI Assistant</span>
+                            </div>
+
+                            <div class="preview-body" id="previewBody" style="background:#F7FAFC;">
+                                <div class="preview-message bot">
+                                    <div class="message-avatar" id="previewAvatar"
+                                         style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #4F46E5;font-weight:600;">
+                                        A
+                                    </div>
+                                    <div class="message-wrapper">
+                                        <div class="message-content bot-message" id="previewWelcome"
+                                             style="background:#FFFFFF;color:#1A202C;">
+                                            Hello! How can I help you?
+                                        </div>
+                                        <div class="preview-buttons-container" id="previewButtonsContainer"></div>
+                                    </div>
+                                </div>
+                                <div class="preview-message user">
+                                    <div class="message-content user-message" id="previewUserMsg"
+                                         style="background:#4F46E5;color:#FFFFFF;">
+                                        This is how user messages look
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="preview-footer">
+                                <label><input type="text" placeholder="Type your message…" disabled></label>
+                                <button type="button" disabled id="previewSendBtn" style="background:#4F46E5;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"/>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div><input type="hidden" id="welcome_buttons" name="welcome_buttons" value="[]">
+            <input type="hidden" name="use_ml_model" value="">
+
+            <div class="form-actions">
+                <a href="{{ url_for('bots') }}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit" onclick="return validateForm()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                    Choose Image
+                    Create Chatbot
                 </button>
-
-                <button type="button" class="btn-adjust small" id="adjustAvatarBtn" onclick="openAvatarEditor()" style="display: none;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="1"></circle>
-                        <path d="M4.6 4.6l2.8 2.8"></path>
-                        <path d="M19.4 19.4l-2.8-2.8"></path>
-                        <path d="M4.6 19.4l2.8-2.8"></path>
-                        <path d="M19.4 4.6l-2.8 2.8"></path>
-                        <path d="M12 2v3m0 12v3"></path>
-                        <path d="M2 12h3m12 0h3"></path>
-                    </svg>
-                    Adjust Image
-                </button>
-
-                <button type="button" class="btn-remove small" id="removeAvatar" style="display: none">
-                    Remove
-                </button>
-
-                <!-- FIXED: Added hidden input for avatar data -->
-                <input type="hidden" id="bot_avatar_data" name="bot_avatar_data" value="">
-                <input type="hidden" id="remove_avatar_flag" name="remove_avatar" value="false">
-                <p class="info-text">💡 Upload an image and use adjust button to position and zoom.</p>
             </div>
 
-        <!-- CLOSE THE WRAPPER DIV -->
+        </form>
+        </div>
+    </main>
+</div>
+
+<div class="modal" id="avatarEditorModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Adjust Your Avatar</h3>
+            <button class="btn-close" type="button" onclick="closeAvatarEditor()">✕</button>
+        </div>
+        <div class="image-editor">
+            <div class="preview-window">
+                <div class="preview-circle" id="previewCircle">
+                    <canvas id="previewCanvas" style="width:100%;height:100%;"></canvas>
+                </div>
+            </div>
+            <div class="controls-group">
+                <div class="control-item">
+                    <label for="zoomSlider">Zoom</label>
+                    <input type="range" id="zoomSlider" min="0" max="100" value="100" step="1">
+                    <span class="value-display"><span id="zoomValue">100</span>%</span>
+                </div>
+                <div class="control-item">
+                    <label for="xSlider">Horizontal</label>
+                    <input type="range" id="xSlider" min="-150" max="150" value="0" step="5">
+                    <span class="value-display" id="xValue">0px</span>
+                </div>
+                <div class="control-item">
+                    <label for="ySlider">Vertical</label>
+                    <input type="range" id="ySlider" min="-150" max="150" value="0" step="5">
+                    <span class="value-display" id="yValue">0px</span>
+                </div>
+                <button class="btn-av choose" style="margin-top:8px;width:100%;justify-content:center;"
+                        type="button" onclick="resetEditorSliders()">Reset Position</button>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" type="button" onclick="closeAvatarEditor()">Cancel</button>
+            <button class="btn-save"   type="button" onclick="saveAvatarImage()">Apply Changes</button>
         </div>
     </div>
 </div>
-                            <!-- Appearance & Colors -->
-                            <div class="form-section compact">
-                                <h2>Appearance & Colors</h2>
 
-                                <div class="color-grid compact">
-                                    <div class="form-group">
-                                        <label for="theme_color">Theme Color</label>
-                                        <div class="color-picker-wrapper">
-                                            <input type="color" id="theme_color" name="theme_color" value="#4F46E5">
-                                            <span class="color-value">#4F46E5</span>
-                                        </div>
-                                    </div>
+<button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+</button>
 
-                                    <div class="form-group">
-                                        <label for="chat_background_color">Chat BG</label>
-                                        <div class="color-picker-wrapper">
-                                            <input type="color" id="chat_background_color" name="chat_background_color" value="#F7FAFC">
-                                            <span class="color-value-bg">#F7FAFC</span>
-                                        </div>
-                                    </div>
+<script>
+/* ── Sidebar ── */
+document.getElementById('mobileMenuToggle').addEventListener('click', function(){
+    document.getElementById('sidebar').classList.toggle('open');
+});
+document.getElementById('accountMenu').addEventListener('click', function(e){
+    e.preventDefault();
+    this.classList.toggle('expanded');
+    document.getElementById('accountSubmenu').classList.toggle('open');
+});
 
-                                    <div class="form-group">
-                                        <label for="bot_message_color">Bot Bubble</label>
-                                        <div class="color-picker-wrapper">
-                                            <input type="color" id="bot_message_color" name="bot_message_color" value="#FFFFFF">
-                                            <span class="color-value-bot-bg">#FFFFFF</span>
-                                        </div>
-                                    </div>
+/* ══ PRESET THEME APPLIER ══ */
+function applyTheme(themeColor, bgColor, botBubbleColor, botTextColor, userTextColor) {
+    document.getElementById('theme_color').value = themeColor;
+    document.getElementById('chat_background_color').value = bgColor;
+    document.getElementById('bot_message_color').value = botBubbleColor;
+    document.getElementById('bot_text_color').value = botTextColor;
+    document.getElementById('user_text_color').value = userTextColor;
 
-                                    <div class="form-group">
-                                        <label for="bot_text_color">Bot Text</label>
-                                        <div class="color-picker-wrapper">
-                                            <input type="color" id="bot_text_color" name="bot_text_color" value="#1A202C">
-                                            <span class="color-value-bot-text">#1A202C</span>
-                                        </div>
-                                    </div>
+    onColor('theme', themeColor);
+    onColor('chatBg', bgColor);
+    onColor('botBg', botBubbleColor);
+    onColor('botText', botTextColor);
+    onColor('userText', userTextColor);
+}
 
-                                    <div class="form-group">
-                                        <label for="user_text_color">User Text</label>
-                                        <div class="color-picker-wrapper">
-                                            <input type="color" id="user_text_color" name="user_text_color" value="#FFFFFF">
-                                            <span class="color-value-user-text">#FFFFFF</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+/* ══ COLOR STATE ══ */
+var clr = {theme:'#4F46E5', chatBg:'#F7FAFC', botBg:'#FFFFFF', botText:'#1A202C', userText:'#FFFFFF'};
 
-                            <!-- Welcome Message & Buttons -->
-                            <div class="form-section compact">
-                                <h2>Welcome Message & Buttons</h2>
+function onColor(key, val) {
+    clr[key] = val;
+    var hexMap = {theme:'cv_theme',chatBg:'cv_chatBg',botBg:'cv_botBg',botText:'cv_botText',userText:'cv_userText'};
+    var el = document.getElementById(hexMap[key]);
+    if (el) el.textContent = val.toUpperCase();
+    if (key === 'theme') document.getElementById('user_message_color').value = val;
+    applyPreview();
+}
 
-                                <div class="form-group">
-                                    <label for="welcome_message">Welcome Message <span class="required">*</span></label>
-                                    <textarea id="welcome_message" name="welcome_message" rows="2" required placeholder="Hello! How can I help you?">Hello! How can I help you?</textarea>
-                                </div>
+function applyPreview() {
+    document.getElementById('previewHeader').style.background  = clr.theme;
+    document.getElementById('previewSendBtn').style.background = clr.theme;
+    document.getElementById('previewBody').style.background    = clr.chatBg;
+    var wb = document.getElementById('previewWelcome');
+    wb.style.background = clr.botBg;
+    wb.style.color      = clr.botText;
+    var um = document.getElementById('previewUserMsg');
+    um.style.background = clr.theme;
+    um.style.color      = clr.userText;
+    if (!uploadedAvatarUrl) {
+        var pa = document.getElementById('previewAvatar');
+        if (pa) pa.style.border = '2px solid ' + clr.theme;
+    }
+    renderPreviewChips();
+}
 
-                                <!-- Welcome Buttons Container -->
-                                <div class="welcome-buttons-section">
-                                    <div class="section-header">
-                                        <label>Welcome Buttons</label>
-                                        <button type="button" class="btn-add-button" id="addWelcomeButton">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            </svg>
-                                            Add Button
-                                        </button>
-                                    </div>
+function updatePreviewBotName(v) { document.getElementById('previewBotName').textContent = v || 'AI Assistant'; }
+function updatePreviewWelcome(v) { document.getElementById('previewWelcome').textContent = v || 'Hello! How can I help you?'; }
 
-                                    <div id="welcomeButtonsList" class="welcome-buttons-list">
-                                        <!-- Buttons will be added here dynamically -->
-                                    </div>
-                                </div>
-                            </div>
+/* ══ AVATAR STATE ══ */
+var uploadedAvatarUrl = null;
+var originalAvatarUrl = null;
+var currentZoom = 100, currentX = 0, currentY = 0;
+var CIRCLE_SIZE = 180, OUTPUT_SIZE = 100;
 
-                        </div>
+var DEFAULT_AVATAR_SVG = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+var DEFAULT_ICON_SVG   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
-                        <!-- Right Column: Live Preview -->
-                        <div class="preview-column">
-                            <div class="preview-sticky">
-                                <h2>Live Preview</h2>
-                                <div class="chatbot-preview">
-                                    <div class="preview-header" id="previewHeader">
-                                        <div class="preview-bot-icon" id="previewIcon">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                            </svg>
-                                        </div>
-                                        <span id="previewBotName">AI Assistant</span>
-                                    </div>
-                                    <div class="preview-body" id="previewBody">
-                                        <div class="preview-message bot">
-                                            <div class="message-avatar" id="previewAvatar">A</div>
-                                            <div class="message-wrapper">
-                                                <div class="message-content bot-message" id="previewWelcome">Hello! How can I help you?</div>
-                                                <div class="preview-buttons-container" id="previewButtonsContainer">
-                                                    <!-- Preview buttons will appear here -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="preview-message user">
-                                            <div class="message-content user-message">This is how user messages look</div>
-                                        </div>
-                                    </div>
-                                    <div class="preview-footer">
-                                        <label>
-                                            <input type="text" placeholder="Type your message..." disabled>
-                                        </label>
-                                        <button type="button" disabled id="previewSendBtn">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+function setAllPreviews(src) {
+    var img = '<img src="' + src + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    document.getElementById('avatarPreview').innerHTML = img;
+    var pi = document.getElementById('previewIcon');
+    pi.innerHTML   = img;
+    pi.style.background = 'white';
+    var pa = document.getElementById('previewAvatar');
+    pa.innerHTML   = img;
+    pa.style.border = '2px solid #e2e8f0';
+}
 
-                    </div>
+function clearAllPreviews() {
+    document.getElementById('avatarPreview').innerHTML = DEFAULT_AVATAR_SVG;
+    document.getElementById('previewIcon').innerHTML   = DEFAULT_ICON_SVG;
+    var pa = document.getElementById('previewAvatar');
+    pa.textContent = (document.getElementById('bot_name').value.charAt(0) || 'A').toUpperCase();
+    pa.style.border = '2px solid ' + clr.theme;
+}
 
-                    <!-- Hidden input to store button data -->
-                    <input type="hidden" id="welcome_buttons" name="welcome_buttons" value="[]">
+function handleAvatarUpload(inp) {
+    var f = inp.files[0];
+    if (!f) return;
+    if (f.size > 2 * 1024 * 1024) { alert('File size must be less than 2MB'); inp.value = ''; return; }
+    var r = new FileReader();
+    r.onload = function(e) {
+        originalAvatarUrl = e.target.result;
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var MAX_SIZE = 400;
+            var width = img.width, height = img.height;
+            if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+            else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+            canvas.width = width; canvas.height = height;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+            var compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            uploadedAvatarUrl = compressedBase64;
+            currentZoom = 100; currentX = 0; currentY = 0;
+            document.getElementById('bot_avatar_data').value = compressedBase64;
+            document.getElementById('remove_avatar_flag').value = 'false';
+            setAllPreviews(compressedBase64);
+            document.getElementById('adjustAvatarBtn').style.display = 'inline-flex';
+            document.getElementById('removeAvatar').style.display = 'inline-flex';
+        };
+        img.src = e.target.result;
+    };
+    r.readAsDataURL(f);
+}
 
-                    <div class="form-actions">
-                        <a href="{{ url_for('dashboard') }}" class="btn-cancel">Cancel</a>
-                        <button type="submit" class="btn-submit">Create Chatbot</button>
-                    </div>
-                </form>
-            </div>
-        </main>
-    </div>
+function removeAvatarImage() {
+    uploadedAvatarUrl = null; originalAvatarUrl = null;
+    document.getElementById('bot_avatar_data').value = '';
+    document.getElementById('remove_avatar_flag').value = 'true';
+    document.getElementById('bot_avatar').value = '';
+    document.getElementById('adjustAvatarBtn').style.display = 'none';
+    document.getElementById('removeAvatar').style.display = 'none';
+    clearAllPreviews();
+}
 
-     <!-- Avatar Editor Modal -->
-    <div class="modal" id="avatarEditorModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Adjust Your Avatar</h3>
-                <button class="btn-close" type="button" onclick="closeAvatarEditor()">✕</button>
-            </div>
+/* ══ AVATAR EDITOR ══ */
+function openAvatarEditor()  { if (!uploadedAvatarUrl) return; document.getElementById('avatarEditorModal').classList.add('open'); renderEditorCanvas(); }
+function closeAvatarEditor() { document.getElementById('avatarEditorModal').classList.remove('open'); }
 
-            <div class="image-editor">
-                <!-- Preview Window -->
-                <div class="preview-window">
-                    <div class="preview-circle" id="previewCircle">
-                        <canvas id="previewCanvas" style="width: 100%; height: 100%;"></canvas>
-                    </div>
-                </div>
+function resetEditorSliders() {
+    currentZoom = 100; currentX = 0; currentY = 0;
+    document.getElementById('zoomSlider').value = 100;
+    document.getElementById('xSlider').value    = 0;
+    document.getElementById('ySlider').value    = 0;
+    updateSliderLabels(); renderEditorCanvas();
+}
 
-                <!-- Controls -->
-                <div class="controls-group">
-                    <!-- Zoom Control -->
-                    <div class="control-item">
-                        <label>Zoom Level</label>
-                        <label for="zoomSlider"></label>
-                        <input type="range" id="zoomSlider" min="0" max="100" value="100" step="1" />
-                        <span class="value-display"><span id="zoomValue">100</span>%</span>
-                    </div>
+function updateSliderLabels() {
+    document.getElementById('zoomValue').textContent = document.getElementById('zoomSlider').value;
+    document.getElementById('xValue').textContent    = document.getElementById('xSlider').value + 'px';
+    document.getElementById('yValue').textContent    = document.getElementById('ySlider').value + 'px';
+}
 
-                    <!-- X Position Control -->
-                    <div class="control-item">
-                        <label>Horizontal Position</label>
-                        <label for="xSlider"></label>
-                        <input type="range" id="xSlider" min="-150" max="150" value="0" step="5" />
-                        <span class="value-display" id="xValue">0px</span>
-                    </div>
+document.getElementById('zoomSlider').addEventListener('input', function(){ currentZoom = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
+document.getElementById('xSlider').addEventListener('input',    function(){ currentX    = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
+document.getElementById('ySlider').addEventListener('input',    function(){ currentY    = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
 
-                    <!-- Y Position Control -->
-                    <div class="control-item">
-                        <label>Vertical Position</label>
-                        <label for="ySlider"></label>
-                        <input type="range" id="ySlider" min="-150" max="150" value="0" step="5" />
-                        <span class="value-display" id="yValue">0px</span>
-                    </div>
+function renderEditorCanvas() {
+    var canvas = document.getElementById('previewCanvas');
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    img.onload = function() {
+        canvas.width = CIRCLE_SIZE; canvas.height = CIRCLE_SIZE;
+        ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE);
+        ctx.beginPath(); ctx.arc(CIRCLE_SIZE/2, CIRCLE_SIZE/2, CIRCLE_SIZE/2, 0, Math.PI*2); ctx.clip();
+        var scale = currentZoom / 100;
+        var sw = img.width * scale, sh = img.height * scale;
+        ctx.drawImage(img, (CIRCLE_SIZE - sw)/2 + currentX, (CIRCLE_SIZE - sh)/2 + currentY, sw, sh);
+    };
+    img.src = originalAvatarUrl || uploadedAvatarUrl;
+}
 
-                    <!-- Reset Button -->
-                    <button class="btn-upload" style="margin-top: 8px; width: 100%; justify-content: center;" type="button" onclick="resetAvatarImage()">
-                        Reset to Default
-                    </button>
-                </div>
-            </div>
+function saveAvatarImage() {
+    var outCanvas = document.createElement('canvas');
+    outCanvas.width = OUTPUT_SIZE; outCanvas.height = OUTPUT_SIZE;
+    var ctx = outCanvas.getContext('2d');
+    var img = new Image();
+    img.onload = function() {
+        ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+        ctx.beginPath(); ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2); ctx.clip();
+        ctx.fillStyle = "#FFFFFF"; ctx.fill();
+        var scale = currentZoom / 100;
+        var sw = img.width * scale, sh = img.height * scale;
+        var ratio = OUTPUT_SIZE / CIRCLE_SIZE;
+        ctx.drawImage(img, (OUTPUT_SIZE - sw)/2 + (currentX * ratio), (OUTPUT_SIZE - sh)/2 + (currentY * ratio), sw, sh);
+        uploadedAvatarUrl = outCanvas.toDataURL('image/jpeg', 0.8);
+        document.getElementById('bot_avatar_data').value = uploadedAvatarUrl;
+        setAllPreviews(uploadedAvatarUrl);
+        closeAvatarEditor();
+    };
+    img.onerror = function(){ alert('Error processing image. Please try again.'); };
+    img.src = originalAvatarUrl || uploadedAvatarUrl;
+}
 
-            <!-- Modal Actions -->
-            <div class="modal-actions">
-                <button class="btn-cancel" type="button" onclick="closeAvatarEditor()">Cancel</button>
-                <button class="btn-save" type="button" onclick="saveAvatarImage()">Apply Changes</button>
-            </div>
-        </div>
-    </div>
+/* ══ WELCOME BUTTONS ══ */
+var wbBtns = [];
 
+function addNewWbButton()       { wbBtns.push({text:'', type:'message', value:''}); renderWbList(); }
+function removeWbButton(i)      { wbBtns.splice(i, 1); renderWbList(); }
+function updateWbField(i, f, v) { if (wbBtns[i]) { wbBtns[i][f] = v; renderPreviewChips(); syncJson(); } }
 
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-    </button>
+function renderWbList() {
+    var list  = document.getElementById('wbList');
+    var empty = document.getElementById('wbEmpty');
+    if (wbBtns.length === 0) { if (empty) empty.style.display = 'block'; list.querySelectorAll('.wb-item').forEach(function(el){el.remove();}); syncJson(); return; }
+    if (empty) empty.style.display = 'none';
+    list.innerHTML = '';
+    wbBtns.forEach(function(btn, i) {
+        var div = document.createElement('div');
+        div.className = 'wb-item';
+        div.innerHTML =
+            '<div class="wb-item-header">' +
+                '<div class="wb-item-num"><div class="wb-num-badge">'+(i+1)+'</div>Button '+(i+1)+'</div>' +
+                '<button type="button" class="btn-wb-remove" onclick="removeWbButton('+i+')">' +
+                '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove</button>' +
+            '</div>' +
+            '<div class="wb-item-body">' +
+                '<div class="wb-field"><label>Button Label</label>' +
+                '<input type="text" placeholder="e.g., Get Started" value="'+esc(btn.text)+'" oninput="updateWbField('+i+',\'text\',this.value)"></div>' +
+                '<div class="wb-field"><label>Action Type</label>' +
+                '<select onchange="updateWbField('+i+',\'type\',this.value)">' +
+                '<option value="message"'+(btn.type==='message'?' selected':'')+'>Send Message</option>' +
+                '<option value="url"'+(btn.type==='url'?' selected':'')+'>Open URL</option>' +
+                '</select></div>' +
+                '<div class="wb-field wb-full"><label>'+valLabel(btn.type)+'</label>' +
+                '<input type="text" placeholder="'+valPlaceholder(btn.type)+'" value="'+esc(btn.value)+'" oninput="updateWbField('+i+',\'value\',this.value)"></div>' +
+            '</div>';
+        list.appendChild(div);
+    });
+    renderPreviewChips(); syncJson();
+}
 
-    <script src="{{ url_for('static', filename='js/create.js') }}"></script>
+function valLabel(t)       { return t==='url'?'URL':t==='intent'?'Intent Tag':'Message Text'; }
+function valPlaceholder(t) { return t==='url'?'https://example.com':t==='intent'?'e.g., pricing_info':'e.g., Tell me about pricing'; }
+
+function renderPreviewChips() {
+    var c = document.getElementById('previewButtonsContainer'); if (!c) return;
+    c.innerHTML = wbBtns.filter(function(b){return b.text.trim();}).map(function(b){
+        return '<button class="preview-button" type="button" style="border-color:'+clr.theme+';color:'+clr.theme+'">'+esc(b.text)+'</button>';
+    }).join('');
+}
+
+function syncJson() {
+    document.getElementById('welcome_buttons').value = JSON.stringify(
+        wbBtns.map(function(b){ return {text:b.text,type:b.type,value:b.value,has_submenu:false,submenu_items:[]}; })
+    );
+}
+
+function esc(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ══════════════════════════════════════════════════════════
+   CONVERSATION FLOW BUILDER
+   ══════════════════════════════════════════════════════════ */
+var flowSteps = [];
+
+function genId() { return 'step_' + Math.random().toString(36).substr(2, 8); }
+
+function addFlowStep() {
+    flowSteps.push({ id: genId(), message: '', isFinal: false, buttons: [] });
+    renderFlowSteps();
+}
+
+function removeFlowStep(id) {
+    flowSteps = flowSteps.filter(function(s){ return s.id !== id; });
+    flowSteps.forEach(function(s){
+        s.buttons.forEach(function(b){ if (b.goToStepId === id) b.goToStepId = ''; });
+    });
+    renderFlowSteps();
+}
+
+function toggleFlowStep(id) {
+    var body = document.getElementById('fsb_' + id);
+    var btn  = document.getElementById('fst_' + id);
+    if (!body || !btn) return;
+    body.classList.toggle('collapsed');
+    btn.classList.toggle('collapsed');
+}
+
+function updateStepMessage(id, val) {
+    var s = flowSteps.find(function(s){ return s.id === id; });
+    if (s) { s.message = val; updateStepSubtitle(id); syncFlowJson(); }
+}
+
+function updateStepFinal(id, checked) {
+    var s = flowSteps.find(function(s){ return s.id === id; });
+    if (!s) return;
+    s.isFinal = checked;
+    var card = document.getElementById('fsc_' + id);
+    if (card) card.classList.toggle('is-final', checked);
+    // Update title inside header
+    var titleEl = document.getElementById('fstitle_' + id);
+    if (titleEl) {
+        var idx = flowSteps.indexOf(s);
+        titleEl.textContent = 'Step ' + (idx + 1) + (checked ? ' · Final' : '');
+    }
+    var btnSection = document.getElementById('fsbsec_' + id);
+    if (btnSection) btnSection.style.display = checked ? 'none' : '';
+    syncFlowJson();
+}
+
+function addStepButton(stepId) {
+    var s = flowSteps.find(function(s){ return s.id === stepId; });
+    if (!s) return;
+    s.buttons.push({ label: '', goToStepId: '' });
+    renderStepButtons(stepId);
+    syncFlowJson();
+}
+
+function removeStepButton(stepId, bi) {
+    var s = flowSteps.find(function(s){ return s.id === stepId; });
+    if (!s) return;
+    s.buttons.splice(bi, 1);
+    renderStepButtons(stepId);
+    syncFlowJson();
+}
+
+function updateStepButton(stepId, bi, field, val) {
+    var s = flowSteps.find(function(s){ return s.id === stepId; });
+    if (s && s.buttons[bi]) { s.buttons[bi][field] = val; syncFlowJson(); }
+}
+
+function updateStepSubtitle(id) {
+    var s = flowSteps.find(function(s){ return s.id === id; });
+    var el = document.getElementById('fssubtitle_' + id);
+    if (!el || !s) return;
+    var preview = s.message ? (s.message.length > 45 ? s.message.substr(0,45)+'…' : s.message) : 'No message yet';
+    el.textContent = preview;
+}
+
+function renderFlowSteps() {
+    var list  = document.getElementById('flowStepsList');
+    var empty = document.getElementById('flowEmpty');
+    if (!list) return;
+
+    if (flowSteps.length === 0) {
+        if (empty) empty.style.display = 'flex';
+        list.innerHTML = '';
+        syncFlowJson();
+        return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    list.innerHTML = '';
+
+    flowSteps.forEach(function(step, idx) {
+        // Connector arrow
+        if (idx > 0) {
+            var conn = document.createElement('div');
+            conn.className = 'flow-step-connector';
+            conn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>';
+            list.appendChild(conn);
+        }
+
+        var card = document.createElement('div');
+        card.className = 'flow-step-card' + (step.isFinal ? ' is-final' : '');
+        card.id = 'fsc_' + step.id;
+
+        var msgPreview = step.message
+            ? (step.message.length > 45 ? step.message.substr(0,45)+'…' : step.message)
+            : 'No message yet';
+
+        card.innerHTML =
+            '<div class="flow-step-header" onclick="toggleFlowStep(\'' + step.id + '\')">' +
+                '<div class="flow-step-header-left">' +
+                    '<div class="flow-step-badge">' + (idx + 1) + '</div>' +
+                    '<div>' +
+                        '<div class="flow-step-title" id="fstitle_' + step.id + '">Step ' + (idx+1) + (step.isFinal?' · Final':'') + '</div>' +
+                        '<div class="flow-step-subtitle" id="fssubtitle_' + step.id + '">' + esc(msgPreview) + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="flow-step-actions">' +
+                    '<button type="button" class="btn-step-remove" onclick="event.stopPropagation();removeFlowStep(\'' + step.id + '\')">' +
+                        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove' +
+                    '</button>' +
+                    '<button type="button" class="flow-step-toggle" id="fst_' + step.id + '" onclick="event.stopPropagation();toggleFlowStep(\'' + step.id + '\')">' +
+                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+                    '</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="flow-step-body" id="fsb_' + step.id + '">' +
+                '<div class="flow-msg-field">' +
+                    '<label>Bot Message <span style="color:#e53e3e">*</span></label>' +
+                    '<textarea rows="3" placeholder="e.g., Great! What would you like to know?" ' +
+                        'oninput="updateStepMessage(\'' + step.id + '\',this.value)">' + esc(step.message) + '</textarea>' +
+                '</div>' +
+                '<label class="flow-final-toggle">' +
+                    '<input type="checkbox"' + (step.isFinal ? ' checked' : '') + ' ' +
+                        'onchange="updateStepFinal(\'' + step.id + '\',this.checked)">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    'This is a final message (ends the conversation, no buttons)' +
+                '</label>' +
+                '<div id="fsbsec_' + step.id + '"' + (step.isFinal ? ' style="display:none"' : '') + '>' +
+                    '<div class="flow-btn-section-label">' +
+                        '<span>Buttons</span>' +
+                        '<button type="button" class="btn-add-step-btn" onclick="addStepButton(\'' + step.id + '\')">' +
+                            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Button' +
+                        '</button>' +
+                    '</div>' +
+                    '<div id="fsblist_' + step.id + '"></div>' +
+                '</div>' +
+            '</div>';
+
+        list.appendChild(card);
+        renderStepButtons(step.id);
+    });
+
+    syncFlowJson();
+}
+
+function renderStepButtons(stepId) {
+    var s = flowSteps.find(function(s){ return s.id === stepId; });
+    var container = document.getElementById('fsblist_' + stepId);
+    if (!s || !container) return;
+
+    if (s.buttons.length === 0) {
+        container.innerHTML = '<div class="step-btn-empty">No buttons yet — add one to let users navigate forward</div>';
+        return;
+    }
+
+    // Build options from all OTHER steps
+    var stepOptions = flowSteps
+        .filter(function(fs){ return fs.id !== stepId; })
+        .map(function(fs){
+            var idx = flowSteps.indexOf(fs);
+            var label = 'Step ' + (idx + 1) + (fs.message ? ': ' + fs.message.substr(0, 28) + (fs.message.length > 28 ? '…' : '') : '');
+            return '<option value="' + fs.id + '"' + ('' === fs.id ? ' selected' : '') + '>' + esc(label) + '</option>';
+        }).join('');
+
+    container.innerHTML = '';
+    s.buttons.forEach(function(btn, bi) {
+        var item = document.createElement('div');
+        item.className = 'step-btn-item';
+
+        // Build select with correct selected option
+        var selectHtml = '<select onchange="updateStepButton(\'' + stepId + '\',' + bi + ',\'goToStepId\',this.value)">' +
+            '<option value="">— Go to step —</option>';
+        flowSteps.filter(function(fs){ return fs.id !== stepId; }).forEach(function(fs){
+            var idx = flowSteps.indexOf(fs);
+            var label = 'Step ' + (idx + 1) + (fs.message ? ': ' + fs.message.substr(0,28) + (fs.message.length>28?'…':'') : '');
+            selectHtml += '<option value="' + fs.id + '"' + (btn.goToStepId === fs.id ? ' selected' : '') + '>' + esc(label) + '</option>';
+        });
+        selectHtml += '</select>';
+
+        item.innerHTML =
+            '<input type="text" placeholder="Button label" value="' + esc(btn.label) + '" ' +
+                'oninput="updateStepButton(\'' + stepId + '\',' + bi + ',\'label\',this.value)">' +
+            selectHtml +
+            '<button type="button" class="btn-remove-step-btn" onclick="removeStepButton(\'' + stepId + '\',' + bi + ')">' +
+                '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+            '</button>';
+        container.appendChild(item);
+    });
+}
+
+function syncFlowJson() {
+    document.getElementById('flow_steps').value = JSON.stringify(flowSteps);
+}
+
+/* ══ VALIDATION ══ */
+function validateForm() {
+    var n = document.getElementById('name').value.trim();
+    var b = document.getElementById('bot_name').value.trim();
+    var w = document.getElementById('welcome_message').value.trim();
+    if (!n) { showAlert('Please enter a Chatbot Name.', 'danger'); return false; }
+    if (!b) { showAlert('Please enter a Bot Display Name.', 'danger'); return false; }
+    if (!w) { showAlert('Please enter a Welcome Message.', 'danger'); return false; }
+    syncJson();
+    syncFlowJson();
+    return true;
+}
+
+function showAlert(msg, type) {
+    var d = document.createElement('div'); d.className = 'alert alert-'+type;
+    d.innerHTML = '<span>'+msg+'</span><button class="alert-close" type="button" onclick="this.closest(\'.alert\').remove()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    document.getElementById('alerts').prepend(d);
+    setTimeout(function(){ if (d.parentNode) d.remove(); }, 5000);
+}
+
+/* init */
+applyPreview();
+</script>
+
+<script src="{{ url_for('static', filename='js/create.js') }}"></script>
 </body>
 </html>

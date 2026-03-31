@@ -3,345 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview {{ chatbot.name }} - Chatbot Panel</title>
+    <title>Preview: {{ chatbot.name }} — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/preview.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    {% if request.args.get('embed') == '1' %}
+    <style>
+        /* ── Embed mode: hide sidebar & outer chrome ── */
+        body { background: #eef0f6 !important; overflow: auto !important; }
+        .sidebar, .mobile-menu-toggle { display: none !important; }
+        .dashboard-container { display: block !important; }
+        .main-content { margin-left: 0 !important; padding: 14px 18px 24px !important; overflow: visible !important; }
+        .page-header { display: none !important; }
+        .breadcrumb, .bot-hero, .page-tab-bar { display: none !important; }
+    </style>
+    {% endif %}
+
+    <style>
+        /* ════ LAYOUT CSS FOR PREVIEW WIDGET ════ */
+        .preview-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+        .preview-info {
+            flex: 1;
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .info-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+        .info-row { display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .info-row .label { color: #64748b; font-weight: 500; }
+        .info-row .value { color: #0f172a; font-weight: 600; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-badge.active { background: #dcfce7; color: #166534; }
+        .status-badge.inactive { background: #f1f5f9; color: #64748b; }
+
+        /* ════ CHAT WIDGET CONTAINER ════ */
+        .chatbot-widget-container {
+            width: 400px;
+            flex-shrink: 0;
+        }
+        .chatbot-widget {
+            width: 100%;
+            height: 650px; /* Fixed height to simulate a phone/widget */
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Header */
+        .chat-header { padding: 16px; display: flex; align-items: center; color: #fff; flex-shrink: 0; }
+        .chat-bot-info { display: flex; align-items: center; gap: 12px; }
+        .chat-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .bot-name { font-weight: 600; font-size: 16px; line-height: 1.2; }
+        .bot-status { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+
+        /* Messages Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+
+        /* Input Area */
+        .chat-input-container {
+            padding: 16px;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .chat-input-container input {
+            flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 24px; outline: none; font-size: 14px; background: #f8fafc; transition: all 0.2s;
+        }
+        .chat-input-container input:focus { background: #fff; border-color: {{ chatbot.theme_color or '#4F46E5' }}; }
+        .chat-input-container button {
+            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; flex-shrink: 0;
+        }
+        .chat-input-container button:hover { transform: scale(1.05); }
+        .chat-input-container button svg { width: 18px; height: 18px; }
+
+        /* ════ BUBBLE CSS ════ */
+        .msg-row { display: flex; margin-bottom: 16px; width: 100%; font-family: 'Inter', sans-serif; align-items: flex-end; }
+        .msg-bot { justify-content: flex-start; }
+        .msg-user { justify-content: flex-end; }
+
+        .msg-avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; margin-right: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #e2e8f0; }
+        .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .msg-avatar svg { width: 16px; height: 16px; }
+
+     .bubble-bot {
+    background: {{ chatbot.bot_message_color or '#FFFFFF' }};
+    color: {{ chatbot.bot_text_color or '#1A202C' }};
+    padding: 12px 16px;
+    border-radius: 16px 16px 16px 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    max-width: 80%;
+    white-space: pre-wrap;
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+
+    /* ADD THESE TWO LINES */
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+.bubble-bot a {
+    color: {{ chatbot.theme_color or '#4F46E5' }};
+    text-decoration: underline;
+    font-weight: 500;
+
+    /* ADD THIS LINE TO BREAK LONG URLS */
+    word-break: break-all;
+}
+
+        /* Sharp Bottom-Right for User */
+        .bubble-user { background: {{ chatbot.theme_color or '#4F46E5' }}; color: {{ chatbot.user_text_color or '#FFFFFF' }}; padding: 12px 16px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: 80%; white-space: pre-wrap; }
+
+        /* 🌟 Buttons INSIDE the chat bubble 🌟 */
+        .flow-btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px; /* Space between text and buttons */
+            width: 100%;
+            min-width: 200px;
+        }
+        .flow-btn {
+            background: {{ chatbot.theme_color or '#4F46E5' }}; /* Solid color */
+            color: #ffffff; /* White text */
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .flow-btn:hover {
+            filter: brightness(0.85);
+            transform: translateY(-1px);
+        }
+
+        /* Typing Dots */
+        .typing-dots { display: flex; align-items: center; height: 20px; gap: 4px; padding: 0 4px; }
+        .typing-dots span { width: 6px; height: 6px; background-color: {{ chatbot.bot_text_color or '#1A202C' }}; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; opacity: 0.6; }
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .preview-container { flex-direction: column; }
+            .chatbot-widget-container { width: 100%; display: flex; justify-content: center; }
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-                        <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
-                        <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                        <defs>
-                            <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
-                                <stop offset="0%" stop-color="#667eea"/>
-                                <stop offset="100%" stop-color="#764ba2"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span>ChatBot Builder</span>
-                </div>
+<div class="dashboard-container">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
+                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>ChatBot Builder</span>
             </div>
+        </div>
 
-            <nav class="nav-menu">
-                <div class="nav-section">
-                    <a href="{{ url_for('dashboard') }}" class="nav-item active" data-page="dashboard">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                        <span>Dashboard</span>
-                    </a>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Workspace</div>
-                    <a href="#" class="nav-item" id="botsMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span>Bots</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                    <div class="submenu" id="botsSubmenu">
-                        {% if chatbots %}
-                            {% for bot in chatbots %}
-                            <a href="{{ url_for('preview_chatbot', chatbot_id=bot.id) }}" class="submenu-item {% if bot.id == chatbot.id %}active{% endif %}" data-chatbot-id="{{ bot.id }}">
-                                <span class="dot"></span>
-                                <span>{{ bot.name }}</span>
-                                <span class="status-indicator {{ 'active' if bot.is_active else 'inactive' }}"></span>
-                            </a>
-                            {% endfor %}
-                        {% else %}
-                            <div class="submenu-item empty">
-                                <span class="dot"></span>
-                                <span>No chatbots created yet</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                    <!--<a href="#" class="nav-item" data-page="analytics">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="20" x2="12" y2="10"></line>
-                            <line x1="18" y1="20" x2="18" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="16"></line>
-                        </svg>
-                        <span>Analytics</span>
-                    </a>
-
-                    <a href="#" class="nav-item" data-page="integration">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M12 1v6m0 6v6m-6-6H1m6 0h6"></path>
-                        </svg>
-                        <span>Integration</span>
-                    </a>
-                </div>-->
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item" id="accountMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span>My Account</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                    <div class="submenu" id="accountSubmenu">
-                        <a href="{{ url_for('edit_profile') }}" class="submenu-item" data-page="Edit Profile">
-                            <span class="dot"></span>
-                            <span>Edit Profile</span>
-                        </a>
-                        <a href="{{ url_for('change_password') }}" class="submenu-item" data-page="Change Password">
-                            <span class="dot"></span>
-                            <span>Change Password</span>
-                        </a>
-                        <a href="{{ url_for('manage_subscription') }}" class="submenu-item" data-page="Subscription">
-                            <span class="dot"></span>
-                            <span>Subscription</span>
-                        </a>
-                    </div>
-                </div>
-            </nav>
-
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-avatar">{{ session.username[0].upper() }}</div>
-                    <div class="user-details">
-                        <div class="user-name">{{ session.username }}</div>
-                        <div class="user-email">{{ session.email }}</div>
-                    </div>
-                </div>
-                <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
                 </a>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="page-header">
-                <div>
-                    <h1>Preview: {{ chatbot.name }}</h1>
-                    <p>Test your chatbot before going live</p>
-                </div>
-                <a href="{{ url_for('dashboard') }}" class="btn-secondary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Back to Dashboard
+            <div class="nav-section">
+                <div class="nav-section-title">Workspace</div>
+                <a href="#" class="nav-item active" id="botsMenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Bots</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
+                <div class="submenu open" id="botsSubmenu">
+                    {% if chatbots %}
+                    {% for bot in chatbots %}
+                    <a href="{{ url_for('preview_chatbot', chatbot_id=bot.id) }}" class="submenu-item {% if bot.id == chatbot.id %}active{% endif %}">
+                        <span class="dot"></span><span>{{ bot.name }}</span>
+                        <span class="status-indicator {{ 'active' if bot.is_active else 'inactive' }}"></span>
+                    </a>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="{{ url_for('bots') }}">Bots</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <a href="{{ url_for('bot_detail', chatbot_id=chatbot.id) }}">{{ chatbot.name }}</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>Preview</span>
+        </div>
+
+        <div class="preview-container">
+
+            <div class="preview-info">
+                <div class="info-card">
+                    <h3 style="margin-top:0; color:#0f172a; font-size: 18px;">Chatbot Information</h3>
+                    <p style="color:#64748b; font-size: 14px; margin-bottom: 20px;">Test your chatbot's responses and interactive flow exactly as your users will see it.</p>
+                    <div class="info-grid">
+                        <div class="info-row"><span class="label">System Name</span><span class="value">{{ chatbot.name }}</span></div>
+                        <div class="info-row"><span class="label">Display Name</span><span class="value">{{ chatbot.bot_name }}</span></div>
+                        <div class="info-row"><span class="label">Status</span><span class="status-badge {{ 'active' if chatbot.is_active else 'inactive' }}">{{ 'Active' if chatbot.is_active else 'Inactive' }}</span></div>
+                        <div class="info-row" style="border-bottom:none; padding-bottom:0;"><span class="label">Trained ML Model</span><span class="value">{{ 'Yes' if chatbot.is_trained else 'No' }}</span></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="preview-container">
-                <!-- Left Column: Info Panel -->
-                <div class="preview-info">
-                    <!-- Chatbot Information Card -->
-                    <div class="info-card">
-                        <h3>Chatbot Information</h3>
-                        <div class="info-grid">
-                            <div class="info-row">
-                                <span class="label">Name:</span>
-                                <span class="value">{{ chatbot.name }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Bot Display Name:</span>
-                                <span class="value">{{ chatbot.bot_name }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Status:</span>
-                                <span class="status-badge {{ 'active' if chatbot.is_active else 'inactive' }}">
-                                    {{ 'Active' if chatbot.is_active else 'Inactive' }}
-                                </span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Training:</span>
-                                <span class="status-badge {{ 'trained' if chatbot.is_trained else 'untrained' }}">
-                                    {{ 'Trained' if chatbot.is_trained else 'Not Trained' }}
-                                </span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Created:</span>
-                                <span class="value">{{ chatbot.created_at.strftime('%B %d, %Y') }}</span>
-                            </div>
-                        </div>
+            <div class="chatbot-widget-container">
+                <div class="chatbot-widget">
 
-                        {% if chatbot.description %}
-                        <div class="info-description">
-                            <span class="description-label">Description:</span>
-                            <p class="description-text">{{ chatbot.description }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Theme Colors Card -->
-                    <div class="info-card">
-                        <h3>Theme Colors</h3>
-                        <div class="color-preview-grid">
-                            <div class="color-preview-item">
-                                <div class="color-box" style="background: {{ chatbot.theme_color }};"></div>
-                                <span>Theme Color</span>
-                            </div>
-                            <div class="color-preview-item">
-                                <div class="color-box" style="background: {{ chatbot.chat_background_color }};"></div>
-                                <span>Chat BG</span>
-                            </div>
-                            <div class="color-preview-item">
-                                <div class="color-box" style="background: {{ chatbot.bot_message_color }};"></div>
-                                <span>Bot Bubble</span>
-                            </div>
-
-                            <div class="color-preview-item">
-                                <div class="color-box" style="background: {{ chatbot.bot_text_color }};"></div>
-                                <span>Bot Text</span>
-                            </div>
-                            <div class="color-preview-item">
-                                <div class="color-box" style="background: {{ chatbot.user_text_color }};"></div>
-                                <span>User Text</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Card -->
-                    <div class="info-card">
-                        <h3>Quick Actions</h3>
-                        <a href="{{ url_for('edit_chatbot', chatbot_id=chatbot.id) }}" class="action-link">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            <span>Edit Chatbot</span>
-                        </a>
-                        <a href="{{ url_for('train_chatbot', chatbot_id=chatbot.id) }}" class="action-link">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                            </svg>
-                            <span>Train Chatbot</span>
-                        </a>
-                        <a href="{{ url_for('dashboard') }}" class="action-link">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                            <span>Back to Dashboard</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Right Column: Chatbot Widget -->
-                        <div class="chatbot-widget-container">
-                            <div class="chatbot-widget" style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                            <div class="chat-header" id="chatHeader" style="background: {{ chatbot.theme_color }};">
-                            <div class="chat-bot-info">
-                            <div class="chat-avatar" id="chatAvatar" style="display: flex; align-items: center; justify-content: center; background: {{ chatbot.theme_color }};">
-                            {% if chatbot.bot_avatar %}
-                                <img src="{{ chatbot.bot_avatar }}" alt="{{ chatbot.bot_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                            {% else %}
-                                <!-- Modern Robot Icon for header (white robot on theme color background) -->
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="20" height="20">
-                                                        <rect x="16" y="24" width="32" height="28" rx="6" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
-                                                        <line x1="32" y1="16" x2="32" y2="24" stroke="{{ chatbot.theme_color or '#4F46E5' }}" stroke-width="2.5" stroke-linecap="round"/>
-                                                        <circle cx="32" cy="14" r="3" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
-                                                        <circle cx="24" cy="34" r="3.5" fill="white"/>
-                                                        <circle cx="40" cy="34" r="3.5" fill="white"/>
-                                                        <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                                                        <rect x="10" y="30" width="6" height="14" rx="3" fill="{{ chatbot.theme_color or '#4F46E5' }}" opacity="0.8"/>
-                                                        <rect x="48" y="30" width="6" height="14" rx="3" fill="{{ chatbot.theme_color or '#4F46E5' }}" opacity="0.8"/>
-                                                        <circle cx="24" cy="46" r="1.5" fill="white" opacity="0.6"/>
-                                                        <circle cx="32" cy="46" r="1.5" fill="white" opacity="0.6"/>
-                                                        <circle cx="40" cy="46" r="1.5" fill="white" opacity="0.6"/>
-                                                    </svg>
-                            {% endif %}
-                            </div>
-                        <div class="bot-details">
-                            <div class="bot-name">{{ chatbot.bot_name }}</div>
-                            <div class="bot-status">Online</div>
-                        </div>
-                    </div>
-                </div>
-
-                        <div class="chat-messages" id="chatMessages" style="background: {{ chatbot.chat_background_color }};">
-                            <!-- Welcome message will be added here by JavaScript -->
-                        </div>
-
-                        <div class="chat-input-container">
-                            <label for="userInput" style="display: none;"></label>
-                            <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
-                            <button type="button" id="sendBtn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    <div class="chat-header" id="chatHeader" style="background: {{ chatbot.theme_color or '#4F46E5' }};">
+                        <div class="chat-bot-info">
+                            <div class="chat-avatar" id="chatAvatar">
+                                {% if chatbot.bot_avatar %}
+                                <img src="{{ chatbot.bot_avatar }}" alt="{{ chatbot.bot_name }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+                                    <rect x="16" y="24" width="32" height="28" rx="6" fill="white" opacity="0.9"/>
+                                    <line x1="32" y1="16" x2="32" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                                    <circle cx="32" cy="14" r="3" fill="white"/>
+                                    <circle cx="24" cy="34" r="3.5" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+                                    <circle cx="40" cy="34" r="3.5" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+                                    <path d="M 24 44 Q 32 48 40 44" stroke="{{ chatbot.theme_color or '#4F46E5' }}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                                    <rect x="10" y="30" width="6" height="14" rx="3" fill="white" opacity="0.7"/>
+                                    <rect x="48" y="30" width="6" height="14" rx="3" fill="white" opacity="0.7"/>
                                 </svg>
-                            </button>
+                                {% endif %}
+                            </div>
+                            <div class="bot-details">
+                                <div class="bot-name">{{ chatbot.bot_name }}</div>
+                                <div class="bot-status"> Online</div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="chat-messages" id="chatMessages" style="background: {{ chatbot.chat_background_color or '#F7FAFC' }};"></div>
+
+                    <div class="chat-input-container">
+                        <label for="userInput" style="display:none;"></label>
+                        <input type="text" id="userInput" placeholder="Type your message…" autocomplete="off">
+                        <button type="button" id="sendBtn" style="background: {{ chatbot.theme_color or '#4F46E5' }}; color: #fff; border: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    </div>
+
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-    </button>
+        </div>
+    </main>
+</div>
 
-    <script>
- const chatbotConfig = {
-        // Basic config
-        embedCode: "{{ chatbot.embed_code }}",
-        themeColor: "{{ chatbot.theme_color }}",
-        welcomeMessage: "{{ chatbot.welcome_message }}",
-        botName: "{{ chatbot.bot_name }}",
-        botAvatar: "{{ chatbot.bot_avatar or '' }}",
-
-        // Color config
-        chatBackgroundColor: "{{ chatbot.chat_background_color }}",
-        botMessageColor: "{{ chatbot.bot_message_color }}",
-        botTextColor: "{{ chatbot.bot_text_color }}",
-        userTextColor: "{{ chatbot.user_text_color }}",
-
-        // ✅ CRITICAL: Welcome buttons with proper JSON parsing
-        welcomeButtons: {{ welcome_buttons | tojson | safe }}
+<script>
+    const config = {
+        embedCode:           "{{ chatbot.embed_code }}",
+        themeColor:          "{{ chatbot.theme_color or '#4F46E5' }}",
+        welcomeMessage:      "{{ chatbot.welcome_message }}",
+        botName:             "{{ chatbot.bot_name }}",
+        botAvatar:           "{{ chatbot.bot_avatar or '' }}",
+        welcomeButtons:      {{ welcome_buttons | tojson | safe }}
     };
 
-    // Debug logging
-    console.log('🔧 Chatbot Config Loaded:');
-    console.log('   - Embed Code:', chatbotConfig.embedCode);
-    console.log('   - Theme Color:', chatbotConfig.themeColor);
-    console.log('   - Welcome Buttons:', chatbotConfig.welcomeButtons);
-    console.log('   - Total Buttons:', Array.isArray(chatbotConfig.welcomeButtons) ? chatbotConfig.welcomeButtons.length : 0);
+    /* ══════════════════════════════════════════════════════════
+       LIVE CHAT WIDGET LOGIC
+    ═══════════════════════════════════════════════════════════ */
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    let currentSessionId = null;
 
-    // Validate buttons
-    if (Array.isArray(chatbotConfig.welcomeButtons)) {
-        chatbotConfig.welcomeButtons.forEach((btn, i) => {
-            console.log(`   Button ${i + 1}:`, btn.text,
-                        btn.has_submenu ? `(${btn.submenu_items?.length || 0} submenu items)` : '');
-        });
+    const fallbackSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18">
+            <rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor}"/>
+            <circle cx="24" cy="34" r="3.5" fill="white"/>
+            <circle cx="40" cy="34" r="3.5" fill="white"/>
+            <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>`;
+
+    const botAvatarHtml = config.botAvatar
+        ? `<img src="${config.botAvatar}" alt="Bot">`
+        : fallbackSvg;
+
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
+    function appendBotMessage(text) {
+        const formattedText = makeLinksClickable(text);
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot">${formattedText}</div>`;
+        chatMessages.appendChild(row);
+        scrollToBottom();
+    }
+
+    function appendUserMessage(text) {
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-user';
+        row.innerHTML = `<div class="bubble-user">${text}</div>`;
+        chatMessages.appendChild(row);
+        scrollToBottom();
+    }
+
+    function showTypingIndicator() {
+        const row = document.createElement('div');
+        row.id = "typingIndicator";
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot" style="padding: 14px 18px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+        chatMessages.appendChild(row);
+        scrollToBottom();
+    }
+
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+
+   function renderButtons(buttons) {
+        if (!buttons || buttons.length === 0) return;
+        const btnContainer = document.createElement('div');
+        btnContainer.className = 'flow-btn-container';
+
+        buttons.forEach((btn, index) => {
+            const btnEl = document.createElement('button');
+            btnEl.className = 'flow-btn';
+            btnEl.textContent = btn.text;
+
+            // Hide any button after the first 3
+            if (index >= 3) {
+                btnEl.style.display = 'none';
+                btnEl.classList.add('hidden-flow-btn');
+            }
+
+            btnEl.onclick = () => {
+                // 🌟 NEW: Check if the button is a URL type
+                if (btn.type === 'url' && btn.value) {
+                    // Format URL safely and open in a new tab
+                    let targetUrl = btn.value.trim();
+                    if (!targetUrl.match(/^https?:\/\//i)) {
+                        targetUrl = 'https://' + targetUrl;
+                    }
+                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                }
+
+                // Still send the request so the bot logs the interaction
+                sendChatRequest(btn.text, btn);
+            };
+            btnContainer.appendChild(btnEl);
+        });
+
+        // Add the "View More" button if needed
+        if (buttons.length > 3) {
+            const viewMoreBtn = document.createElement('button');
+            viewMoreBtn.className = 'flow-btn';
+            viewMoreBtn.innerHTML = `View More (${buttons.length - 3}) &darr;`;
+            viewMoreBtn.style.opacity = '0.85';
+
+            viewMoreBtn.onclick = () => {
+                const hiddenBtns = btnContainer.querySelectorAll('.hidden-flow-btn');
+                hiddenBtns.forEach(b => {
+                    b.style.display = 'block';
+                });
+                viewMoreBtn.remove();
+                scrollToBottom();
+            };
+            btnContainer.appendChild(viewMoreBtn);
+        }
+
+        // Put the buttons inside the last chat bubble
+        const botBubbles = chatMessages.querySelectorAll('.bubble-bot');
+        if (botBubbles.length > 0) {
+            const lastBubble = botBubbles[botBubbles.length - 1];
+            lastBubble.appendChild(btnContainer);
+        } else {
+            chatMessages.appendChild(btnContainer);
+        }
+
+        scrollToBottom();
+    }
+    function showMainMenu() {
+        setTimeout(() => {
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                appendBotMessage("Is there anything else I can help you with?");
+                if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons);
+            }, 600);
+        }, 1000);
+    }
+
+    function makeLinksClickable(text) {
+        if (!text) return '';
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+        let formattedText = text.replace(emailRegex, '<a href="mailto:$1">$1</a>');
+        const urlRegex = /(^|\s)((https?:\/\/|www\.)[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
+        formattedText = formattedText.replace(urlRegex, function(match, space, url) {
+            let hyperlink = url;
+            if (!hyperlink.match('^https?://')) hyperlink = 'https://' + hyperlink;
+            return space + '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+        });
+        const phoneRegex = /(^|\s)(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}(\s|$)/g;
+        formattedText = formattedText.replace(phoneRegex, function(match, spaceBefore, fullMatch, spaceAfter) {
+            let cleanNumber = match.replace(/[^\d+]/g, '');
+            return spaceBefore + '<a href="tel:' + cleanNumber + '">' + match.trim() + '</a>' + (spaceAfter || '');
+        });
+        return formattedText;
+    }
+
+    async function sendChatRequest(messageText, buttonActionObj = null) {
+        if (messageText) appendUserMessage(messageText);
+
+        userInput.disabled = true;
+        if(sendBtn) sendBtn.disabled = true;
+        showTypingIndicator();
+
+        const payload = { message: messageText || "", is_voice: false };
+        if (buttonActionObj) payload.button_action = buttonActionObj;
+        if (currentSessionId) payload.session_id = currentSessionId;
+
+        try {
+            const response = await fetch(`/api/chat/${config.embedCode}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            hideTypingIndicator();
+
+            if (data.error) {
+                appendBotMessage("⚠️ Error: " + data.error);
+            } else {
+                if (data.session_id) currentSessionId = data.session_id;
+
+                if (data.response) appendBotMessage(data.response);
+
+                if (data.nested_buttons && data.nested_buttons.length > 0) {
+                    renderButtons(data.nested_buttons);
+                } else if (buttonActionObj) {
+                    showMainMenu();
+                }
+            }
+        } catch (error) {
+            hideTypingIndicator();
+            appendBotMessage("⚠️ Sorry, I couldn't connect to the server.");
+        } finally {
+            userInput.disabled = false;
+            if(sendBtn) sendBtn.disabled = false;
+            userInput.focus();
+        }
+    }
+
+    function handleFreeTextSubmit() {
+        const text = userInput.value.trim();
+        if (!text) return;
+        userInput.value = '';
+        sendChatRequest(text, null);
+    }
+
+    if(sendBtn) sendBtn.onclick = handleFreeTextSubmit;
+    userInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') handleFreeTextSubmit(); });
+
+    function initChat() {
+        userInput.disabled = false;
+        if(sendBtn) sendBtn.disabled = false;
+        chatMessages.innerHTML = '';
+        showTypingIndicator();
+
+        setTimeout(() => {
+            hideTypingIndicator();
+            appendBotMessage(config.welcomeMessage);
+            if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                renderButtons(config.welcomeButtons);
+            }
+        }, 600);
+    }
+
+    initChat();
 </script>
-    <script src="{{ url_for('static', filename='js/preview.js') }}"></script>
 </body>
 </html>

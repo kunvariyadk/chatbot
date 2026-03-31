@@ -1,0 +1,57 @@
+{
+  "user_id": 2,
+  "chatbot_id": 6,
+  "trained_at": "2026-03-23T13:25:57.584134+00:00",
+  "accuracy": 0.56,
+  "models": {
+    "svm": {
+      "accuracy": 0.56,
+      "status": "success"
+    }
+  },
+  "total_intents": 27,
+  "total_patterns": 257,
+  "general_intents_included": true,
+  "classes": [
+    "about",
+    "campaign_manager_10",
+    "campaign_manager_9",
+    "capabilities",
+    "compliment",
+    "consultation_1",
+    "consultation_5",
+    "fintech_3",
+    "fintech_32",
+    "fintech_4",
+    "goodbye",
+    "greeting",
+    "help",
+    "how_are_you",
+    "hrms_16",
+    "hrms_2",
+    "hrms_6",
+    "mobile_apps_27",
+    "mobile_apps_35",
+    "mobile_apps_38",
+    "mobile_apps_47",
+    "no",
+    "thanks",
+    "web_development_15",
+    "web_development_7",
+    "web_development_8",
+    "yes"
+  ],
+  "ml_trained": true,
+  "kb_created": true,
+  "augmented": true,
+  "augmentation_info": {
+    "enabled": true,
+    "min_patterns_per_intent": 10,
+    "techniques": [
+      "paraphrase",
+      "synonym",
+      "template",
+      "structural"
+    ]
+  }
+}

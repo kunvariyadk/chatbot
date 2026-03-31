@@ -3,346 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Train Chatbot - {{ chatbot.name }}</title>
+    <title>Train: {{ chatbot.name }} — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/train.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    {% if request.args.get('embed') == '1' %}
+    <style>
+        /* ── Embed mode: hide sidebar & outer chrome ── */
+        body {
+            background: #eef0f6 !important;
+            overflow: auto !important;
+        }
+
+        .sidebar, .mobile-menu-toggle {
+            display: none !important;
+        }
+
+        .dashboard-container {
+            display: block !important;
+            overflow: visible !important;
+            height: auto !important;
+        }
+
+        .main-content {
+            margin-left: 0 !important;
+            padding: 14px 18px 24px !important;
+            overflow: visible !important;
+            height: auto !important;
+        }
+
+        .page-header {
+            display: none !important;
+        }
+    </style>
+    {% endif %}
+
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="dashboard-container">
-         <!-- ── SIDEBAR ── -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="8" fill="url(#grad2)"/>
-                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                    <defs>
-                        <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40">
-                            <stop offset="0%" stop-color="#667eea"/>
-                            <stop offset="100%" stop-color="#764ba2"/>
-                        </linearGradient>
-                    </defs>
+<div class="dashboard-container">
+
+    <main class="main-content">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible" role="alert" style="margin-bottom:10px;">
+            {% if category == 'success' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {% elif category == 'error' or category == 'danger' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {% elif category == 'warning' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            {% endif %}
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="dismissAlert(this)" aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        {% endfor %}{% endif %}
+        {% endwith %}
+
+        <div class="staging-banner" id="stagingBanner">
+            <div class="staging-banner-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
-                <span>ChatBot Builder</span>
+            </div>
+            <div class="staging-banner-text">
+                <strong>New data waiting in Staging</strong>
+                <span id="stagingBannerCount">— pairs pending review before going live.</span>
+            </div>
+            <div class="staging-banner-actions">
+                <button class="btn-view-staging" onclick="goToStaging()">Review &amp; Deploy</button>
+                <button class="btn-dismiss-staging" onclick="dismissStagingBanner()">Dismiss</button>
             </div>
         </div>
 
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <a href="{{ url_for('dashboard') }}" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                    </svg>
-                    <span>Dashboard</span>
-                </a>
-            </div>
+        <div id="alertContainer"></div>
 
-            <div class="nav-section">
-                <div class="nav-section-title">Workspace</div>
+        <div id="mainPage" class="main-page" {% if not chatbot.training_data %}style="display:none;"{% endif %}>
+            <div class="training-container">
 
-                <!-- Bots nav item — active on this page -->
-                <a href="{{ url_for('bots') }}" class="nav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    <span>Bots</span>
-                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    </svg>
-                </a><br>
+                {% if chatbot.training_data %}
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item" id="accountMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        <span>My Account</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"/>
-                        </svg>
-                    </a>
-                    <div class="submenu" id="accountSubmenu">
-                        <a href="{{ url_for('edit_profile') }}" class="submenu-item">
-                            <span class="dot"></span><span>Edit Profile</span>
-                        </a>
-                        <a href="{{ url_for('change_password') }}" class="submenu-item">
-                            <span class="dot"></span><span>Change Password</span>
-                        </a>
-                        <a href="{{ url_for('manage_subscription') }}" class="submenu-item">
-                            <span class="dot"></span><span>Subscription</span>
-                        </a>
+                <div class="main-page-header">
+                    <div>
+                        <h2>Training Data Overview</h2>
+                        <p class="main-page-subtitle">Manage your chatbot's knowledge base</p>
+                    </div>
+                    <div class="main-page-actions">
+
+                        <button class="btn-view-staging" id="stagingHeaderBtn" onclick="goToStaging()" style="display:none;">
+                            Staging <span class="staging-badge" id="stagingHeaderBadge"></span>
+                        </button>
+                        <button class="btn-add-data" onclick="showUploadPage('append')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Add More Data
+                        </button>
+                        <button class="btn-replace-data" onclick="showUploadPage('replace')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"/>
+                                <path d="M20.49 15a9 9 0 1 1-2-8.83"/>
+                            </svg>
+                            Replace All Data
+                        </button>
+                        <button class="btn-danger" onclick="deleteAllTrainingData()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                            </svg>
+                            Delete All
+                        </button>
                     </div>
                 </div>
-            </div>
-        </nav>
 
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar">{{ user.username[0].upper() }}</div>
-                <div class="user-details">
-                    <div class="user-name">{{ user.username }}</div>
-                    <div class="user-email">{{ user.email }}</div>
+                <div class="search-section">
+                    <div class="search-bar-wrapper">
+                        <div class="search-input-group">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <label for="searchInput"></label>
+                            <input type="text" id="searchInput" class="search-input" placeholder="Search questions or answers…" autocomplete="off">
+                            <button class="btn-clear-search" id="clearSearchBtn" style="display:none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="filter-chips">
+                            <button class="filter-chip active" data-filter="all">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                All
+                            </button>
+                            <button class="filter-chip" data-filter="recent">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <path d="M20.49 15a9 9 0 1 1-2-8.83"/>
+                                </svg>
+                                Recent
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-results-header">
+                        <div class="results-info">
+                            Showing <strong id="resultsCount">0</strong> of <strong id="totalCount">0</strong> Q&amp;A pairs
+                        </div>
+                        <div class="sort-options">
+                            <label for="sortSelect">Sort by:</label>
+                            <select id="sortSelect" class="sort-select">
+                                <option value="recent">Most Recent</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="az">A–Z (Question)</option>
+                                <option value="za">Z–A (Question)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+
+                <div id="qaCardsContainer" class="qa-cards-container"></div>
+
+                <div class="qa-pagination" id="qaPagination"></div>
+
+                {% endif %}
             </div>
-            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-            </a>
         </div>
-    </aside>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
+        <div id="uploadPage" class="upload-page" {% if chatbot.training_data %}style="display:none;"{% endif %}>
+            <div class="training-container">
 
-        <main class="main-content">
-            <div class="page-header">
-                <div>
-                    <h1>Train: {{ chatbot.name }}</h1>
-                    <p>Manage training data for {{ chatbot.name }}</p>
-                </div>
-                <div class="header-actions">
+                <div class="upload-page-header">
+                    <div>
+                        <h2 id="uploadPageTitle">Upload Training Data</h2>
+                        <p class="upload-page-subtitle" id="uploadPageSubtitle">Choose your preferred method</p>
+                    </div>
                     {% if chatbot.training_data %}
-                    <button class="btn-download" onclick="downloadIntents()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                    <button class="btn-back" onclick="backToMainPage()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
                         </svg>
-                        Download Intents
+                        Back
                     </button>
                     {% endif %}
-                    <a href="/bots" class="btn-secondary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="19" y1="12" x2="5" y2="12"></line>
-                            <polyline points="12 19 5 12 12 5"></polyline>
-                        </svg>
-                        Back to Bots
-                    </a>
                 </div>
-            </div>
 
-            <div id="alertContainer"></div>
-
-            <!-- ===== MAIN PAGE - Q&A LIST VIEW ===== -->
-            <div id="mainPage" class="main-page">
-                <div class="training-container">
-                    {% if chatbot.training_data %}
-                    <!-- HAS DATA: Show Q&A Cards -->
-                    <div class="main-page-header">
-                        <div>
-                            <h2>Training Data Overview</h2>
-                            <p class="main-page-subtitle">Manage your chatbot's knowledge base</p>
-                        </div>
-                        <div class="main-page-actions">
-                            <button class="btn-add-data" onclick="showUploadPage('append')">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                                Add More Data
-                            </button>
-                            <button class="btn-replace-data" onclick="showUploadPage('replace')">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="23 4 23 10 17 10"></polyline>
-                                        <path d="M20.49 15a9 9 0 1 1-2-8.83"></path>
-                                    </svg>
-                                Replace All Data
-                            </button>
-
-                            <button class="btn-danger" onclick="deleteAllTrainingData()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                </svg>
-                                Delete All Data
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Search & Filter Section -->
-                    <div class="search-section">
-                        <div class="search-bar-wrapper">
-                            <div class="search-input-group">
-                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <path d="m21 21-4.35-4.35"></path>
-                                </svg>
-                                <label for="searchInput"></label><input type="text" id="searchInput" class="search-input" placeholder="Search questions or answers...">
-                                <button class="btn-clear-search" id="clearSearchBtn" style="display: none;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div class="filter-chips">
-                                <button class="filter-chip active" data-filter="all">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <polyline points="12 6 12 12 16 14"></polyline>
-                                    </svg>
-                                    All
-                                </button>
-                                <button class="filter-chip" data-filter="recent">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="23 4 23 10 17 10"></polyline>
-                                        <path d="M20.49 15a9 9 0 1 1-2-8.83"></path>
-                                    </svg>
-                                    Recent
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="search-results-header">
-                            <div class="results-info">
-                                <span class="results-count">Showing <strong id="resultsCount">0</strong> of <strong id="totalCount">0</strong> Q&A pairs</span>
-                            </div>
-                            <div class="sort-options">
-                                <label for="sortSelect">Sort by:</label>
-                                <select id="sortSelect" class="sort-select">
-                                    <option value="recent">Most Recent</option>
-                                    <option value="oldest">Oldest First</option>
-                                    <option value="az">A-Z (Question)</option>
-                                    <option value="za">Z-A (Question)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Q&A Cards Grid -->
-                    <div id="qaCardsContainer" class="qa-cards-container">
-                        <!-- Loaded by JavaScript -->
-                    </div>
-
-                    {% else %}
-                    <!-- NO DATA: Show Empty State -->
-                    <div class="empty-state">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="json">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                            <polyline points="13 2 13 9 20 9"/>
                         </svg>
-                        <h2>No Training Data Yet</h2>
-                        <p>Start training your chatbot by uploading your first dataset</p>
-                        <button class="btn-primary-large" onclick="showUploadPage('replace')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="17 8 12 3 7 8"></polyline>
-                                <line x1="12" y1="3" x2="12" y2="15"></line>
-                            </svg>
-                            Add Training Data
-                        </button>
-                    </div>
-                    {% endif %}
+                        JSON File
+                    </button>
+                     <button class="tab-btn" data-tab="manual">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Simple Q&amp;A
+                    </button>
+                    <button class="tab-btn" data-tab="text">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Text/HTML File
+                    </button>
+                    <button class="tab-btn" data-tab="excel">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                        Excel File
+                    </button>
+                    <button class="tab-btn" data-tab="flow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        Interactive Flow
+                    </button>
                 </div>
-            </div>
 
-            <!-- ===== UPLOAD PAGE - TAB VIEW ===== -->
-            <div id="uploadPage" class="upload-page" style="display: none;">
-                <div class="training-container">
-                    <div class="upload-page-header">
-                        <button class="btn-back" onclick="backToMainPage()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="19" y1="12" x2="5" y2="12"></line>
-                                <polyline points="12 19 5 12 12 5"></polyline>
-                            </svg>
-                            Back
-                        </button>
-                        <div>
-                            <h2 id="uploadPageTitle">Upload Training Data</h2>
-                            <p class="upload-page-subtitle" id="uploadPageSubtitle">Choose your preferred method</p>
-                        </div>
-                    </div>
+                <div class="tab-content-wrapper">
 
-                    <!-- Tab Navigation -->
-                    <div class="tab-navigation">
-                        <button class="tab-btn active" data-tab="json">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                <polyline points="13 2 13 9 20 9"></polyline>
-                            </svg>
-                            JSON File
-                        </button>
-                        <button class="tab-btn" data-tab="text">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                            </svg>
-                            Text/HTML File
-                        </button>
-                        <button class="tab-btn" data-tab="excel">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="9" y1="15" x2="15" y2="15"></line>
-                            </svg>
-                            Excel File
-                        </button>
-                        <button class="tab-btn" data-tab="manual">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Simple Q&A
-                        </button>
-                    </div>
-
-                    <!-- Tab Content -->
-                    <div class="tab-content-wrapper">
-                        <!-- JSON Upload Tab -->
-                        <div id="jsonTab" class="tab-content active">
-                            <div class="tab-card">
-                                <div class="tab-card-header">
-                                    <h3>Upload JSON File</h3>
-                                    <div class="tab-card-actions">
-                                        <button class="btn-view-format" onclick="toggleFormatExample('json')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                            View Format
-                                        </button>
-                                        <button class="btn-download-sample" onclick="downloadSample('json')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                            Sample
-                                        </button>
-                                    </div>
+                    <div id="jsonTab" class="tab-content active">
+                        <div class="tab-card">
+                            <div class="tab-card-header">
+                                <h3>Upload JSON File</h3>
+                                <div class="tab-card-actions">
+                                    <button class="btn-view-format" onclick="toggleFormatExample('json')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        View Format
+                                    </button>
+                                    <button class="btn-download-sample" onclick="downloadSample('json')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        Sample
+                                    </button>
                                 </div>
-                                <p class="tab-card-description">Upload a JSON file with training data. We support multiple formats!</p>
+                            </div>
+                            <p class="tab-card-description">Upload a JSON file with training data. We support multiple formats!</p>
 
-                                <!-- Format Example -->
-                                <div class="format-example" id="jsonFormatExample" style="display: none;">
-                                    <div class="format-close">
-                                        <button onclick="toggleFormatExample('json')" class="btn-close-format">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <h4>✅ Supported Formats:</h4>
-                                    <pre><code>// Format 1: Intent-based (Recommended)
+                            <div class="format-example" id="jsonFormatExample" style="display:none;">
+                                <div class="format-close">
+                                    <button onclick="toggleFormatExample('json')" class="btn-close-format">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <h4>✅ Supported Formats:</h4>
+                                <pre><code>// Format 1: Intent-based (Recommended)
 {
   "intents": [
     {
@@ -362,278 +300,857 @@
     }
   ]
 }</code></pre>
-                                </div>
-
-                                <form id="uploadForm" enctype="multipart/form-data">
-                                    <div class="upload-area" id="uploadArea">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                                        </svg>
-                                        <h3>Drop your JSON file here</h3>
-                                        <p>or click to browse</p>
-                                        <input type="file" id="fileInput" name="training_file" accept=".json" hidden>
-                                    </div>
-
-                                    <div id="fileInfo" class="file-info" style="display: none;">
-                                        <div class="file-details">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                                <polyline points="13 2 13 9 20 9"></polyline>
-                                            </svg>
-                                            <div>
-                                                <div class="file-name" id="fileName"></div>
-                                                <div class="file-size" id="fileSize"></div>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="removeFile" class="btn-remove">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <div class="progress-bar" id="progressBar" style="display: none;">
-                                        <div class="progress-fill" id="progressFill"></div>
-                                    </div>
-
-                                    <button type="submit" id="uploadBtn" class="btn-primary" disabled>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        Upload & Train
-                                    </button>
-                                </form>
                             </div>
-                        </div>
 
-                        <!-- Text/HTML Upload Tab -->
-                        <div id="textTab" class="tab-content">
-                            <div class="tab-card">
-                                <div class="tab-card-header">
-                                    <h3>Upload Text/HTML File</h3>
-                                    <div class="tab-card-actions">
-                                        <button class="btn-view-format" onclick="toggleFormatExample('text')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                            View Format
-                                        </button>
-                                        <button class="btn-download-sample" onclick="downloadSample('text')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                            Sample
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="tab-card-description">Upload a text or HTML file. We'll extract Q&A pairs automatically!</p>
-
-                                <!-- Format Example -->
-                                <div class="format-example" id="textFormatExample" style="display: none;">
-                                    <div class="format-close">
-                                        <button onclick="toggleFormatExample('text')" class="btn-close-format">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <h4>✅ Supported Formats:</h4>
-                                    <div class="format-tip">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                        </svg>
-                                        <span><strong>Best Practice:</strong> Include 10-20 Q&A pairs minimum. Clear formatting improves extraction accuracy!</span>
-                                    </div>
-                                    <pre><code>// Format 1: Q: / A: Pattern
-Q: What are your business hours?
-A: We are open Monday to Friday, 9 AM to 6 PM.
-
-Q: How can I contact support?
-A: You can email us at support@example.com
-
-// Format 2: Question: / Answer: Pattern
-Question: Do you offer refunds?
-Answer: Yes, we offer 30-day money-back guarantee.
-
-// Format 3: Alternating Lines
-What services do you provide?
-We provide web development, design, and consulting.</code></pre>
-                                </div>
-
-                                <form id="textUploadForm" enctype="multipart/form-data">
-                                    <div class="upload-area" id="textUploadArea">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        </svg>
-                                        <h3>Drop your TXT/HTML file here</h3>
-                                        <p>or click to browse</p>
-                                        <input type="file" id="textFileInput" name="text_file" accept=".txt,.html,.htm" hidden>
-                                    </div>
-
-                                    <div id="textFileInfo" class="file-info" style="display: none;">
-                                        <div class="file-details">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                                <polyline points="13 2 13 9 20 9"></polyline>
-                                            </svg>
-                                            <div>
-                                                <div class="file-name" id="textFileName"></div>
-                                                <div class="file-size" id="textFileSize"></div>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="removeTextFile" class="btn-remove">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <div class="progress-bar" id="textProgressBar" style="display: none;">
-                                        <div class="progress-fill" id="textProgressFill"></div>
-                                    </div>
-
-                                    <button type="submit" id="textUploadBtn" class="btn-primary" disabled>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        Upload & Train
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Excel Upload Tab -->
-                        <div id="excelTab" class="tab-content">
-                            <div class="tab-card">
-                                <div class="tab-card-header">
-                                    <h3>Upload Excel File</h3>
-                                    <div class="tab-card-actions">
-                                        <button class="btn-download-sample" onclick="downloadSample('excel')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                            Sample
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="tab-card-description">Upload an Excel file (.xlsx, .xls) with Question and Answer columns</p>
-
-                                <form id="excelUploadForm" enctype="multipart/form-data">
-                                    <div class="upload-area" id="excelUploadArea">
-                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="9" y1="15" x2="15" y2="15"></line>
-                                        </svg>
-                                        <h3>Drop your Excel file here</h3>
-                                        <p>or click to browse</p>
-                                        <input type="file" id="excelFileInput" name="excel_file" accept=".xlsx,.xls" hidden>
-                                    </div>
-
-                                    <div id="excelFileInfo" class="file-info" style="display: none;">
-                                        <div class="file-details">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                                <polyline points="13 2 13 9 20 9"></polyline>
-                                            </svg>
-                                            <div>
-                                                <div class="file-name" id="excelFileName"></div>
-                                                <div class="file-size" id="excelFileSize"></div>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="removeExcelFile" class="btn-remove">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-
-                                    <div class="progress-bar" id="excelProgressBar" style="display: none;">
-                                        <div class="progress-fill" id="excelProgressFill"></div>
-                                    </div>
-
-                                    <button type="submit" id="excelUploadBtn" class="btn-primary" disabled>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        Upload & Train
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Manual Q&A Tab -->
-                        <div id="manualTab" class="tab-content">
-                            <div class="tab-card">
-                                <div class="tab-card-header">
-                                    <h3>Simple Q&A Entry</h3>
-                                </div>
-                                <p class="tab-card-description">Enter questions and answers directly</p>
-
-                                <div class="qa-best-practices">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="upload-area" id="uploadArea">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/>
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
                                     </svg>
-                                    <span><strong>Tip:</strong> Add at least 10-15 Q&A pairs for optimal performance!</span>
+                                    <h3>Drop your JSON file here</h3>
+                                    <p>or click to browse</p>
+                                    <input type="file" id="fileInput" name="training_file" accept=".json" hidden>
                                 </div>
-
-                                <div class="qa-container" id="qaContainer">
-                                    <!-- Q&A pairs loaded by JavaScript -->
-                                </div>
-
-                                <div class="manual-actions">
-                                    <button type="button" id="addQaBtn" class="btn-secondary">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <div id="fileInfo" class="file-info" style="display:none;">
+                                    <div class="file-details">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                            <polyline points="13 2 13 9 20 9"/>
                                         </svg>
-                                        Add Q&A Pair
-                                    </button>
-
-                                    <button type="button" id="clearAllBtn" class="btn-clear">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <div>
+                                            <div class="file-name" id="fileName"></div>
+                                            <div class="file-size" id="fileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="removeFile" class="btn-remove">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
                                         </svg>
-                                        Clear All
                                     </button>
                                 </div>
-
-                                <button type="button" id="saveManualBtn" class="btn-primary">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                <div class="progress-bar" id="progressBar" style="display:none;">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                                <button type="submit" id="uploadBtn" class="btn-primary" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"/>
                                     </svg>
-                                    Save & Train Chatbot
+                                    Upload &amp; Train
                                 </button>
-                            </div>
+                            </form>
                         </div>
                     </div>
+
+                    <div id="textTab" class="tab-content">
+                        <div class="tab-card">
+                            <div class="tab-card-header">
+                                <h3>Upload Text/HTML File</h3>
+                                <div class="tab-card-actions">
+                                    <button class="btn-view-format" onclick="toggleFormatExample('text')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        View Format
+                                    </button>
+                                    <button class="btn-download-sample" onclick="downloadSample('text')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        Sample
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="tab-card-description">Upload a text or HTML file. We'll extract Q&amp;A pairs automatically!</p>
+                            <div class="format-example" id="textFormatExample" style="display:none;">
+                                <div class="format-close">
+                                    <button onclick="toggleFormatExample('text')" class="btn-close-format">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <h4>✅ Supported Formats:</h4>
+                                <div class="format-tip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="16" x2="12" y2="12"/>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                    </svg>
+                                    <span><strong>Best Practice:</strong> Include 10–20 Q&amp;A pairs minimum. Clear formatting improves extraction accuracy!</span>
+                                </div>
+                                <pre><code>Q: What are your business hours?
+                                A: We are open Monday to Friday, 9 AM to 6 PM.
+
+                                Question: Do you offer refunds?
+                                Answer: Yes, we offer a 30-day money-back guarantee.</code></pre>
+                            </div>
+                            <form id="textUploadForm" enctype="multipart/form-data">
+                                <div class="upload-area" id="textUploadArea">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                    </svg>
+                                    <h3>Drop your TXT/HTML file here</h3>
+                                    <p>or click to browse</p>
+                                    <input type="file" id="textFileInput" name="text_file" accept=".txt,.html,.htm" hidden>
+                                </div>
+                                <div id="textFileInfo" class="file-info" style="display:none;">
+                                    <div class="file-details">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                            <polyline points="13 2 13 9 20 9"/>
+                                        </svg>
+                                        <div>
+                                            <div class="file-name" id="textFileName"></div>
+                                            <div class="file-size" id="textFileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="removeTextFile" class="btn-remove">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="progress-bar" id="textProgressBar" style="display:none;">
+                                    <div class="progress-fill" id="textProgressFill"></div>
+                                </div>
+                                <button type="submit" id="textUploadBtn" class="btn-primary" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                    Upload &amp; Train
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="excelTab" class="tab-content">
+                        <div class="tab-card">
+                            <div class="tab-card-header">
+                                <h3>Upload Excel File</h3>
+                                <div class="tab-card-actions">
+                                    <button class="btn-download-sample" onclick="downloadSample('excel')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        Sample
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="tab-card-description">Upload an Excel file (.xlsx, .xls) with Question and Answer columns</p>
+                            <form id="excelUploadForm" enctype="multipart/form-data">
+                                <div class="upload-area" id="excelUploadArea">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="9" y1="15" x2="15" y2="15"/>
+                                    </svg>
+                                    <h3>Drop your Excel file here</h3>
+                                    <p>or click to browse</p>
+                                    <input type="file" id="excelFileInput" name="excel_file" accept=".xlsx,.xls" hidden>
+                                </div>
+                                <div id="excelFileInfo" class="file-info" style="display:none;">
+                                    <div class="file-details">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                            <polyline points="13 2 13 9 20 9"/>
+                                        </svg>
+                                        <div>
+                                            <div class="file-name" id="excelFileName"></div>
+                                            <div class="file-size" id="excelFileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="removeExcelFile" class="btn-remove">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="progress-bar" id="excelProgressBar" style="display:none;">
+                                    <div class="progress-fill" id="excelProgressFill"></div>
+                                </div>
+                                <button type="submit" id="excelUploadBtn" class="btn-primary" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                    Upload &amp; Train
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="manualTab" class="tab-content">
+                        <div class="tab-card">
+                            <div class="tab-card-header">
+                                <h3>Simple Q&amp;A Entry</h3>
+                            </div>
+                            <p class="tab-card-description">Enter questions and answers directly</p>
+
+                            <div class="qa-best-practices">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                <span><strong>Tip:</strong> Add at least 10–15 Q&amp;A pairs for optimal performance!</span>
+                            </div>
+
+                            <div class="qa-container" id="qaContainer"></div>
+
+                            <div class="manual-actions">
+                                <button type="button" id="addQaBtn" class="btn-secondary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"/>
+                                        <line x1="5" y1="12" x2="19" y2="12"/>
+                                    </svg>
+                                    Add Q&amp;A Pair
+                                </button>
+                                <button type="button" id="clearAllBtn" class="btn-clear">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                    </svg>
+                                    Clear All
+                                </button>
+                            </div>
+
+                            <button type="button" id="saveManualBtn" class="btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Save &amp; Train Chatbot
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="flowTab" class="tab-content">
+                        <div class="tab-card">
+                            <div class="tab-card-header">
+                                <h3>Conversational Flow Builder</h3>
+                                <div class="tab-card-actions">
+                                    <button type="button" class="btn-clear-flow" onclick="clearEntireFlow()">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        Clear Flow
+                                    </button>
+                                    <button type="button" class="btn-save-flow" id="btnSaveFlow" onclick="saveFlowData()">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                        Save Flow
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="tab-card-description">Build interactive button menus that guide users to specific answers or URLs.</p>
+
+                            <div class="format-example" id="flowFormatExample" style="display:none; margin-top: 15px;">
+                                <div class="format-close">
+                                    <button onclick="toggleFlowFormatExample()" class="btn-close-format">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <h4 style="margin: 0;">✅ Required JSON Structure:</h4>
+                                    <button onclick="copyFlowFormat()" id="copyFlowFormatBtn" class="btn-secondary" style="padding: 4px 10px; font-size: 11px; margin-bottom: 0;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                        Copy JSON
+                                    </button>
+                                </div>
+                                <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">The root must be an
+                                    array. Valid types are: <code>message</code>, <code>url</code>, or
+                                    <code>intent</code>.</p>
+                                <pre><code id="flowJsonTemplate">[
+  {
+    "id": "btn_example_root",
+    "text": "Root Button Label",
+    "type": "message",
+    "value": "This is the message shown when user clicks this button.",
+    "nested_buttons": [
+      {
+        "id": "btn_example_child1",
+        "text": "Child Button (message type)",
+        "type": "message",
+        "value": "This is a message response with details:\n\n- Point one\n- Point two\n- Point three\n\nContact: example@email.com",
+        "nested_buttons": [
+          {
+            "id": "btn_example_grandchild1",
+            "text": "Go to Website",
+            "type": "url",
+            "value": "https://example.com/page",
+            "nested_buttons": []
+          }
+        ]
+      },
+      {
+        "id": "btn_example_child2",
+        "text": "Child Button (url type)",
+        "type": "url",
+        "value": "https://example.com/contact",
+        "nested_buttons": []
+      },
+      {
+        "id": "btn_example_child3",
+        "text": "Child Button (no further nesting)",
+        "type": "message",
+        "value": "This button has no children, so nested_buttons is an empty array.",
+        "nested_buttons": []
+      }
+    ]
+  }
+]</code></pre>
+                            </div>
+
+                            <div style="margin-top: 16px;">
+                                <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 10px; align-items: center;">
+                                    <button type="button" class="btn-add-primary" onclick="addRootButton()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        Add Main Button
+                                    </button>
+
+                                    <button type="button" class="btn-secondary" onclick="document.getElementById('flowJsonInput').click()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        Upload JSON
+                                    </button>
+                                    <button type="button" class="btn-view-format" onclick="toggleFlowFormatExample()" style="background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #475569; font-size: 13px; font-weight: 500;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        View Format
+                                    </button>
+
+                                    <input type="file" id="flowJsonInput" accept=".json" style="display: none;">
+                                </div>
+
+                                <input type="hidden" id="flow_data_hidden" value="{{ chatbot.welcome_buttons or '[]' }}">
+                                <div id="flowContainer" class="flow-container"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
 
-    <script>
-        const CHATBOT_ID = {{ chatbot.id }};
-    </script>
-    <script src="{{ url_for('static', filename='js/train.js') }}"></script>
+    </main>
+</div>
+
+<script>const CHATBOT_ID = {{ chatbot.id }};</script>
+<script src="{{ url_for('static', filename='js/train.js') }}"></script>
+
+<script>
+let flowData = [];
+
+function generateId() { return Math.random().toString(36).substr(2, 9); }
+function escapeHtml(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Initialize data from database on page load
+(function initFlow() {
+    const hiddenEl = document.getElementById('flow_data_hidden');
+    if (hiddenEl && hiddenEl.value) {
+        try { flowData = JSON.parse(hiddenEl.value); }
+        catch (e) { flowData = []; }
+    }
+    if (!Array.isArray(flowData)) flowData = [];
+
+    function ensureIdsAndArrays(nodes) {
+        nodes.forEach(node => {
+            if (!node.id || node.id === '') node.id = generateId();
+            if (!node.nested_buttons) node.nested_buttons = [];
+            delete node.has_submenu;
+            delete node.submenu_items;
+            if (node.nested_buttons.length > 0) ensureIdsAndArrays(node.nested_buttons);
+        });
+    }
+    ensureIdsAndArrays(flowData);
+    renderFlow();
+})();
+
+function addRootButton() {
+    flowData.push({ id: generateId(), text: '', type: 'message', value: '', nested_buttons: [] });
+    renderFlow();
+}
+
+function addNestedButton(parentId) {
+    const parent = findNodeById(flowData, parentId);
+    if (parent) {
+        if (!parent.nested_buttons) parent.nested_buttons = [];
+        parent.nested_buttons.push({ id: generateId(), text: '', type: 'message', value: '', nested_buttons: [] });
+        renderFlow();
+    }
+}
+
+function findNodeById(nodes, id) {
+    for (let node of nodes) {
+        if (node.id === id) return node;
+        if (node.nested_buttons && node.nested_buttons.length > 0) {
+            const found = findNodeById(node.nested_buttons, id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function deleteNode(nodes, id) {
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].id === id) { nodes.splice(i, 1); return true; }
+        if (nodes[i].nested_buttons && nodes[i].nested_buttons.length > 0) {
+            if (deleteNode(nodes[i].nested_buttons, id)) return true;
+        }
+    }
+    return false;
+}
+
+function removeNodeUI(id) {
+    if(confirm('Remove this button and all of its follow-up options?')) {
+        deleteNode(flowData, id);
+        renderFlow();
+    }
+}
+
+function clearEntireFlow() {
+    if(confirm('Are you sure you want to completely clear this Interactive Flow? This cannot be undone once saved.')) {
+        flowData = [];
+        renderFlow();
+        saveFlowData();
+    }
+}
+
+function updateNode(id, field, value) {
+    const node = findNodeById(flowData, id);
+    if (node) {
+        node[field] = value;
+        if (field === 'type' && value !== 'message') node.nested_buttons = [];
+        if (field === 'type') renderFlow();
+    }
+}
+
+function renderFlow() {
+    const container = document.getElementById('flowContainer');
+    if (!container) return;
+
+    if (flowData.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 40px; border: 2px dashed #e2e8f0; border-radius: 8px; background: #f8fafc; color: #64748b; font-size: 14px; margin-top: 10px;">No buttons configured yet.<br><span style="font-size: 13px; opacity: 0.8;">Click "Add Main Button" to start building your interactive flow.</span></div>';
+        return;
+    }
+
+    function buildNodeHTML(nodes, level = 0) {
+        let html = '';
+        nodes.forEach((node, index) => {
+            let valueLabel = 'Bot Reply Message';
+            let valuePlaceholder = 'Type what the bot should say...';
+            if (node.type === 'url') { valueLabel = 'URL to Open'; valuePlaceholder = 'https://...'; }
+            if (node.type === 'intent') { valueLabel = 'Intent Tag'; valuePlaceholder = 'e.g., pricing'; }
+
+            const branchClass = level === 0 ? 'main-badge' : 'nested-badge';
+            const branchText = level === 0 ? `Main Button ${index + 1}` : `↳ Option ${index + 1}`;
+            const depthClass = level <= 3 ? `level-${level}` : 'level-3';
+
+            html += `
+            <div class="flow-node ${depthClass}">
+                <div class="node-header">
+                    <span class="branch-badge ${branchClass}">${branchText}</span>
+                    <button type="button" class="btn-remove-node" title="Delete this option" onclick="removeNodeUI('${node.id}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <div class="node-controls">
+                    <div class="node-field">
+                        <label>Button Label</label>
+                        <input type="text" placeholder="e.g. View Services" value="${escapeHtml(node.text)}" oninput="updateNode('${node.id}', 'text', this.value)">
+                    </div>
+                    <div class="node-field">
+                        <label>Action</label>
+                        <select onchange="updateNode('${node.id}', 'type', this.value)">
+                            <option value="message" ${node.type === 'message' ? 'selected' : ''}>Show More Options</option>
+                            <option value="url" ${node.type === 'url' ? 'selected' : ''}>Open URL (Ends)</option>
+                            <option value="intent" ${node.type === 'intent' ? 'selected' : ''}>Trigger Intent (Ends)</option>
+                        </select>
+                    </div>
+                    <div class="node-field">
+                        <label>${valueLabel}</label>
+                        <input type="text" placeholder="${valuePlaceholder}" value="${escapeHtml(node.value)}" oninput="updateNode('${node.id}', 'value', this.value)">
+                    </div>
+                </div>`;
+
+            if (node.type === 'message') {
+                html += `<div class="nested-flow">`;
+                if (node.nested_buttons && node.nested_buttons.length > 0) {
+                    html += buildNodeHTML(node.nested_buttons, level + 1);
+                }
+                html += `<button type="button" class="btn-add-nested" onclick="addNestedButton('${node.id}')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; margin-bottom:-2px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Follow-up Option
+                         </button>
+                </div>`;
+            }
+
+            html += `</div>`;
+        });
+        return html;
+    }
+
+    container.innerHTML = buildNodeHTML(flowData);
+}
+
+// Custom Alert Function
+function showFlowAlert(msg, isSuccess) {
+    const alertContainer = document.getElementById('alertContainer');
+    const color = isSuccess ? '#10b981' : '#ef4444';
+    const bg = isSuccess ? '#ecfdf5' : '#fef2f2';
+    const border = isSuccess ? '#a7f3d0' : '#fecaca';
+
+    const alertDiv = document.createElement('div');
+    alertDiv.style.cssText = `position:fixed; top:20px; right:20px; background:${bg}; border:1px solid ${border}; color:${color}; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:600; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.1); animation:slideIn 0.3s ease;`;
+    alertDiv.textContent = msg;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        alertDiv.style.transform = 'translateY(-10px)';
+        alertDiv.style.transition = 'all 0.3s ease';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
+}
+
+const alertStyle = document.createElement('style');
+alertStyle.innerHTML = `@keyframes slideIn { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }`;
+document.head.appendChild(alertStyle);
+
+// AJAX Save Function
+async function saveFlowData() {
+    const btn = document.getElementById('btnSaveFlow');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff;margin-right:6px;"></div> Saving...';
+
+    try {
+        const response = await fetch(`/chatbot/save-flow/${CHATBOT_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ flow_data: flowData })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showFlowAlert('Interactive Flow saved successfully!', true);
+            document.getElementById('flow_data_hidden').value = JSON.stringify(flowData);
+        } else {
+            showFlowAlert('Failed to save flow: ' + result.message, false);
+        }
+    } catch (err) {
+        showFlowAlert('Network error occurred while saving.', false);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Flow';
+    }
+}
+
+/* ══════════════════════════════════════════════════
+   INTERACTIVE FLOW: JSON UPLOAD, VALIDATION & COPY
+══════════════════════════════════════════════════ */
+
+function toggleFlowFormatExample() {
+    const el = document.getElementById('flowFormatExample');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// 🌟 NEW: Function to copy JSON format to clipboard
+function copyFlowFormat() {
+    const codeText = document.getElementById('flowJsonTemplate').textContent;
+    navigator.clipboard.writeText(codeText).then(() => {
+        const btn = document.getElementById('copyFlowFormatBtn');
+        const originalHTML = btn.innerHTML;
+
+        btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+        btn.style.color = '#10b981'; // Green text
+        btn.style.borderColor = '#10b981'; // Green border
+
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.color = ''; // Reverts to CSS default
+            btn.style.borderColor = '';
+        }, 2000);
+    });
+}
+
+// Ensure nested structures get unique IDs so the UI logic doesn't break
+function applyIdsToUploadedFlow(nodes) {
+    nodes.forEach(node => {
+        if (!node.id) node.id = generateId();
+        if (!node.nested_buttons) node.nested_buttons = [];
+        if (node.nested_buttons.length > 0) {
+            applyIdsToUploadedFlow(node.nested_buttons);
+        }
+    });
+}
+
+// Strict Validator
+function validateFlowJSONStructure(data) {
+    if (!Array.isArray(data)) return false;
+
+    function checkNodes(nodes) {
+        for (let node of nodes) {
+            // Must be an object
+            if (typeof node !== 'object' || node === null) return false;
+
+            // Must have a 'text' property
+            if (!node.hasOwnProperty('text') || typeof node.text !== 'string') return false;
+
+            // Must have a valid 'type'
+            if (!node.hasOwnProperty('type') || !['message', 'url', 'intent'].includes(node.type)) return false;
+
+            // Validate nested_buttons if they exist
+            if (node.hasOwnProperty('nested_buttons')) {
+                if (!Array.isArray(node.nested_buttons)) return false;
+                if (!checkNodes(node.nested_buttons)) return false;
+            }
+        }
+        return true;
+    }
+
+    return checkNodes(data);
+}
+
+// File Input Listener
+document.getElementById('flowJsonInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const uploadedData = JSON.parse(evt.target.result);
+
+            if (validateFlowJSONStructure(uploadedData)) {
+                // Apply IDs and default missing arrays
+                applyIdsToUploadedFlow(uploadedData);
+
+                // Replace existing flow with new data
+                flowData = uploadedData;
+                renderFlow();
+
+                showFlowAlert('JSON imported successfully! Click "Save Flow" to apply.', true);
+            } else {
+                showFlowAlert('Invalid JSON structure. Please check "View Format".', false);
+            }
+        } catch (err) {
+            showFlowAlert('Error parsing file. Make sure it is a valid JSON file.', false);
+        }
+
+        // Clear input so the user can upload the same file again if they tweak it
+        e.target.value = '';
+    };
+    reader.readAsText(file);
+});
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════
+   SMART PAGINATION — FINAL FIX
+══════════════════════════════════════════════════ */
+(function () {
+
+    function buildPagination(current, totalPages) {
+        var container = document.getElementById('qaPagination');
+        if (!container) return;
+
+        if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+        var pages = [];
+        if (totalPages <= 7) {
+            for (var x = 1; x <= totalPages; x++) pages.push(x);
+        } else {
+            pages = [1, totalPages];
+            for (var p = Math.max(2, current - 1); p <= Math.min(totalPages - 1, current + 1); p++) {
+                pages.push(p);
+            }
+            pages = pages
+                .filter(function (v, i, a) { return a.indexOf(v) === i; })
+                .sort(function (a, b) { return a - b; });
+        }
+
+        var html = '';
+
+        html += '<button class="pg-nav"' + (current === 1 ? ' disabled' : '') +
+                ' onclick="changeQAPage(' + (current - 1) + ')">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>' +
+                ' Prev</button>';
+
+        for (var i = 0; i < pages.length; i++) {
+            var n = pages[i];
+            if (i > 0 && pages[i] - pages[i - 1] > 1) {
+                html += '<span class="pg-dots">…</span>';
+            }
+            html += '<button class="' + (n === current ? 'active' : '') +
+                    '" onclick="changeQAPage(' + n + ')">' + n + '</button>';
+        }
+
+        html += '<button class="pg-nav"' + (current === totalPages ? ' disabled' : '') +
+                ' onclick="changeQAPage(' + (current + 1) + ')">' +
+                'Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>' +
+                '</button>';
+
+        container.innerHTML = html;
+    }
+
+    /* Override renderQAPagination — train.js calls this after rendering cards */
+    window.renderQAPagination = function (totalPages) {
+        var current = window.qaCurrentPage || 1;
+        buildPagination(current, totalPages);
+    };
+
+    /* Override changeQAPage — intercept BEFORE train.js updates qaCurrentPage */
+    var _originalChangeQAPage = null;
+
+    /* Wait for train.js to define changeQAPage, then wrap it */
+    function wrapChangeQAPage() {
+        if (typeof window.changeQAPage === 'function' && !window.changeQAPage._wrapped) {
+            _originalChangeQAPage = window.changeQAPage;
+
+            window.changeQAPage = function (page) {
+                _originalChangeQAPage(page);
+                var data = window.__qaFullData || [];
+                var totalPages = Math.ceil(data.length / 10);
+                buildPagination(page, totalPages);
+            };
+
+            window.changeQAPage._wrapped = true;
+        }
+    }
+
+    wrapChangeQAPage();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        wrapChangeQAPage();
+    });
+
+})();
+</script>
+
+<script>
+/* ── Flash message dismiss ── */
+function dismissAlert(btn) {
+    var a = btn.closest ? btn.closest(".alert-dismissible") : btn.parentElement;
+    if (!a) return;
+    a.style.transition     = "opacity 0.35s ease, transform 0.35s ease, max-height 0.4s ease, margin-bottom 0.4s ease, padding 0.4s ease";
+    a.style.opacity        = "0";
+    a.style.transform      = "translateY(-6px)";
+    a.style.maxHeight      = "0";
+    a.style.marginBottom   = "0";
+    a.style.padding        = "0";
+    a.style.overflow       = "hidden";
+    setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 420);
+}
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".alert-dismissible").forEach(function (a) {
+        var btn = a.querySelector(".alert-close");
+        if (btn) setTimeout(function(){ dismissAlert(btn); }, 5000);
+    });
+});
+</script>
+
+
+<script>
+/* ══════════════════════════════════════════════
+   STAGING INTEGRATION
+══════════════════════════════════════════════ */
+
+function goToStaging() {
+    window.location.href = '/chatbot/staging-page/' + CHATBOT_ID;
+}
+
+function dismissStagingBanner() {
+    document.getElementById('stagingBanner').classList.remove('visible');
+    sessionStorage.setItem('stagingBannerDismissed_' + CHATBOT_ID, '1');
+}
+
+function checkStagingCount() {
+    fetch('/chatbot/staging/' + CHATBOT_ID)
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+            if (!data.success) return;
+            var count = data.count || 0;
+            var badge = document.getElementById('stagingHeaderBadge');
+            var btn   = document.getElementById('stagingHeaderBtn');
+            var banner = document.getElementById('stagingBanner');
+            var bannerCount = document.getElementById('stagingBannerCount');
+
+            if (count > 0) {
+                if (btn)   { btn.style.display = 'inline-flex'; }
+                if (badge) { badge.textContent = count; badge.classList.add('visible'); }
+
+                var dismissed = sessionStorage.getItem('stagingBannerDismissed_' + CHATBOT_ID);
+                if (!dismissed && banner) {
+                    bannerCount.textContent = count + ' pair' + (count !== 1 ? 's' : '') + ' pending review before going live.';
+                    banner.classList.add('visible');
+                }
+            } else {
+                if (btn)    btn.style.display = 'none';
+                if (badge)  badge.classList.remove('visible');
+                if (banner) banner.classList.remove('visible');
+            }
+        })
+        .catch(function(){});
+}
+
+(function patchUploadHandlers() {
+    var _origShowAlert = window.showAlert;
+
+    function afterUpload(data) {
+        if (data && data.staged) {
+            sessionStorage.removeItem('stagingBannerDismissed_' + CHATBOT_ID);
+            checkStagingCount();
+        }
+    }
+
+    var _origOpen = XMLHttpRequest.prototype.open;
+    var _origSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function(method, url) {
+        this._url = url;
+        return _origOpen.apply(this, arguments);
+    };
+
+    XMLHttpRequest.prototype.send = function(body) {
+        var self = this;
+        var _origOnLoad = this.onload;
+        this.onload = function() {
+            if (_origOnLoad) _origOnLoad.apply(self, arguments);
+            if (self._url && (
+                self._url.indexOf('/chatbot/train/') !== -1 ||
+                self._url.indexOf('/chatbot/train-text/') !== -1 ||
+                self._url.indexOf('/chatbot/train-excel/') !== -1 ||
+                self._url.indexOf('/chatbot/train-manual/') !== -1
+            )) {
+                try {
+                    var data = JSON.parse(self.responseText);
+                    afterUpload(data);
+                } catch(e) {}
+            }
+        };
+        return _origSend.apply(this, arguments);
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkStagingCount();
+});
+
+</script>
+
 </body>
 </html>

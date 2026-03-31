@@ -10,11 +10,12 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar (same as dashboard) -->
-       <aside class="sidebar" id="sidebar">
+       <!-- ════════════ SIDEBAR ════════════ -->
+    <aside class="sidebar" id="sidebar">
+
         <div class="sidebar-header">
             <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
                     <rect width="40" height="40" rx="8" fill="url(#grad2)"/>
                     <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
                     <defs>
@@ -29,6 +30,7 @@
         </div>
 
         <nav class="nav-menu">
+
             <div class="nav-section">
                 <a href="{{ url_for('dashboard') }}" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,45 +45,40 @@
 
             <div class="nav-section">
                 <div class="nav-section-title">Workspace</div>
-
-
-                <!-- Bots nav item — active on this page -->
-                <a href="{{ url_for('bots') }}" class="nav-item ">
+                <a href="{{ url_for('bots') }}" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                     <span>Bots</span>
-                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2">
-                    </svg>
-                </a><br>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+                </a>
+            </div>
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item active" id="accountMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        <span>My Account</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"/>
-                        </svg>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item active" id="accountMenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>My Account</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+                <div class="submenu open" id="accountSubmenu">
+                    <a href="{{ url_for('edit_profile') }}" class="submenu-item ">
+                        <span class="dot"></span><span>Edit Profile</span>
                     </a>
-                    <div class="submenu" id="accountSubmenu">
-                        <a href="{{ url_for('edit_profile') }}" class="submenu-item">
-                            <span class="dot"></span><span>Edit Profile</span>
-                        </a>
-                        <a href="{{ url_for('change_password') }}" class="submenu-item ">
-                            <span class="dot"></span><span>Change Password</span>
-                        </a>
-                        <a href="{{ url_for('manage_subscription') }}" class="submenu-item active">
-                            <span class="dot"></span><span>Subscription</span>
-                        </a>
-                    </div>
+                    <a href="{{ url_for('change_password') }}" class="submenu-item">
+                        <span class="dot"></span><span>Change Password</span>
+                    </a>
+                    <a href="{{ url_for('manage_subscription') }}" class="submenu-item active">
+                        <span class="dot"></span><span>Subscription</span>
+                    </a>
                 </div>
             </div>
+
         </nav>
 
         <div class="user-section">
@@ -93,13 +90,14 @@
                 </div>
             </div>
             <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" y1="12" x2="9" y2="12"/>
                 </svg>
             </a>
         </div>
+
     </aside>
 
         <!-- Main Content -->

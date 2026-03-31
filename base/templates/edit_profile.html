@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - ChatBot Panel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <title>Edit Profile — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="dashboard-container">
-    <!-- Sidebar -->
+
+    <!-- ════════════ SIDEBAR ════════════ -->
     <aside class="sidebar" id="sidebar">
+
         <div class="sidebar-header">
             <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
                     <rect width="40" height="40" rx="8" fill="url(#grad2)"/>
                     <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
                     <defs>
@@ -30,6 +30,7 @@
         </div>
 
         <nav class="nav-menu">
+
             <div class="nav-section">
                 <a href="{{ url_for('dashboard') }}" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -44,44 +45,40 @@
 
             <div class="nav-section">
                 <div class="nav-section-title">Workspace</div>
-
-                <!-- Bots nav item — active on this page -->
-                <a href="{{ url_for('bots') }}" class="nav-item ">
+                <a href="{{ url_for('bots') }}" class="nav-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                     <span>Bots</span>
-                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2">
-                    </svg>
-                </a><br>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+                </a>
+            </div>
 
-                <div class="nav-section">
-                    <div class="nav-section-title">Account</div>
-                    <a href="#" class="nav-item active" id="accountMenu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        <span>My Account</span>
-                        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"/>
-                        </svg>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item active" id="accountMenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>My Account</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+                <div class="submenu open" id="accountSubmenu">
+                    <a href="{{ url_for('edit_profile') }}" class="submenu-item active">
+                        <span class="dot"></span><span>Edit Profile</span>
                     </a>
-                    <div class="submenu" id="accountSubmenu">
-                        <a href="{{ url_for('edit_profile') }}" class="submenu-item active">
-                            <span class="dot"></span><span>Edit Profile</span>
-                        </a>
-                        <a href="{{ url_for('change_password') }}" class="submenu-item">
-                            <span class="dot"></span><span>Change Password</span>
-                        </a>
-                        <a href="{{ url_for('manage_subscription') }}" class="submenu-item">
-                            <span class="dot"></span><span>Subscription</span>
-                        </a>
-                    </div>
+                    <a href="{{ url_for('change_password') }}" class="submenu-item">
+                        <span class="dot"></span><span>Change Password</span>
+                    </a>
+                    <a href="{{ url_for('manage_subscription') }}" class="submenu-item">
+                        <span class="dot"></span><span>Subscription</span>
+                    </a>
                 </div>
             </div>
+
         </nav>
 
         <div class="user-section">
@@ -93,17 +90,19 @@
                 </div>
             </div>
             <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" y1="12" x2="9" y2="12"/>
                 </svg>
             </a>
         </div>
+
     </aside>
 
-    <!-- Main Content -->
+    <!-- ════════════ MAIN CONTENT ════════════ -->
     <main class="main-content">
+
         <header class="page-header">
             <div>
                 <h1>Edit Profile</h1>
@@ -111,16 +110,32 @@
             </div>
         </header>
 
+        <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
+        {% if messages %}{% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+            {% if category == 'success' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            {% elif category == 'error' or category == 'danger' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {% elif category == 'warning' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            {% endif %}
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="dismissAlert(this)" aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        {% endfor %}{% endif %}
         {% endwith %}
 
         <div class="profile-container">
+
+            <!-- ── Profile form card ── -->
             <div class="profile-card">
+
                 <div class="profile-header">
                     <div class="profile-avatar-large">{{ user.username[0].upper() }}</div>
                     <div class="profile-header-info">
@@ -131,63 +146,46 @@
 
                 <form method="POST" class="profile-form">
 
-                    <!-- First Name -->
                     <div class="form-group">
                         <label for="first_name">First Name</label>
                         <div class="input-with-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
                             </svg>
                             <input type="text" id="first_name" name="first_name"
                                    value="{{ user.first_name if user.first_name else '' }}" required>
                         </div>
                     </div>
 
-                    <!-- Last Name -->
                     <div class="form-group">
                         <label for="last_name">Last Name</label>
                         <div class="input-with-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
                             </svg>
                             <input type="text" id="last_name" name="last_name"
                                    value="{{ user.last_name if user.last_name else '' }}" required>
                         </div>
                     </div>
 
-                    <!-- Username -->
                     <div class="form-group">
                         <label for="username">Username</label>
                         <div class="input-with-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
                             </svg>
                             <input type="text" id="username" name="username" value="{{ user.username }}" required>
                         </div>
                     </div>
 
-                    <!-- Phone Number -->
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
                         <div class="input-with-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 16.92V21a2 2 0 0 1-2.18 2
-                                             A19.86 19.86 0 0 1 3 5.18
-                                             2 2 0 0 1 5 3h4.09
-                                             a2 2 0 0 1 2 1.72
-                                             c.12.81.37 1.6.73 2.35
-                                             a2 2 0 0 1-.45 2.11L10 10
-                                             a16 16 0 0 0 6 6l.82-.82
-                                             a2 2 0 0 1 2.11-.45
-                                             c.75.36 1.54.61 2.35.73
-                                             a2 2 0 0 1 1.72 2z"></path>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92V21a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h4.09a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L9 10a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
                             <input type="tel" id="phone" name="phone"
                                    value="{{ user.phone if user.phone else '' }}"
@@ -195,67 +193,99 @@
                         </div>
                     </div>
 
-                    <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <div class="input-with-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12
-                                             c0 1.1-.9 2-2 2H4
-                                             c-1.1 0-2-.9-2-2V6
-                                             c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
                             </svg>
                             <input type="email" id="email" name="email" value="{{ user.email }}" required>
                         </div>
                     </div>
 
-                    <!-- Buttons -->
                     <div class="form-actions">
                         <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancel</a>
                         <button type="submit" class="btn-primary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5
-                                             a2 2 0 0 1 2-2h11l5 5v11
-                                             a2 2 0 0 1-2 2z"></path>
-                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                <polyline points="7 3 7 8 15 8"></polyline>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
                             </svg>
                             Save Changes
                         </button>
                     </div>
+
                 </form>
             </div>
 
+            <!-- ── Right: Stats card ── -->
             <div class="profile-stats">
                 <h3>Account Statistics</h3>
+
                 <div class="stat-item">
                     <span class="stat-label">Total Chatbots</span>
                     <span class="stat-value">{{ user.chatbots|length }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Active Chatbots</span>
-                    <span class="stat-value">{{ user. chatbots|selectattr('is_active')|list|length }}</span>
+                    <span class="stat-value">{{ user.chatbots|selectattr('is_active')|list|length }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Account Created</span>
                     <span class="stat-value">{{ user.created_at.strftime('%b %d, %Y') }}</span>
                 </div>
             </div>
+
         </div>
     </main>
 </div>
 
+<!-- Mobile toggle -->
 <button class="mobile-menu-toggle" id="mobileMenuToggle">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
 </button>
+
+<script>
+    document.getElementById('mobileMenuToggle').addEventListener('click', function () {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    /* Account submenu — starts open since we're on an account page */
+    document.getElementById('accountMenu').addEventListener('click', function (e) {
+        e.preventDefault();
+        this.classList.toggle('expanded');
+        document.getElementById('accountSubmenu').classList.toggle('open');
+    });
+    /* Mark expanded on load since submenu is open */
+    document.getElementById('accountMenu').classList.add('expanded');
+</script>
 <script src="{{ url_for('static', filename='js/password.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+/* ── Flash message dismiss ── */
+function dismissAlert(btn) {
+    var a = btn.closest ? btn.closest(".alert-dismissible") : btn.parentElement;
+    if (!a) return;
+    a.style.transition     = "opacity 0.35s ease, transform 0.35s ease, max-height 0.4s ease, margin-bottom 0.4s ease, padding 0.4s ease";
+    a.style.opacity        = "0";
+    a.style.transform      = "translateY(-6px)";
+    a.style.maxHeight      = "0";
+    a.style.marginBottom   = "0";
+    a.style.padding        = "0";
+    a.style.overflow       = "hidden";
+    setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 420);
+}
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".alert-dismissible").forEach(function (a) {
+        var btn = a.querySelector(".alert-close");
+        if (btn) setTimeout(function(){ dismissAlert(btn); }, 5000);
+    });
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,1417 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hi"
+      ],
+      "responses": [
+        "Hello! How can I assist you today?"
+      ]
+    },
+    {
+      "tag": "about_company",
+      "patterns": [
+        "what is td tech"
+      ],
+      "responses": [
+        "TD Tech Solutions is a software development company that provides web, mobile, and enterprise technology solutions."
+      ]
+    },
+    {
+      "tag": "services",
+      "patterns": [
+        "what services do you provide"
+      ],
+      "responses": [
+        "We provide web development, mobile app development, product development, and software consulting services."
+      ]
+    },
+    {
+      "tag": "web_development",
+      "patterns": [
+        "do you build websites"
+      ],
+      "responses": [
+        "Yes, we develop custom websites and web applications tailored to your business needs."
+      ]
+    },
+    {
+      "tag": "mobile_app",
+      "patterns": [
+        "do you develop mobile apps"
+      ],
+      "responses": [
+        "Yes, we develop mobile apps for Android, iOS, and cross-platform environments."
+      ]
+    },
+    {
+      "tag": "contact",
+      "patterns": [
+        "how can i contact you"
+      ],
+      "responses": [
+        "You can contact us via email at inquiry@tdtech.in or call +91 99252 92157."
+      ]
+    },
+    {
+      "tag": "location",
+      "patterns": [
+        "where is your office"
+      ],
+      "responses": [
+        "Our office is located in Ahmedabad, Gujarat, India."
+      ]
+    },
+    {
+      "tag": "pricing",
+      "patterns": [
+        "how much does a website cost"
+      ],
+      "responses": [
+        "The cost depends on the project requirements. Please contact us to get a custom quote."
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "bye"
+      ],
+      "responses": [
+        "Goodbye! Have a great day."
+      ]
+    },
+    {
+      "tag": "qa_1",
+      "patterns": [
+        "What is artificial intelligence?"
+      ],
+      "responses": [
+        "Artificial intelligence is the simulation of human intelligence in machines."
+      ]
+    },
+    {
+      "tag": "qa_2",
+      "patterns": [
+        "What is machine learning?"
+      ],
+      "responses": [
+        "Machine learning is a subset of AI that allows systems to learn from data."
+      ]
+    },
+    {
+      "tag": "qa_3",
+      "patterns": [
+        "What programming language is commonly used for AI?"
+      ],
+      "responses": [
+        "Python is one of the most commonly used languages for AI development."
+      ]
+    },
+    {
+      "tag": "qa_4",
+      "patterns": [
+        "What is a database?"
+      ],
+      "responses": [
+        "A database is a structured collection of data stored electronically."
+      ]
+    },
+    {
+      "tag": "qa_5",
+      "patterns": [
+        "What is HTML used for?"
+      ],
+      "responses": [
+        "HTML is used to create and structure content on web pages."
+      ]
+    },
+    {
+      "tag": "qa_6",
+      "patterns": [
+        "What does CSS do?"
+      ],
+      "responses": [
+        "CSS is used to style and design web pages."
+      ]
+    },
+    {
+      "tag": "qa_7",
+      "patterns": [
+        "What is JavaScript?"
+      ],
+      "responses": [
+        "JavaScript is a programming language used to add interactivity to websites."
+      ]
+    },
+    {
+      "tag": "qa_8",
+      "patterns": [
+        "What is a web server?"
+      ],
+      "responses": [
+        "A web server is software that serves web pages to users."
+      ]
+    },
+    {
+      "tag": "qa_9",
+      "patterns": [
+        "What is Flask?"
+      ],
+      "responses": [
+        "Flask is a lightweight Python web framework used to build web applications."
+      ]
+    },
+    {
+      "tag": "qa_10",
+      "patterns": [
+        "What is an API?"
+      ],
+      "responses": [
+        "An API allows different software systems to communicate with each other."
+      ]
+    },
+    {
+      "tag": "qa_11",
+      "patterns": [
+        "What is cloud computing?"
+      ],
+      "responses": [
+        "Cloud computing allows access to computing resources over the internet."
+      ]
+    },
+    {
+      "tag": "qa_12",
+      "patterns": [
+        "What is Git?"
+      ],
+      "responses": [
+        "Git is a version control system used to track code changes."
+      ]
+    },
+    {
+      "tag": "qa_13",
+      "patterns": [
+        "What is GitHub?"
+      ],
+      "responses": [
+        "GitHub is a platform for hosting and collaborating on code repositories."
+      ]
+    },
+    {
+      "tag": "qa_14",
+      "patterns": [
+        "What is SQL?"
+      ],
+      "responses": [
+        "SQL is a language used to manage and query databases."
+      ]
+    },
+    {
+      "tag": "qa_15",
+      "patterns": [
+        "What is MySQL?"
+      ],
+      "responses": [
+        "MySQL is an open-source relational database management system."
+      ]
+    },
+    {
+      "tag": "qa_16",
+      "patterns": [
+        "What is a primary key in a database?"
+      ],
+      "responses": [
+        "A primary key uniquely identifies each record in a table."
+      ]
+    },
+    {
+      "tag": "qa_17",
+      "patterns": [
+        "What is an IP address?"
+      ],
+      "responses": [
+        "An IP address is a unique identifier for a device on a network."
+      ]
+    },
+    {
+      "tag": "qa_18",
+      "patterns": [
+        "What is cybersecurity?"
+      ],
+      "responses": [
+        "Cybersecurity is the practice of protecting systems from digital attacks."
+      ]
+    },
+    {
+      "tag": "qa_19",
+      "patterns": [
+        "What is encryption?"
+      ],
+      "responses": [
+        "Encryption converts data into a secure format to prevent unauthorized access."
+      ]
+    },
+    {
+      "tag": "qa_20",
+      "patterns": [
+        "What is a firewall?"
+      ],
+      "responses": [
+        "A firewall is a security system that monitors network traffic."
+      ]
+    },
+    {
+      "tag": "qa_21",
+      "patterns": [
+        "What is data science?"
+      ],
+      "responses": [
+        "Data science involves analyzing and interpreting complex data."
+      ]
+    },
+    {
+      "tag": "qa_22",
+      "patterns": [
+        "What is big data?"
+      ],
+      "responses": [
+        "Big data refers to extremely large datasets that require advanced tools to process."
+      ]
+    },
+    {
+      "tag": "qa_23",
+      "patterns": [
+        "What is deep learning?"
+      ],
+      "responses": [
+        "Deep learning is a type of machine learning using neural networks."
+      ]
+    },
+    {
+      "tag": "qa_24",
+      "patterns": [
+        "What is computer vision?"
+      ],
+      "responses": [
+        "Computer vision enables machines to interpret images and videos."
+      ]
+    },
+    {
+      "tag": "qa_25",
+      "patterns": [
+        "What is natural language processing?"
+      ],
+      "responses": [
+        "NLP allows computers to understand and process human language."
+      ]
+    },
+    {
+      "tag": "qa_26",
+      "patterns": [
+        "What is OCR?"
+      ],
+      "responses": [
+        "OCR converts text from images into machine-readable text."
+      ]
+    },
+    {
+      "tag": "qa_27",
+      "patterns": [
+        "What is a chatbot?"
+      ],
+      "responses": [
+        "A chatbot is a software program that simulates human conversation."
+      ]
+    },
+    {
+      "tag": "qa_28",
+      "patterns": [
+        "What is automation?"
+      ],
+      "responses": [
+        "Automation uses technology to perform tasks with minimal human intervention."
+      ]
+    },
+    {
+      "tag": "qa_29",
+      "patterns": [
+        "What is DevOps?"
+      ],
+      "responses": [
+        "DevOps is a set of practices combining software development and IT operations."
+      ]
+    },
+    {
+      "tag": "qa_30",
+      "patterns": [
+        "What is Docker?"
+      ],
+      "responses": [
+        "Docker is a platform used to build and run applications in containers."
+      ]
+    },
+    {
+      "tag": "qa_31",
+      "patterns": [
+        "What is a laptop?"
+      ],
+      "responses": [
+        "A laptop is a portable personal computer."
+      ]
+    },
+    {
+      "tag": "qa_32",
+      "patterns": [
+        "What is RAM?"
+      ],
+      "responses": [
+        "RAM is temporary memory used by a computer to run programs."
+      ]
+    },
+    {
+      "tag": "qa_33",
+      "patterns": [
+        "What is a GPU?"
+      ],
+      "responses": [
+        "A GPU is a processor designed for graphics and parallel computing."
+      ]
+    },
+    {
+      "tag": "qa_34",
+      "patterns": [
+        "What is an SSD?"
+      ],
+      "responses": [
+        "An SSD is a fast storage device using flash memory."
+      ]
+    },
+    {
+      "tag": "qa_35",
+      "patterns": [
+        "What is a CPU?"
+      ],
+      "responses": [
+        "A CPU is the main processor that executes instructions in a computer."
+      ]
+    },
+    {
+      "tag": "qa_36",
+      "patterns": [
+        "What is an operating system?"
+      ],
+      "responses": [
+        "An operating system manages hardware and software resources."
+      ]
+    },
+    {
+      "tag": "qa_37",
+      "patterns": [
+        "What is Windows?"
+      ],
+      "responses": [
+        "Windows is an operating system developed by Microsoft."
+      ]
+    },
+    {
+      "tag": "qa_38",
+      "patterns": [
+        "What is Linux?"
+      ],
+      "responses": [
+        "Linux is an open-source operating system."
+      ]
+    },
+    {
+      "tag": "qa_39",
+      "patterns": [
+        "What is macOS?"
+      ],
+      "responses": [
+        "macOS is Apple's operating system for Mac computers."
+      ]
+    },
+    {
+      "tag": "qa_40",
+      "patterns": [
+        "What is a network?"
+      ],
+      "responses": [
+        "A network connects multiple devices to share data."
+      ]
+    },
+    {
+      "tag": "qa_41",
+      "patterns": [
+        "What is e-commerce?"
+      ],
+      "responses": [
+        "E-commerce is the buying and selling of goods online."
+      ]
+    },
+    {
+      "tag": "qa_42",
+      "patterns": [
+        "What is digital marketing?"
+      ],
+      "responses": [
+        "Digital marketing promotes products using online platforms."
+      ]
+    },
+    {
+      "tag": "qa_43",
+      "patterns": [
+        "What is SEO?"
+      ],
+      "responses": [
+        "SEO improves website visibility on search engines."
+      ]
+    },
+    {
+      "tag": "qa_44",
+      "patterns": [
+        "What is social media marketing?"
+      ],
+      "responses": [
+        "It involves promoting products through social media platforms."
+      ]
+    },
+    {
+      "tag": "qa_45",
+      "patterns": [
+        "What is content marketing?"
+      ],
+      "responses": [
+        "Content marketing uses valuable content to attract customers."
+      ]
+    },
+    {
+      "tag": "qa_46",
+      "patterns": [
+        "What is email marketing?"
+      ],
+      "responses": [
+        "Email marketing sends promotional messages to customers via email."
+      ]
+    },
+    {
+      "tag": "qa_47",
+      "patterns": [
+        "What is branding?"
+      ],
+      "responses": [
+        "Branding is creating a unique identity for a business."
+      ]
+    },
+    {
+      "tag": "qa_48",
+      "patterns": [
+        "What is customer support?"
+      ],
+      "responses": [
+        "Customer support helps customers resolve issues."
+      ]
+    },
+    {
+      "tag": "qa_49",
+      "patterns": [
+        "What is CRM?"
+      ],
+      "responses": [
+        "CRM is software used to manage customer relationships."
+      ]
+    },
+    {
+      "tag": "qa_50",
+      "patterns": [
+        "What is a startup?"
+      ],
+      "responses": [
+        "A startup is a newly established business."
+      ]
+    },
+    {
+      "tag": "qa_51",
+      "patterns": [
+        "What is health insurance?"
+      ],
+      "responses": [
+        "Health insurance covers medical expenses."
+      ]
+    },
+    {
+      "tag": "qa_52",
+      "patterns": [
+        "What is a balanced diet?"
+      ],
+      "responses": [
+        "A balanced diet includes all essential nutrients."
+      ]
+    },
+    {
+      "tag": "qa_53",
+      "patterns": [
+        "What is exercise?"
+      ],
+      "responses": [
+        "Exercise is physical activity that improves health."
+      ]
+    },
+    {
+      "tag": "qa_54",
+      "patterns": [
+        "What is hydration?"
+      ],
+      "responses": [
+        "Hydration is maintaining adequate water levels in the body."
+      ]
+    },
+    {
+      "tag": "qa_55",
+      "patterns": [
+        "What is meditation?"
+      ],
+      "responses": [
+        "Meditation is a practice to improve mental clarity and relaxation."
+      ]
+    },
+    {
+      "tag": "qa_56",
+      "patterns": [
+        "What is stress management?"
+      ],
+      "responses": [
+        "Stress management involves techniques to control stress."
+      ]
+    },
+    {
+      "tag": "qa_57",
+      "patterns": [
+        "What is sleep hygiene?"
+      ],
+      "responses": [
+        "Sleep hygiene refers to habits that promote good sleep."
+      ]
+    },
+    {
+      "tag": "qa_58",
+      "patterns": [
+        "What is mental health?"
+      ],
+      "responses": [
+        "Mental health refers to emotional and psychological well-being."
+      ]
+    },
+    {
+      "tag": "qa_59",
+      "patterns": [
+        "What is a healthy lifestyle?"
+      ],
+      "responses": [
+        "A healthy lifestyle includes good diet, exercise, and rest."
+      ]
+    },
+    {
+      "tag": "qa_60",
+      "patterns": [
+        "What is preventive healthcare?"
+      ],
+      "responses": [
+        "Preventive healthcare focuses on preventing diseases."
+      ]
+    },
+    {
+      "tag": "qa_61",
+      "patterns": [
+        "What is travel insurance?"
+      ],
+      "responses": [
+        "Travel insurance protects against travel-related risks."
+      ]
+    },
+    {
+      "tag": "qa_62",
+      "patterns": [
+        "What is tourism?"
+      ],
+      "responses": [
+        "Tourism is traveling for leisure or business."
+      ]
+    },
+    {
+      "tag": "qa_63",
+      "patterns": [
+        "What is a passport?"
+      ],
+      "responses": [
+        "A passport is an official document for international travel."
+      ]
+    },
+    {
+      "tag": "qa_64",
+      "patterns": [
+        "What is a visa?"
+      ],
+      "responses": [
+        "A visa is permission to enter another country."
+      ]
+    },
+    {
+      "tag": "qa_65",
+      "patterns": [
+        "What is a hotel?"
+      ],
+      "responses": [
+        "A hotel provides accommodation for travelers."
+      ]
+    },
+    {
+      "tag": "qa_66",
+      "patterns": [
+        "What is a tourist attraction?"
+      ],
+      "responses": [
+        "A tourist attraction is a place people visit for enjoyment."
+      ]
+    },
+    {
+      "tag": "qa_67",
+      "patterns": [
+        "What is a travel itinerary?"
+      ],
+      "responses": [
+        "A travel itinerary is a plan for a trip."
+      ]
+    },
+    {
+      "tag": "qa_68",
+      "patterns": [
+        "What is public transport?"
+      ],
+      "responses": [
+        "Public transport is shared transportation for the public."
+      ]
+    },
+    {
+      "tag": "qa_69",
+      "patterns": [
+        "What is a boarding pass?"
+      ],
+      "responses": [
+        "A boarding pass allows passengers to board a flight."
+      ]
+    },
+    {
+      "tag": "qa_70",
+      "patterns": [
+        "What is baggage allowance?"
+      ],
+      "responses": [
+        "Baggage allowance is the permitted luggage limit."
+      ]
+    },
+    {
+      "tag": "qa_71",
+      "patterns": [
+        "What is education?"
+      ],
+      "responses": [
+        "Education is the process of gaining knowledge and skills."
+      ]
+    },
+    {
+      "tag": "qa_72",
+      "patterns": [
+        "What is online learning?"
+      ],
+      "responses": [
+        "Online learning uses the internet for education."
+      ]
+    },
+    {
+      "tag": "qa_73",
+      "patterns": [
+        "What is a university?"
+      ],
+      "responses": [
+        "A university is an institution for higher education."
+      ]
+    },
+    {
+      "tag": "qa_74",
+      "patterns": [
+        "What is a scholarship?"
+      ],
+      "responses": [
+        "A scholarship is financial support for education."
+      ]
+    },
+    {
+      "tag": "qa_75",
+      "patterns": [
+        "What is a curriculum?"
+      ],
+      "responses": [
+        "A curriculum is the set of courses taught in an institution."
+      ]
+    },
+    {
+      "tag": "qa_76",
+      "patterns": [
+        "What is a teacher?"
+      ],
+      "responses": [
+        "A teacher educates and guides students."
+      ]
+    },
+    {
+      "tag": "qa_77",
+      "patterns": [
+        "What is a student?"
+      ],
+      "responses": [
+        "A student is a person who studies to gain knowledge."
+      ]
+    },
+    {
+      "tag": "qa_78",
+      "patterns": [
+        "What is an exam?"
+      ],
+      "responses": [
+        "An exam evaluates a student's knowledge."
+      ]
+    },
+    {
+      "tag": "qa_79",
+      "patterns": [
+        "What is homework?"
+      ],
+      "responses": [
+        "Homework is assigned work to complete outside class."
+      ]
+    },
+    {
+      "tag": "qa_80",
+      "patterns": [
+        "What is graduation?"
+      ],
+      "responses": [
+        "Graduation is the completion of an academic program."
+      ]
+    },
+    {
+      "tag": "qa_81",
+      "patterns": [
+        "How are you?"
+      ],
+      "responses": [
+        "I'm doing great! Thanks for asking. How are you?"
+      ]
+    },
+    {
+      "tag": "qa_82",
+      "patterns": [
+        "What is your name?"
+      ],
+      "responses": [
+        "I'm your friendly chatbot assistant."
+      ]
+    },
+    {
+      "tag": "qa_83",
+      "patterns": [
+        "What can you do?"
+      ],
+      "responses": [
+        "I can answer questions, chat with you, and help with information."
+      ]
+    },
+    {
+      "tag": "qa_84",
+      "patterns": [
+        "Nice to meet you"
+      ],
+      "responses": [
+        "Nice to meet you too! I'm happy to chat with you."
+      ]
+    },
+    {
+      "tag": "qa_85",
+      "patterns": [
+        "Can you help me?"
+      ],
+      "responses": [
+        "Of course! I'll do my best to help you."
+      ]
+    },
+    {
+      "tag": "qa_86",
+      "patterns": [
+        "Thank you"
+      ],
+      "responses": [
+        "You're welcome! I'm always happy to help."
+      ]
+    },
+    {
+      "tag": "qa_87",
+      "patterns": [
+        "Good morning"
+      ],
+      "responses": [
+        "Good morning! Hope you have a wonderful day."
+      ]
+    },
+    {
+      "tag": "qa_88",
+      "patterns": [
+        "Good afternoon"
+      ],
+      "responses": [
+        "Good afternoon! How is your day going?"
+      ]
+    },
+    {
+      "tag": "qa_89",
+      "patterns": [
+        "Good evening"
+      ],
+      "responses": [
+        "Good evening! How can I assist you today?"
+      ]
+    },
+    {
+      "tag": "qa_90",
+      "patterns": [
+        "Good night"
+      ],
+      "responses": [
+        "Good night! Sleep well and take care."
+      ]
+    },
+    {
+      "tag": "qa_91",
+      "patterns": [
+        "What are you doing?"
+      ],
+      "responses": [
+        "I'm here chatting with you and ready to help."
+      ]
+    },
+    {
+      "tag": "qa_92",
+      "patterns": [
+        "Are you a human?"
+      ],
+      "responses": [
+        "No, I'm a chatbot designed to assist and talk with you."
+      ]
+    },
+    {
+      "tag": "qa_93",
+      "patterns": [
+        "Who created you?"
+      ],
+      "responses": [
+        "I was created by developers to help people with information and conversations."
+      ]
+    },
+    {
+      "tag": "qa_94",
+      "patterns": [
+        "Can you tell me a joke?"
+      ],
+      "responses": [
+        "Sure! Why did the computer go to the doctor? Because it caught a virus."
+      ]
+    },
+    {
+      "tag": "qa_95",
+      "patterns": [
+        "Do you like chatting?"
+      ],
+      "responses": [
+        "Yes! I enjoy chatting and helping people."
+      ]
+    },
+    {
+      "tag": "qa_96",
+      "patterns": [
+        "What is the time?"
+      ],
+      "responses": [
+        "I can't see the exact time, but you can check your device clock."
+      ]
+    },
+    {
+      "tag": "qa_97",
+      "patterns": [
+        "Where are you from?"
+      ],
+      "responses": [
+        "I exist in the digital world to help users like you."
+      ]
+    },
+    {
+      "tag": "qa_98",
+      "patterns": [
+        "Are you smart?"
+      ],
+      "responses": [
+        "I try my best to provide helpful answers."
+      ]
+    },
+    {
+      "tag": "qa_99",
+      "patterns": [
+        "I'm bored"
+      ],
+      "responses": [
+        "Maybe we can chat, play a quiz, or I can tell you a joke."
+      ]
+    },
+    {
+      "tag": "qa_100",
+      "patterns": [
+        "Tell me something interesting"
+      ],
+      "responses": [
+        "Did you know honey never spoils? It can last for thousands of years!"
+      ]
+    },
+    {
+      "tag": "qa_101",
+      "patterns": [
+        "Do you like music?"
+      ],
+      "responses": [
+        "Music is wonderful! Many people enjoy it for relaxation and fun."
+      ]
+    },
+    {
+      "tag": "qa_102",
+      "patterns": [
+        "What is your favorite color?"
+      ],
+      "responses": [
+        "I like all colors, but blue is very calming."
+      ]
+    },
+    {
+      "tag": "qa_103",
+      "patterns": [
+        "Do you sleep?"
+      ],
+      "responses": [
+        "No, chatbots don't need sleep. I'm always ready to help."
+      ]
+    },
+    {
+      "tag": "qa_104",
+      "patterns": [
+        "Can you learn new things?"
+      ],
+      "responses": [
+        "I can improve when developers update my knowledge."
+      ]
+    },
+    {
+      "tag": "qa_105",
+      "patterns": [
+        "Do you like humans?"
+      ],
+      "responses": [
+        "Of course! I was created to help people."
+      ]
+    },
+    {
+      "tag": "qa_106",
+      "patterns": [
+        "Can you give advice?"
+      ],
+      "responses": [
+        "I can give general suggestions, but big decisions are always yours."
+      ]
+    },
+    {
+      "tag": "qa_107",
+      "patterns": [
+        "What should I do today?"
+      ],
+      "responses": [
+        "Maybe try something fun like learning a new skill or going for a walk."
+      ]
+    },
+    {
+      "tag": "qa_108",
+      "patterns": [
+        "Do you like food?"
+      ],
+      "responses": [
+        "I don't eat, but food sounds delicious!"
+      ]
+    },
+    {
+      "tag": "qa_109",
+      "patterns": [
+        "Tell me a fun fact"
+      ],
+      "responses": [
+        "Octopuses have three hearts!"
+      ]
+    },
+    {
+      "tag": "qa_110",
+      "patterns": [
+        "What is friendship?"
+      ],
+      "responses": [
+        "Friendship is a bond of trust, support, and care between people."
+      ]
+    },
+    {
+      "tag": "qa_111",
+      "patterns": [
+        "Can you motivate me?"
+      ],
+      "responses": [
+        "Of course! Keep going, every small step leads to success."
+      ]
+    },
+    {
+      "tag": "qa_112",
+      "patterns": [
+        "I'm feeling sad"
+      ],
+      "responses": [
+        "I'm sorry to hear that. Talking to someone you trust can help."
+      ]
+    },
+    {
+      "tag": "qa_113",
+      "patterns": [
+        "I'm happy today"
+      ],
+      "responses": [
+        "That's wonderful! Happiness is always nice to hear."
+      ]
+    },
+    {
+      "tag": "qa_114",
+      "patterns": [
+        "What is happiness?"
+      ],
+      "responses": [
+        "Happiness is a feeling of joy, satisfaction, and well-being."
+      ]
+    },
+    {
+      "tag": "qa_115",
+      "patterns": [
+        "What is success?"
+      ],
+      "responses": [
+        "Success means achieving your goals and feeling proud of your efforts."
+      ]
+    },
+    {
+      "tag": "qa_116",
+      "patterns": [
+        "Can you play games?"
+      ],
+      "responses": [
+        "I can play simple word or quiz games with you."
+      ]
+    },
+    {
+      "tag": "qa_117",
+      "patterns": [
+        "Ask me a question"
+      ],
+      "responses": [
+        "Sure! What is your favorite hobby?"
+      ]
+    },
+    {
+      "tag": "qa_118",
+      "patterns": [
+        "My hobby is reading"
+      ],
+      "responses": [
+        "That's great! Reading helps you learn and imagine new worlds."
+      ]
+    },
+    {
+      "tag": "qa_119",
+      "patterns": [
+        "I like movies"
+      ],
+      "responses": [
+        "Movies are fun! What kind of movies do you like?"
+      ]
+    },
+    {
+      "tag": "qa_120",
+      "patterns": [
+        "I like music"
+      ],
+      "responses": [
+        "Music can really lift the mood. What's your favorite genre?"
+      ]
+    },
+    {
+      "tag": "qa_121",
+      "patterns": [
+        "I like traveling"
+      ],
+      "responses": [
+        "Traveling is exciting! You get to see new places and cultures."
+      ]
+    },
+    {
+      "tag": "qa_122",
+      "patterns": [
+        "What is your hobby?"
+      ],
+      "responses": [
+        "My hobby is chatting with people and helping them."
+      ]
+    },
+    {
+      "tag": "qa_123",
+      "patterns": [
+        "Can we be friends?"
+      ],
+      "responses": [
+        "Of course! I'm always happy to chat with you."
+      ]
+    },
+    {
+      "tag": "qa_124",
+      "patterns": [
+        "Do you get tired?"
+      ],
+      "responses": [
+        "No, I can chat as long as you want."
+      ]
+    },
+    {
+      "tag": "qa_125",
+      "patterns": [
+        "What should I learn?"
+      ],
+      "responses": [
+        "Learning programming, languages, or creative skills can be useful."
+      ]
+    },
+    {
+      "tag": "qa_126",
+      "patterns": [
+        "Do you know programming?"
+      ],
+      "responses": [
+        "Yes, I know many programming concepts and languages."
+      ]
+    },
+    {
+      "tag": "qa_127",
+      "patterns": [
+        "What is Python?"
+      ],
+      "responses": [
+        "Python is a popular programming language used for many applications."
+      ]
+    },
+    {
+      "tag": "qa_128",
+      "patterns": [
+        "What is AI?"
+      ],
+      "responses": [
+        "AI stands for artificial intelligence, which allows machines to learn and solve problems."
+      ]
+    },
+    {
+      "tag": "qa_129",
+      "patterns": [
+        "Can you explain things simply?"
+      ],
+      "responses": [
+        "Yes! I always try to explain things in a simple way."
+      ]
+    },
+    {
+      "tag": "qa_130",
+      "patterns": [
+        "Do you like questions?"
+      ],
+      "responses": [
+        "Yes! Questions make conversations interesting."
+      ]
+    },
+    {
+      "tag": "qa_131",
+      "patterns": [
+        "Can you give me ideas?"
+      ],
+      "responses": [
+        "Sure! What kind of ideas are you looking for?"
+      ]
+    },
+    {
+      "tag": "qa_132",
+      "patterns": [
+        "I want to learn something new"
+      ],
+      "responses": [
+        "That's great! Learning new skills is always valuable."
+      ]
+    },
+    {
+      "tag": "qa_133",
+      "patterns": [
+        "What is technology?"
+      ],
+      "responses": [
+        "Technology refers to tools and systems created to solve problems."
+      ]
+    },
+    {
+      "tag": "qa_134",
+      "patterns": [
+        "Do you work all day?"
+      ],
+      "responses": [
+        "Yes, chatbots can work anytime without breaks."
+      ]
+    },
+    {
+      "tag": "qa_135",
+      "patterns": [
+        "Are you always online?"
+      ],
+      "responses": [
+        "I am available whenever you start chatting."
+      ]
+    },
+    {
+      "tag": "qa_136",
+      "patterns": [
+        "What makes you useful?"
+      ],
+      "responses": [
+        "I can provide information, answers, and friendly conversations."
+      ]
+    },
+    {
+      "tag": "qa_137",
+      "patterns": [
+        "What do people ask you most?"
+      ],
+      "responses": [
+        "People ask about technology, advice, and general questions."
+      ]
+    },
+    {
+      "tag": "qa_138",
+      "patterns": [
+        "Can you improve my day?"
+      ],
+      "responses": [
+        "I hope our conversation brings a smile to your face!"
+      ]
+    },
+    {
+      "tag": "qa_139",
+      "patterns": [
+        "Why should I stay positive?"
+      ],
+      "responses": [
+        "Staying positive helps you face challenges with confidence."
+      ]
+    },
+    {
+      "tag": "qa_140",
+      "patterns": [
+        "What is the meaning of life?"
+      ],
+      "responses": [
+        "Many people believe it is about happiness, growth, and helping others."
+      ]
+    },
+    {
+      "tag": "qa_141",
+      "patterns": [
+        "Do you like helping people?"
+      ],
+      "responses": [
+        "Yes! Helping people is my main purpose."
+      ]
+    },
+    {
+      "tag": "qa_142",
+      "patterns": [
+        "What is curiosity?"
+      ],
+      "responses": [
+        "Curiosity is the desire to learn and explore new things."
+      ]
+    },
+    {
+      "tag": "qa_143",
+      "patterns": [
+        "Can you inspire me?"
+      ],
+      "responses": [
+        "Believe in yourself. Every big achievement starts with a small step."
+      ]
+    },
+    {
+      "tag": "qa_144",
+      "patterns": [
+        "What is creativity?"
+      ],
+      "responses": [
+        "Creativity is the ability to produce new and original ideas."
+      ]
+    },
+    {
+      "tag": "qa_145",
+      "patterns": [
+        "Why is learning important?"
+      ],
+      "responses": [
+        "Learning helps you grow and understand the world better."
+      ]
+    },
+    {
+      "tag": "qa_146",
+      "patterns": [
+        "What is teamwork?"
+      ],
+      "responses": [
+        "Teamwork means people working together to achieve a goal."
+      ]
+    },
+    {
+      "tag": "qa_147",
+      "patterns": [
+        "What is kindness?"
+      ],
+      "responses": [
+        "Kindness means being caring and helpful toward others."
+      ]
+    },
+    {
+      "tag": "qa_148",
+      "patterns": [
+        "Do you enjoy conversations?"
+      ],
+      "responses": [
+        "Yes! Conversations help me connect with people like you."
+      ]
+    }
+  ]
+}

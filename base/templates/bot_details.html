@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ chatbot.name }} — ChatBot Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/botdetails.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ══ PRESET THEMES UI ══ */
+        .theme-presets-container {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .theme-presets-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .theme-presets-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .theme-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .theme-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .theme-btn::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            font-size: 10px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .theme-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="av-modal-overlay" id="avModalOverlay">
+    <div class="av-modal">
+        <div class="av-modal-head">
+            <h3>Adjust Avatar</h3>
+            <button class="av-modal-close" onclick="closeAvatarEditor()" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="av-modal-body">
+            <div class="av-preview-circle">
+                <canvas id="avCanvas" width="180" height="180"></canvas>
+            </div>
+            <div class="av-controls">
+                <div class="av-control-row">
+                    <label>Zoom</label>
+                    <input type="range" id="avZoom" min="10" max="300" value="100" step="1">
+                    <span class="av-control-val"><span id="avZoomVal">100</span>%</span>
+                </div>
+                <div class="av-control-row">
+                    <label>Horizontal</label>
+                    <input type="range" id="avX" min="-150" max="150" value="0" step="2">
+                    <span class="av-control-val"><span id="avXVal">0</span>px</span>
+                </div>
+                <div class="av-control-row">
+                    <label>Vertical</label>
+                    <input type="range" id="avY" min="-150" max="150" value="0" step="2">
+                    <span class="av-control-val"><span id="avYVal">0</span>px</span>
+                </div>
+                <button class="av-reset-btn" type="button" onclick="resetAvatarEditor()">
+                    ↺ Reset Position
+                </button>
+            </div>
+        </div>
+        <div class="av-modal-foot">
+            <button class="av-btn-cancel" type="button" onclick="closeAvatarEditor()">Cancel</button>
+            <button class="av-btn-apply" type="button" onclick="applyAvatarEdit()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:5px;">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Apply Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="8" fill="url(#grad)"/>
+                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
+                    <defs><linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
+                        <stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/>
+                    </linearGradient></defs>
+                </svg>
+                <span>ChatBot Builder</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <a href="{{ url_for('dashboard') }}" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Workspace</div>
+                <a href="{{ url_for('bots') }}" class="nav-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Bots</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="#" class="nav-item" id="accountMenu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>My Account</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+                <div class="submenu" id="accountSubmenu">
+                    <a href="{{ url_for('edit_profile') }}" class="submenu-item"><span class="dot"></span><span>Edit Profile</span></a>
+                    <a href="{{ url_for('change_password') }}" class="submenu-item"><span class="dot"></span><span>Change Password</span></a>
+                    <a href="{{ url_for('manage_subscription') }}" class="submenu-item"><span class="dot"></span><span>Subscription</span></a>
+                </div>
+            </div>
+        </nav>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar">{{ session.username[0].upper() }}</div>
+                <div class="user-details">
+                    <div class="user-name">{{ session.username }}</div>
+                    <div class="user-email">{{ session.email }}</div>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="breadcrumb">
+            <a href="{{ url_for('bots') }}">Bots</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>{{ chatbot.name }}</span>
+        </div>
+
+        <div class="bot-hero">
+            <div class="hero-avatar">
+                {% if chatbot.bot_avatar %}<img src="{{ chatbot.bot_avatar }}" alt="{{ chatbot.name }}">
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="34" height="34">
+                    <rect x="16" y="24" width="32" height="28" rx="6" fill="white" opacity="0.9"/>
+                    <line x1="32" y1="16" x2="32" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="32" cy="14" r="3" fill="white"/>
+                    <circle cx="24" cy="34" r="3.5" fill="#667eea"/>
+                    <circle cx="40" cy="34" r="3.5" fill="#667eea"/>
+                    <path d="M 24 44 Q 32 48 40 44" stroke="#667eea" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <rect x="10" y="30" width="6" height="14" rx="3" fill="white" opacity="0.7"/>
+                    <rect x="48" y="30" width="6" height="14" rx="3" fill="white" opacity="0.7"/>
+                </svg>
+                {% endif %}
+            </div>
+            <div class="hero-info">
+                <div class="hero-name">{{ chatbot.name }}</div>
+                <div class="hero-meta">
+                    <span class="hero-badge {{ 'active' if chatbot.is_active else 'inactive' }}">{{ 'Active' if chatbot.is_active else 'Inactive' }}</span>
+                    <span class="hero-badge">{{ 'Trained' if chatbot.is_trained else 'Not Trained' }}</span>
+                    <span class="hero-badge">{{ chatbot.bot_name }}</span>
+                    <span class="hero-badge">{{ chatbot.created_at.strftime('%b %d, %Y') }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-bar" id="tabBar">
+            <button class="tab-btn active" data-tab="overview" onclick="switchTab(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Overview</span>
+            </button>
+            <button class="tab-btn" data-tab="edit" onclick="switchTab(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span>Edit</span>
+            </button>
+            <button class="tab-btn" data-tab="train" onclick="switchTab(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>Train</span>
+            </button>
+            <button class="tab-btn" data-tab="preview" onclick="switchTab(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Preview</span>
+            </button>
+            <button class="tab-btn" data-tab="deploy" onclick="openDeployModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+                <span>Deploy</span>
+            </button>
+            <div class="tab-spacer"></div>
+            <button class="tab-btn tab-delete" data-tab="delete" onclick="switchTab(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Delete</span>
+            </button>
+        </div>
+
+        <div class="tab-panel active" id="panel-overview">
+            <div class="overview-layout">
+                <div>
+                    <div class="info-card">
+                        <div class="info-card-head">Bot Information</div>
+                        <div class="info-card-body">
+                            <div class="info-row"><span class="ir-label">Chatbot Name</span><span class="ir-value">{{ chatbot.name }}</span></div>
+                            <div class="info-row"><span class="ir-label">Display Name</span><span class="ir-value">{{ chatbot.bot_name }}</span></div>
+                            <div class="info-row"><span class="ir-label">Status</span><span class="status-pill {{ 'active' if chatbot.is_active else 'inactive' }}">{{ 'Active' if chatbot.is_active else 'Inactive' }}</span></div>
+                            <div class="info-row"><span class="ir-label">Training</span><span class="status-pill {{ 'trained' if chatbot.is_trained else 'untrained' }}">{{ 'Trained' if chatbot.is_trained else 'Not Trained' }}</span></div>
+                            <div class="info-row"><span class="ir-label">Created</span><span class="ir-value">{{ chatbot.created_at.strftime('%B %d, %Y') }}</span></div>
+                            {% if chatbot.description %}
+                            <div class="info-row" style="align-items:flex-start;">
+                                <span class="ir-label">Description</span>
+                                <span class="ir-value" style="font-weight:500;color:var(--text-mid);max-width:58%;line-height:1.5;">{{ chatbot.description }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-head">Welcome Message</div>
+                        <div class="info-card-body">
+                            <div class="welcome-box">{{ chatbot.welcome_message or 'No welcome message set.' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="info-card">
+                        <div class="info-card-head">Theme Colors</div>
+                        <div class="info-card-body">
+                            <div class="color-swatches">
+                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.theme_color }};"></div><div class="swatch-label">Theme</div></div>
+                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.chat_background_color }};"></div><div class="swatch-label">Chat BG</div></div>
+                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.bot_message_color }};"></div><div class="swatch-label">Bot Bubble</div></div>
+                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.bot_text_color }};"></div><div class="swatch-label">Bot Text</div></div>
+                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.user_text_color }};"></div><div class="swatch-label">User Text</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-edit">
+            <div class="edit-with-preview">
+                <div class="edit-form-wrap">
+                    <div class="edit-form-head"><h3>Edit Bot Settings</h3></div>
+                    <form method="POST" action="{{ url_for('edit_chatbot_route', chatbot_id=chatbot.id) }}" enctype="multipart/form-data">
+                        <div class="edit-form-body">
+
+                            <div class="edit-row single">
+                                <div class="edit-group">
+                                    <label>Bot Avatar</label>
+                                    <input type="file" id="avatarFileInput" name="bot_avatar" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="handleAvatarSelect(this)">
+                                    <input type="hidden" id="removeAvatarFlag" name="remove_avatar" value="0">
+                                    <input type="hidden" id="botAvatarData" name="bot_avatar_data" value="">
+
+                                    <div class="avatar-upload-section" id="avatarUploadCard"
+                                         onclick="document.getElementById('avatarFileInput').click()"
+                                         ondragover="avatarDragOver(event)"
+                                         ondragleave="avatarDragLeave(event)"
+                                         ondrop="avatarDrop(event)">
+
+                                        <div class="avatar-preview-wrap">
+                                            <div class="avatar-preview" id="avatarPreview">
+                                                {% if chatbot.bot_avatar %}
+                                                <img src="{{ chatbot.bot_avatar }}" alt="Bot Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                                {% else %}
+                                                <span>{{ chatbot.bot_name[0].upper() if chatbot.bot_name else 'B' }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="avatar-camera-badge">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                            </div>
+                                        </div>
+
+                                        <div class="avatar-upload-info">
+                                            <div class="avatar-upload-title" id="avatarUploadTitle">{% if chatbot.bot_avatar %}Change Avatar{% else %}Upload Avatar{% endif %}</div>
+                                            <div class="avatar-upload-hint">PNG, JPG, GIF or WebP · Max 2 MB<br>Click or drag &amp; drop an image here</div>
+                                            <div class="avatar-file-tag" id="avatarFileTag">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                                                <span id="avatarFileName"></span>
+                                                <button type="button" onclick="clearAvatarSelection(event)" title="Remove"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                                            </div>
+                                        </div>
+
+                                        <div class="avatar-upload-actions" onclick="event.stopPropagation()">
+                                            <button type="button" class="btn-avatar-choose" onclick="document.getElementById('avatarFileInput').click()">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                                Choose
+                                            </button>
+                                            <button type="button" class="btn-avatar-adjust hidden" id="btnAdjustAvatar" onclick="openAvatarEditor()">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                                                </svg>
+                                                Adjust
+                                            </button>
+                                            <button type="button" class="btn-avatar-remove {% if not chatbot.bot_avatar %}hidden{% endif %}" id="btnRemoveAvatar" onclick="removeAvatar(event)">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="edit-row">
+                                <div class="edit-group"><label for="ei_name">Chatbot Name *</label><input type="text" id="ei_name" name="name" value="{{ chatbot.name }}" required oninput="syncPreview()"></div>
+                                <div class="edit-group"><label for="ei_bot_name">Display Name *</label><input type="text" id="ei_bot_name" name="bot_name" value="{{ chatbot.bot_name }}" required oninput="syncPreview()"></div>
+                            </div>
+                            <div class="edit-row single"><div class="edit-group"><label for="ei_desc">Description</label><textarea id="ei_desc" name="description" rows="2">{{ chatbot.description or '' }}</textarea></div></div>
+                            <div class="edit-row single"><div class="edit-group"><label for="ei_welcome">Welcome Message *</label><textarea id="ei_welcome" name="welcome_message" rows="2" required oninput="syncPreview()">{{ chatbot.welcome_message or '' }}</textarea></div></div>
+                            <div class="edit-row single">
+                            </div>
+
+                            <div class="edit-row single" style="margin-top:4px;">
+                                <div class="edit-group">
+
+                                    <div class="theme-presets-container">
+                                        <div class="theme-presets-header">Preset Themes</div>
+                                        <div class="theme-presets-grid">
+                                            <button type="button" class="theme-btn" data-title="Indigo"
+                                                    style="background: linear-gradient(135deg, #4F46E5 50%, #F7FAFC 50%);"
+                                                    onclick="applyTheme('#4F46E5', '#F7FAFC', '#FFFFFF', '#1A202C', '#FFFFFF')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Emerald"
+                                                    style="background: linear-gradient(135deg, #10b981 50%, #f0fdf4 50%);"
+                                                    onclick="applyTheme('#10b981', '#f0fdf4', '#ffffff', '#064e3b', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Pro Slate"
+                                                    style="background: linear-gradient(135deg, #1e293b 50%, #f8fafc 50%);"
+                                                    onclick="applyTheme('#1e293b', '#f8fafc', '#f1f5f9', '#334155', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Sunset"
+                                                    style="background: linear-gradient(135deg, #f97316 50%, #fff7ed 50%);"
+                                                    onclick="applyTheme('#f97316', '#fff7ed', '#ffffff', '#7c2d12', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Rose"
+                                                    style="background: linear-gradient(135deg, #be185d 50%, #fff1f2 50%);"
+                                                    onclick="applyTheme('#be185d', '#fff1f2', '#ffffff', '#831843', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Forest"
+                                                    style="background: linear-gradient(135deg, #065f46 50%, #ecfdf5 50%);"
+                                                    onclick="applyTheme('#065f46', '#ecfdf5', '#ffffff', '#064e3b', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Lavender"
+                                                    style="background: linear-gradient(135deg, #7c3aed 50%, #f5f3ff 50%);"
+                                                    onclick="applyTheme('#7c3aed', '#f5f3ff', '#ffffff', '#4c1d95', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Dark Mode"
+                                                    style="background: linear-gradient(135deg, #374151 50%, #111827 50%);"
+                                                    onclick="applyTheme('#374151', '#111827', '#1f2937', '#f9fafb', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Cyber"
+                                                    style="background: linear-gradient(135deg, #00ff41 50%, #0d0d0d 50%);"
+                                                    onclick="applyTheme('#00ff41', '#0d0d0d', '#1a1a1a', '#00ff41', '#000000')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Earth"
+                                                    style="background: linear-gradient(135deg, #78350f 50%, #fef3c7 50%);"
+                                                    onclick="applyTheme('#78350f', '#fef3c7', '#ffffff', '#451a03', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Ocean"
+                                                    style="background: linear-gradient(135deg, #0ea5e9 50%, #f0f9ff 50%);"
+                                                    onclick="applyTheme('#0ea5e9', '#f0f9ff', '#ffffff', '#0c4a6e', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Blossom"
+                                                    style="background: linear-gradient(135deg, #fb7185 50%, #fff1f2 50%);"
+                                                    onclick="applyTheme('#fb7185', '#fff1f2', '#ffffff', '#881337', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Midnight"
+                                                    style="background: linear-gradient(135deg, #3b82f6 50%, #0f172a 50%);"
+                                                    onclick="applyTheme('#3b82f6', '#0f172a', '#1e293b', '#f8fafc', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Minimal"
+                                                    style="background: linear-gradient(135deg, #000000 50%, #ffffff 50%);"
+                                                    onclick="applyTheme('#000000', '#ffffff', '#f3f4f6', '#000000', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Synthwave"
+                                                    style="background: linear-gradient(135deg, #d946ef 50%, #170229 50%);"
+                                                    onclick="applyTheme('#d946ef', '#170229', '#2e1065', '#fdf4ff', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Latte"
+                                                    style="background: linear-gradient(135deg, #9a3412 50%, #fefce8 50%);"
+                                                    onclick="applyTheme('#9a3412', '#fefce8', '#ffffff', '#451a03', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Mint"
+                                                    style="background: linear-gradient(135deg, #14b8a6 50%, #f0fdfa 50%);"
+                                                    onclick="applyTheme('#14b8a6', '#f0fdfa', '#ffffff', '#134e4a', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Royal"
+                                                    style="background: linear-gradient(135deg, #9333ea 50%, #faf5ff 50%);"
+                                                    onclick="applyTheme('#9333ea', '#faf5ff', '#ffffff', '#3b0764', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Coral"
+                                                    style="background: linear-gradient(135deg, #f43f5e 50%, #fff1f2 50%);"
+                                                    onclick="applyTheme('#f43f5e', '#fff1f2', '#ffffff', '#881337', '#ffffff')"></button>
+
+                                            <button type="button" class="theme-btn" data-title="Glacier"
+                                                    style="background: linear-gradient(135deg, #64748b 50%, #f8fafc 50%);"
+                                                    onclick="applyTheme('#64748b', '#f8fafc', '#ffffff', '#0f172a', '#ffffff')"></button>
+                                        </div>
+                                    </div>
+
+                                    <label>Custom Colors</label>
+                                    <div class="color-edit-grid">
+                                        <div class="color-edit-item"><label for="ei_theme">Theme</label><input type="color" id="ei_theme" name="theme_color" value="{{ chatbot.theme_color }}" oninput="syncPreview()"></div>
+                                        <div class="color-edit-item"><label for="ei_bg">Chat BG</label><input type="color" id="ei_bg" name="chat_background_color" value="{{ chatbot.chat_background_color }}" oninput="syncPreview()"></div>
+                                        <div class="color-edit-item"><label for="ei_bubble">Bot Bubble</label><input type="color" id="ei_bubble" name="bot_message_color" value="{{ chatbot.bot_message_color }}" oninput="syncPreview()"></div>
+                                        <div class="color-edit-item"><label for="ei_btext">Bot Text</label><input type="color" id="ei_btext" name="bot_text_color" value="{{ chatbot.bot_text_color }}" oninput="syncPreview()"></div>
+                                        <div class="color-edit-item"><label for="ei_utext">User Text</label><input type="color" id="ei_utext" name="user_text_color" value="{{ chatbot.user_text_color }}" oninput="syncPreview()"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="edit-form-actions">
+                            <a href="{{ url_for('bots') }}" class="btn-cancel-edit">Cancel</a>
+                            <button type="submit" class="btn-save-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="edit-live-preview">
+                    <div class="elp-head"><span class="elp-pulse"></span>LIVE PREVIEW</div>
+                    <div class="elp-widget">
+                        <div class="elp-accent-bar"></div>
+                        <div class="elp-chat-header" id="elpHeader" style="background:{{ chatbot.theme_color }};">
+                            <div class="elp-chat-bot-info">
+                                <div class="elp-avatar" id="elpAvatar">{% if chatbot.bot_avatar %}<img src="{{ chatbot.bot_avatar }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% endif %}</div>
+                                <div><div class="elp-bot-name" id="elpBotName">{{ chatbot.bot_name }}</div><div class="elp-bot-status"><span class="elp-online-dot"></span>Online</div></div>
+                            </div>
+                        </div>
+                        <div class="elp-messages" id="elpMessages" style="background:{{ chatbot.chat_background_color }};">
+                            <div class="elp-msg elp-msg-bot">
+                                <div class="elp-msg-avatar" id="elpMsgAvatar">{% if chatbot.bot_avatar %}<img src="{{ chatbot.bot_avatar }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% endif %}</div>
+                                <div class="elp-msg-bubble" id="elpWelcome" style="background:{{ chatbot.bot_message_color }};color:{{ chatbot.bot_text_color }};">{{ chatbot.welcome_message or 'Hello! How can I help you?' }}</div>
+                            </div>
+                            <div class="elp-msg elp-msg-user">
+                                <div class="elp-msg-bubble elp-user-bubble" id="elpUserBubble" style="background:{{ chatbot.theme_color }};color:{{ chatbot.user_text_color }};">This is how user messages look</div>
+                            </div>
+                        </div>
+                        <div class="elp-input-area">
+                            <input type="text" class="elp-input" placeholder="Type your message…" disabled>
+                            <button class="elp-send" id="elpSend" style="background:{{ chatbot.theme_color }};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-train">
+            <div class="iframe-card">
+                <div class="iframe-card-head"><h3>Train Bot</h3></div>
+                <div class="iframe-wrap" id="trainWrap"><div class="iframe-overlay" id="trainOverlay"><div class="spinner"></div><p>Loading training page…</p></div></div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-preview">
+            <div class="iframe-card">
+                <div class="iframe-card-head"><h3>Preview Bot</h3></div>
+                <div class="iframe-wrap" id="previewWrap"><div class="iframe-overlay" id="previewOverlay"><div class="spinner"></div><p>Loading preview…</p></div></div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-deploy">
+            <div class="deploy-layout">
+                <div class="deploy-card">
+                    <div class="deploy-card-head"><div class="deploy-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="deploy-card-title"><h4>Embed Code</h4><p>Add to your website HTML</p></div></div>
+                    <div class="deploy-card-body">
+                        <div class="code-block"><pre><code id="embedCode">{{ iframe_code }}</code></pre><button class="btn-copy-code" onclick="copyCode()" id="copyCodeBtn"><svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Copy</button></div>
+                        <div class="step-list"><div class="step-item"><div class="step-num">1</div><span>Copy the embed code above</span></div><div class="step-item"><div class="step-num">2</div><span>Paste it inside your website's HTML</span></div><div class="step-item"><div class="step-num">3</div><span>Publish your site — done!</span></div></div>
+                    </div>
+                </div>
+                <div class="deploy-card">
+                    <div class="deploy-card-head"><div class="deploy-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="deploy-card-title"><h4>Direct Link &amp; QR</h4><p>Share your bot anywhere</p></div></div>
+                    <div class="deploy-card-body">
+                        <div class="link-row"><input type="text" class="link-input" id="directLink" readonly value="{{ request.host_url.rstrip('/') }}/embed/{{ chatbot.embed_code }}"><button class="btn-copy-link" onclick="copyLink()" id="copyLinkBtn"><svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Copy</button></div>
+                        <div class="link-actions" style="margin-bottom:14px;"><a href="{{ request.host_url.rstrip('/') }}/embed/{{ chatbot.embed_code }}" target="_blank" class="link-act-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Test Widget</a><button onclick="shareBot()" class="link-act-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button></div>
+                        <div class="qr-section"><p>Scan to open your bot</p><canvas id="qrCanvas" width="120" height="120"></canvas><br><button class="btn-dl-qr" onclick="downloadQR()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download QR</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-delete">
+            <div class="delete-zone">
+                <div class="danger-banner">
+                    <div class="danger-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                    <div><h4>Delete "{{ chatbot.name }}"?</h4><p>This action is permanent and cannot be undone. The following will be removed forever:</p></div>
+                </div>
+                <ul class="delete-checklist">
+                    <li>All bot configuration and appearance settings</li>
+                    <li>All training data and Q&amp;A pairs</li>
+                    <li>Conversation history and logs</li>
+                    <li>Embed codes and share links (will stop working)</li>
+                </ul>
+                <a href="{{ url_for('delete_chatbot_route', chatbot_id=chatbot.id) }}" class="btn-danger" onclick="return confirm('Permanently delete \'{{ chatbot.name }}\'? This cannot be undone.');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Yes, Delete Permanently
+                </a>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+</button>
+
+<script>
+/* ══ TOAST SYSTEM ══ */
+var toastIcons = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+};
+function showToast(type, title, msg, duration) {
+    duration = duration || 4000;
+    var c = document.getElementById('toastContainer');
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = '<div class="toast-icon-wrap">' + (toastIcons[type]||toastIcons.info) + '</div>' +
+        '<div class="toast-body"><p class="toast-title">' + title + '</p><p class="toast-msg">' + msg + '</p></div>' +
+        '<button class="toast-close" aria-label="Close">&#x2715;</button>' +
+        '<div class="toast-progress" style="animation-duration:' + duration + 'ms;"></div>';
+    t.querySelector('.toast-close').addEventListener('click', function(){ removeToast(t); });
+    c.appendChild(t);
+    setTimeout(function(){ t.classList.add('show'); }, 20);
+    t._timer = setTimeout(function(){ removeToast(t); }, duration);
+}
+function removeToast(t) {
+    if (!t || t.classList.contains('hide')) return;
+    clearTimeout(t._timer); t.classList.remove('show'); t.classList.add('hide');
+    setTimeout(function(){ if(t.parentElement) t.remove(); }, 420);
+}
+
+/* ══════════════════════════════════════
+   AVATAR STATE
+══════════════════════════════════════ */
+var _avatarBlobUrl     = null;
+var _avatarOriginalSrc = null;
+var _currentAvatarSrc  = '{{ chatbot.bot_avatar or "" }}' || null;
+
+var _avZoom = 100, _avX = 0, _avY = 0;
+var CANVAS_SIZE = 180;
+var OUTPUT_SIZE = 200;
+
+function handleAvatarSelect(input) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('error', 'File Too Large', 'Please choose an image under 2 MB.');
+        input.value = '';
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        _avatarOriginalSrc = e.target.result;
+        _avatarBlobUrl     = e.target.result;
+        _currentAvatarSrc  = e.target.result;
+
+        _avZoom = 100; _avX = 0; _avY = 0;
+
+        document.getElementById('botAvatarData').value    = e.target.result;
+        document.getElementById('removeAvatarFlag').value = '0';
+
+        document.getElementById('avatarPreview').innerHTML =
+            '<img src="'+e.target.result+'" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        document.getElementById('avatarFileName').textContent = file.name;
+        document.getElementById('avatarFileTag').classList.add('visible');
+        document.getElementById('avatarUploadTitle').textContent = 'Change Avatar';
+        document.getElementById('btnRemoveAvatar').classList.remove('hidden');
+
+        document.getElementById('btnAdjustAvatar').classList.remove('hidden');
+
+        _syncPreviewAvatars();
+        showToast('success', 'Avatar Uploaded', 'Use "Adjust" to crop or reposition it.');
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearAvatarSelection(event) {
+    event.stopPropagation();
+    document.getElementById('avatarFileInput').value = '';
+    _avatarBlobUrl = null; _avatarOriginalSrc = null;
+    document.getElementById('botAvatarData').value = '';
+
+    var savedUrl = '{{ chatbot.bot_avatar or "" }}';
+    var preview  = document.getElementById('avatarPreview');
+    if (savedUrl) {
+        _currentAvatarSrc = savedUrl;
+        preview.innerHTML = '<img src="'+savedUrl+'" alt="Bot Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        document.getElementById('avatarUploadTitle').textContent = 'Change Avatar';
+        document.getElementById('btnRemoveAvatar').classList.remove('hidden');
+        document.getElementById('btnAdjustAvatar').classList.remove('hidden');
+    } else {
+        _currentAvatarSrc = null;
+        var initial = (document.getElementById('ei_bot_name').value || '{{ chatbot.bot_name }}').charAt(0).toUpperCase() || 'B';
+        preview.innerHTML = '<span>'+initial+'</span>';
+        document.getElementById('avatarUploadTitle').textContent = 'Upload Avatar';
+        document.getElementById('btnRemoveAvatar').classList.add('hidden');
+        document.getElementById('btnAdjustAvatar').classList.add('hidden');
+    }
+    document.getElementById('avatarFileTag').classList.remove('visible');
+    document.getElementById('removeAvatarFlag').value = '0';
+    _syncPreviewAvatars();
+}
+
+function removeAvatar(event) {
+    event.stopPropagation();
+    if (!confirm('Remove the current bot avatar?')) return;
+    document.getElementById('avatarFileInput').value = '';
+    document.getElementById('botAvatarData').value   = '';
+    if (_avatarBlobUrl) { URL.revokeObjectURL(_avatarBlobUrl); _avatarBlobUrl = null; }
+    _avatarOriginalSrc = null; _currentAvatarSrc = null;
+    document.getElementById('removeAvatarFlag').value = '1';
+    var botName = document.getElementById('ei_bot_name').value || '{{ chatbot.bot_name }}';
+    document.getElementById('avatarPreview').innerHTML = '<span>'+botName.charAt(0).toUpperCase()+'</span>';
+    document.getElementById('avatarFileTag').classList.remove('visible');
+    document.getElementById('avatarUploadTitle').textContent = 'Upload Avatar';
+    document.getElementById('btnRemoveAvatar').classList.add('hidden');
+    document.getElementById('btnAdjustAvatar').classList.add('hidden');
+    _syncPreviewAvatars();
+}
+
+function avatarDragOver(e)  { e.preventDefault(); document.getElementById('avatarUploadCard').classList.add('dragover'); }
+function avatarDragLeave(e) { document.getElementById('avatarUploadCard').classList.remove('dragover'); }
+function avatarDrop(e) {
+    e.preventDefault();
+    document.getElementById('avatarUploadCard').classList.remove('dragover');
+    var files = e.dataTransfer.files;
+    if (files && files[0]) {
+        try { var dt = new DataTransfer(); dt.items.add(files[0]); document.getElementById('avatarFileInput').files = dt.files; } catch(ex){}
+        handleAvatarSelect({ files: files });
+    }
+}
+
+function _syncPreviewAvatars() {
+    var h = document.getElementById('elpAvatar');
+    var m = document.getElementById('elpMsgAvatar');
+    if (!h || !m) return;
+    if (_currentAvatarSrc) {
+        var s = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+        h.innerHTML = '<img src="'+_currentAvatarSrc+'" alt="" style="'+s+'">';
+        m.innerHTML = '<img src="'+_currentAvatarSrc+'" alt="" style="'+s+'">';
+    } else {
+        var c = document.getElementById('ei_theme') ? document.getElementById('ei_theme').value : '{{ chatbot.theme_color }}';
+        h.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18"><rect x="16" y="22" width="32" height="26" rx="6" fill="white" opacity="0.92"/><circle cx="23" cy="32" r="3.5" fill="'+c+'"/><circle cx="41" cy="32" r="3.5" fill="'+c+'"/><path d="M23 42 Q32 46 41 42" stroke="'+c+'" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="10" y="28" width="6" height="13" rx="3" fill="white" opacity="0.7"/><rect x="48" y="28" width="6" height="13" rx="3" fill="white" opacity="0.7"/></svg>';
+        m.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="14" height="14"><rect x="16" y="22" width="32" height="26" rx="6" fill="'+c+'"/><circle cx="23" cy="32" r="3.5" fill="white"/><circle cx="41" cy="32" r="3.5" fill="white"/><path d="M23 42 Q32 46 41 42" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+    }
+}
+
+/* ══════════════════════════════════════
+   AVATAR EDITOR
+══════════════════════════════════════ */
+function openAvatarEditor() {
+    var src = _avatarOriginalSrc || _currentAvatarSrc;
+    if (!src) { showToast('warning', 'No Image', 'Please upload an avatar first.'); return; }
+
+    document.getElementById('avZoom').value = _avZoom;
+    document.getElementById('avX').value    = _avX;
+    document.getElementById('avY').value    = _avY;
+    document.getElementById('avZoomVal').textContent = _avZoom;
+    document.getElementById('avXVal').textContent    = _avX;
+    document.getElementById('avYVal').textContent    = _avY;
+
+    document.getElementById('avModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(renderEditorCanvas, 50);
+}
+
+function closeAvatarEditor() {
+    document.getElementById('avModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function resetAvatarEditor() {
+    _avZoom = 100; _avX = 0; _avY = 0;
+    document.getElementById('avZoom').value = 100;
+    document.getElementById('avX').value    = 0;
+    document.getElementById('avY').value    = 0;
+    document.getElementById('avZoomVal').textContent = 100;
+    document.getElementById('avXVal').textContent    = 0;
+    document.getElementById('avYVal').textContent    = 0;
+    renderEditorCanvas();
+}
+
+function renderEditorCanvas() {
+    var canvas = document.getElementById('avCanvas');
+    var ctx    = canvas.getContext('2d');
+    var src    = _avatarOriginalSrc || _currentAvatarSrc;
+    if (!src) return;
+
+    var img = new Image();
+    img.onload = function() {
+        canvas.width  = CANVAS_SIZE;
+        canvas.height = CANVAS_SIZE;
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+        ctx.beginPath();
+        ctx.arc(CANVAS_SIZE/2, CANVAS_SIZE/2, CANVAS_SIZE/2, 0, Math.PI*2);
+        ctx.clip();
+
+        var scale = _avZoom / 100;
+        var sw = img.width  * scale;
+        var sh = img.height * scale;
+        ctx.drawImage(img,
+            (CANVAS_SIZE - sw) / 2 + _avX,
+            (CANVAS_SIZE - sh) / 2 + _avY,
+            sw, sh
+        );
+    };
+    img.src = src;
+}
+
+function applyAvatarEdit() {
+    var src = _avatarOriginalSrc || _currentAvatarSrc;
+    if (!src) { closeAvatarEditor(); return; }
+
+    var outCanvas = document.createElement('canvas');
+    outCanvas.width  = OUTPUT_SIZE;
+    outCanvas.height = OUTPUT_SIZE;
+    var ctx = outCanvas.getContext('2d');
+    var img = new Image();
+
+    img.onload = function() {
+        ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+        ctx.beginPath();
+        ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2);
+        ctx.clip();
+
+        var ratio  = OUTPUT_SIZE / CANVAS_SIZE;
+        var scale  = _avZoom / 100;
+        var sw = img.width  * scale;
+        var sh = img.height * scale;
+        ctx.drawImage(img,
+            (OUTPUT_SIZE - sw) / 2 + (_avX * ratio),
+            (OUTPUT_SIZE - sh) / 2 + (_avY * ratio),
+            sw, sh
+        );
+
+        var dataUrl = outCanvas.toDataURL('image/png');
+
+        _currentAvatarSrc = dataUrl;
+        document.getElementById('botAvatarData').value = dataUrl;
+        document.getElementById('avatarPreview').innerHTML =
+            '<img src="'+dataUrl+'" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        document.getElementById('removeAvatarFlag').value = '0';
+        document.getElementById('btnRemoveAvatar').classList.remove('hidden');
+        document.getElementById('btnAdjustAvatar').classList.remove('hidden');
+
+        _syncPreviewAvatars();
+        closeAvatarEditor();
+        showToast('success', 'Avatar Adjusted', 'Your changes have been applied. Save the form to keep them.');
+    };
+
+    img.onerror = function() {
+        showToast('error', 'Error', 'Could not process the image. Please try again.');
+    };
+
+    img.src = src;
+}
+
+document.getElementById('avZoom').addEventListener('input', function() {
+    _avZoom = parseInt(this.value);
+    document.getElementById('avZoomVal').textContent = _avZoom;
+    renderEditorCanvas();
+});
+document.getElementById('avX').addEventListener('input', function() {
+    _avX = parseInt(this.value);
+    document.getElementById('avXVal').textContent = _avX;
+    renderEditorCanvas();
+});
+document.getElementById('avY').addEventListener('input', function() {
+    _avY = parseInt(this.value);
+    document.getElementById('avYVal').textContent = _avY;
+    renderEditorCanvas();
+});
+
+document.getElementById('avModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeAvatarEditor();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (document.getElementById('avModalOverlay').classList.contains('open')) closeAvatarEditor();
+        else closeDeployModal();
+    }
+});
+
+(function() {
+    if ('{{ chatbot.bot_avatar }}') {
+        var btn = document.getElementById('btnAdjustAvatar');
+        if (btn) btn.classList.remove('hidden');
+        _avatarOriginalSrc = '{{ chatbot.bot_avatar }}';
+    }
+})();
+
+/* ══ WELCOME BUTTONS ══ */
+var _eiButtons=[];
+(function initButtons(){
+    var hiddenEl=document.getElementById('ei_welcome_buttons');
+    var raw=hiddenEl?hiddenEl.getAttribute('data-raw'):'[]';
+    try{var parsed=JSON.parse(raw);if(Array.isArray(parsed))_eiButtons=parsed.map(function(b){return{text:b.text||'',type:b.type||'message',value:b.value||''};});}catch(e){_eiButtons=[];}
+    eiRenderButtons();
+})();
+function eiAddButton(){_eiButtons.push({text:'',type:'message',value:''});eiRenderButtons();}
+function eiRemoveButton(i){_eiButtons.splice(i,1);eiRenderButtons();}
+function eiUpdateField(i,f,v){if(_eiButtons[i]){_eiButtons[i][f]=v;eiSyncJson();}}
+function eiValLabel(t){return t==='url'?'URL':t==='intent'?'Intent Tag':'Message Text';}
+function eiValPlaceholder(t){return t==='url'?'https://example.com':t==='intent'?'e.g., pricing_info':'e.g., Tell me about pricing';}
+function eiRenderButtons(){
+    var list=document.getElementById('eiWbList');if(!list)return;
+    if(_eiButtons.length===0){list.innerHTML='<div class="ei-wb-empty">No buttons yet — click "Add Button" to add quick replies below the welcome message.</div>';eiSyncJson();return;}
+    list.innerHTML=_eiButtons.map(function(btn,i){return'<div class="ei-wb-item"><div class="ei-wb-item-head"><span class="ei-wb-num">Button '+(i+1)+'</span><button type="button" class="ei-btn-remove-wb" onclick="eiRemoveButton('+i+')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove</button></div><div class="ei-wb-fields"><div class="ei-wb-field"><label>Label</label><input type="text" placeholder="e.g., Get Started" value="'+eiEsc(btn.text)+'" oninput="eiUpdateField('+i+',\'text\',this.value)"></div><div class="ei-wb-field"><label>Action</label><select onchange="eiUpdateField('+i+',\'type\',this.value)"><option value="message"'+(btn.type==='message'?' selected':'')+'>Message</option><option value="url"'+(btn.type==='url'?' selected':'')+'>URL</option><option value="intent"'+(btn.type==='intent'?' selected':'')+'>Intent</option></select></div><div class="ei-wb-field ei-wb-full"><label>'+eiValLabel(btn.type)+'</label><input type="text" placeholder="'+eiValPlaceholder(btn.type)+'" value="'+eiEsc(btn.value)+'" oninput="eiUpdateField('+i+',\'value\',this.value)"></div></div></div>';}).join('');
+    eiSyncJson();
+}
+function eiSyncJson(){var el=document.getElementById('ei_welcome_buttons');if(el)el.value=JSON.stringify(_eiButtons.map(function(b){return{text:b.text,type:b.type,value:b.value,has_submenu:false,submenu_items:[]};}));}
+function eiEsc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ══ PRESET THEME APPLIER ══ */
+function applyTheme(themeColor, bgColor, botBubbleColor, botTextColor, userTextColor) {
+    document.getElementById('ei_theme').value = themeColor;
+    document.getElementById('ei_bg').value = bgColor;
+    document.getElementById('ei_bubble').value = botBubbleColor;
+    document.getElementById('ei_btext').value = botTextColor;
+    document.getElementById('ei_utext').value = userTextColor;
+
+    syncPreview();
+    showToast('success', 'Theme Applied', 'Live preview updated! Click Save to keep it.');
+}
+
+/* ══ LIVE PREVIEW ══ */
+function syncPreview(){
+    var botName=document.getElementById('ei_bot_name'),welcome=document.getElementById('ei_welcome'),theme=document.getElementById('ei_theme'),chatBg=document.getElementById('ei_bg'),botBubble=document.getElementById('ei_bubble'),botText=document.getElementById('ei_btext'),userText=document.getElementById('ei_utext');
+    if(botName)document.getElementById('elpBotName').textContent=botName.value||'AI Assistant';
+    if(welcome)document.getElementById('elpWelcome').textContent=welcome.value||'Hello! How can I help you?';
+    if(theme){document.getElementById('elpHeader').style.background=theme.value;document.getElementById('elpSend').style.background=theme.value;}
+    if(chatBg)document.getElementById('elpMessages').style.background=chatBg.value;
+    if(botBubble&&botText){document.getElementById('elpWelcome').style.background=botBubble.value;document.getElementById('elpWelcome').style.color=botText.value;}
+    if(theme&&userText){document.getElementById('elpUserBubble').style.background=theme.value;document.getElementById('elpUserBubble').style.color=userText.value;}
+    if(!_currentAvatarSrc)_syncPreviewAvatars();
+}
+
+/* ══ SIDEBAR ══ */
+document.getElementById('mobileMenuToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open');});
+document.getElementById('accountMenu').addEventListener('click',function(e){e.preventDefault();this.classList.toggle('expanded');document.getElementById('accountSubmenu').classList.toggle('open');});
+
+/* ══ TABS ══ */
+var _trainLoaded=false,_previewLoaded=false;
+function switchTab(btn){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var tab=btn.dataset.tab;
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+    document.getElementById('panel-'+tab).classList.add('active');
+    if(tab==='train'&&!_trainLoaded)loadIframe('train');
+    if(tab==='preview'&&!_previewLoaded)loadIframe('preview');
+    if(tab==='deploy')buildQR();
+    window.location.hash=tab;
+}
+function loadIframe(type){
+    var urls={train:'{{ url_for("train_chatbot",chatbot_id=chatbot.id) }}?embed=1',preview:'{{ url_for("preview_chatbot",chatbot_id=chatbot.id) }}?embed=1'};
+    var wrap=document.getElementById(type+'Wrap'),overlay=document.getElementById(type+'Overlay'),iframe=document.createElement('iframe');
+    iframe.src=urls[type];iframe.title=type==='train'?'Train Bot':'Preview Bot';
+    iframe.style.cssText='width:100%;border:none;display:block;min-height:500px;';
+    iframe.onload=function(){overlay.style.display='none';try{var resize=function(){var h=iframe.contentDocument.documentElement.scrollHeight;if(h>200)iframe.style.height=h+'px';};resize();setTimeout(resize,300);setTimeout(resize,800);}catch(e){iframe.style.height='750px';}};
+    wrap.appendChild(iframe);
+    if(type==='train')_trainLoaded=true;else _previewLoaded=true;
+}
+
+/* ══ COPY / SHARE / QR ══ */
+function copyCode(){navigator.clipboard.writeText(document.getElementById('embedCode').textContent).then(function(){var b=document.getElementById('copyCodeBtn');b.classList.add('copied');setTimeout(function(){b.classList.remove('copied');},2500);});}
+function copyLink(){navigator.clipboard.writeText(document.getElementById('directLink').value).then(function(){var b=document.getElementById('copyLinkBtn');b.classList.add('copied');setTimeout(function(){b.classList.remove('copied');},2500);});}
+function shareBot(){var l=document.getElementById('directLink').value;if(navigator.share)navigator.share({title:'{{ chatbot.name }}',url:l});else copyLink();}
+function buildQR(){var canvas=document.getElementById('qrCanvas');if(!canvas||canvas.dataset.built)return;canvas.dataset.built='1';var ctx=canvas.getContext('2d'),url=document.getElementById('directLink').value;ctx.fillStyle='#fff';ctx.fillRect(0,0,120,120);ctx.fillStyle='#1a1f3a';var size=4,cols=30;for(var i=0;i<cols;i++)for(var j=0;j<cols;j++){if((url.charCodeAt((i*cols+j)%url.length)+i+j)%3===0)ctx.fillRect(i*size,j*size,size,size);}[0,22].forEach(function(x){[0,22].forEach(function(y){ctx.fillStyle='#1a1f3a';ctx.fillRect(x*size,y*size,size*6,size*6);ctx.fillStyle='#fff';ctx.fillRect(x*size+size,y*size+size,size*4,size*4);ctx.fillStyle='#1a1f3a';ctx.fillRect(x*size+size*2,y*size+size*2,size*2,size*2);});});}
+function downloadQR(){var a=document.createElement('a');a.download='{{ chatbot.name }}-qr.png';a.href=document.getElementById('qrCanvas').toDataURL();a.click();}
+
+/* ══ DEPLOY MODAL ══ */
+var _isBotActive={{ 'true' if chatbot.is_active else 'false' }};
+function openDeployModal(){if(_isBotActive){window.location.href='{{ url_for("deploy_chatbot",chatbot_id=chatbot.id) }}';return;}document.getElementById('deployModalOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeDeployModal(){document.getElementById('deployModalOverlay').classList.remove('open');document.body.style.overflow='';}
+function confirmDeploy(){var btn=document.getElementById('deployModalConfirmBtn');btn.disabled=true;btn.innerHTML='Deploying…';window.location.href='{{ url_for("deploy_chatbot",chatbot_id=chatbot.id) }}';}
+
+/* ══ FLASK FLASH MESSAGES → TOASTS ══ */
+document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    {% if category == 'error' or category == 'danger' %}
+    showToast('error', 'Error', '{{ message }}');
+    {% elif category == 'success' %}
+    showToast('success', 'Success', '{{ message }}');
+    {% elif category == 'warning' %}
+    showToast('warning', 'Warning', '{{ message }}');
+    {% else %}
+    showToast('info', 'Notice', '{{ message }}');
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    var hash=window.location.hash.replace('#','');
+    if(hash){var t=document.querySelector('.tab-btn[data-tab="'+hash+'"]');if(t)switchTab(t);}
+    if(!_currentAvatarSrc)_syncPreviewAvatars();
+});
+</script>
+
+<div class="deploy-modal-overlay" id="deployModalOverlay" onclick="closeDeployModal()">
+    <div class="deploy-modal" onclick="event.stopPropagation()">
+        <div class="deploy-modal-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></div>
+        <h3 class="deploy-modal-title">Deploy "{{ chatbot.name }}"?</h3>
+        <p class="deploy-modal-body">This will <strong>activate</strong> your chatbot and make it publicly accessible via its embed code and direct link.</p>
+        <ul class="deploy-modal-checks">
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Bot status will be set to <strong>Active</strong></li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Embed code becomes live on your website</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>You can deactivate it anytime from Bot Settings</li>
+        </ul>
+        <div class="deploy-modal-actions">
+            <button class="deploy-modal-cancel" onclick="closeDeployModal()">Cancel</button>
+            <button class="deploy-modal-confirm" id="deployModalConfirmBtn" onclick="confirmDeploy()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>Yes, Deploy Now</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

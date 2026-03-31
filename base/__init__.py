@@ -45,6 +45,20 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.secret_key = SECRET_KEY
 
 # ============================================
+# ENVIRONMENT CONFIGURATION (MOVED UP)
+# ============================================
+flask_env = os.getenv('FLASK_ENV', 'development')
+
+if flask_env == 'production':
+    app.config['DEBUG'] = False  # FIXED: Should be False in production
+    app.config['TESTING'] = False  # FIXED: Should be False in production
+    print("🔒 Running in PRODUCTION mode")
+else:
+    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
+    app.config['TESTING'] = False
+    print("🔧 Running in DEVELOPMENT mode")
+
+# ============================================
 # DATABASE CONFIGURATION
 # ============================================
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -82,20 +96,6 @@ app.permanent_session_lifetime = timedelta(seconds=session_lifetime)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
-# ============================================
-# ENVIRONMENT CONFIGURATION
-# ============================================
-flask_env = os.getenv('FLASK_ENV', 'development')
-
-if flask_env == 'production':
-    app.config['DEBUG'] = True
-    app.config['TESTING'] = True
-    print("🔒 Running in PRODUCTION mode")
-else:
-    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
-    app.config['TESTING'] = False
-    print("🔧 Running in DEVELOPMENT mode")
 
 # ============================================
 # FILE STORAGE CONFIGURATION
@@ -150,23 +150,46 @@ else:
     print("⚠️  Email not configured")
 
 # ============================================
-# PERFORMANCE & CACHING
+# PERFORMANCE & CACHING (FIXED)
 # ============================================
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 year for static files
+# Version for cache busting
+app.config['VERSION'] = os.getenv('APP_VERSION', '1.0.0')
+
+# Different cache settings for dev vs production
+if flask_env == 'production':
+    # Cache static files for 1 year in production
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000
+    print("✅ Static file caching: ENABLED (1 year)")
+else:
+    # No caching in development for easier CSS/JS changes
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    print("✅ Static file caching: DISABLED (development mode)")
 
 # ============================================
-# SECURITY HEADERS
+# SECURITY HEADERS (IMPROVED)
 # ============================================
 @app.after_request
 def add_security_headers(response):
     """Add security headers to all responses"""
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    response.headers["Surrogate-Control"] = "no-store"
+
+    # Only disable caching for HTML pages, not static files
+    if response.mimetype == 'text/html':
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        response.headers["Surrogate-Control"] = "no-store"
+    elif flask_env != 'production':
+        # In development, also disable caching for CSS/JS
+        if response.mimetype in ['text/css', 'application/javascript', 'application/x-javascript']:
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+
+    # Security headers for all responses
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["X-XSS-Protection"] = "1; mode=block"
+
     return response
 
 # ============================================
@@ -197,6 +220,17 @@ def from_json_filter(s):
     except Exception as e:
         print(f"Error parsing JSON: {e}")
         return {}
+
+# ============================================
+# TEMPLATE CONTEXT PROCESSORS (NEW)
+# ============================================
+@app.context_processor
+def inject_version():
+    """Inject version number for cache busting in templates"""
+    return {
+        'app_version': app.config['VERSION'],
+        'flask_env': flask_env
+    }
 
 # ============================================
 # CREATE DIRECTORY STRUCTURE

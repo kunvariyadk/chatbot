@@ -855,31 +855,62 @@ avatarInput.addEventListener('change', function(e) {
 
         const reader = new FileReader();
         reader.onload = function(event) {
-            uploadedAvatarUrl = event.target.result;
-            originalAvatarUrl = event.target.result;
+            // Create an image object to resize and compress
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
 
-            avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            updatePreviewAvatars();
+                // Resize down to a max of 400x400 to save space
+                const MAX_SIZE = 400;
+                let width = img.width;
+                let height = img.height;
 
-            removeAvatarBtn.style.display = 'inline-flex';
-            adjustAvatarBtn.style.display = 'inline-flex';
+                if (width > height && width > MAX_SIZE) {
+                    height *= MAX_SIZE / width;
+                    width = MAX_SIZE;
+                } else if (height > MAX_SIZE) {
+                    width *= MAX_SIZE / height;
+                    height = MAX_SIZE;
+                }
 
-             if (botAvatarDataInput) {
-                botAvatarDataInput.value = event.target.result;
-            }
+                canvas.width = width;
+                canvas.height = height;
 
-            if (removeAvatarFlag) {
-                removeAvatarFlag.value = 'false';
-            }
+                // Fill white background in case of transparent PNGs
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, width, height);
 
-            currentZoom = 100;
-            currentX = 0;
-            currentY = 0;
+                // COMPRESS: Convert to JPEG at 70% quality
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                uploadedAvatarUrl = compressedBase64;
+                originalAvatarUrl = compressedBase64;
+
+                avatarPreview.innerHTML = `<img src="${uploadedAvatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                updatePreviewAvatars();
+
+                removeAvatarBtn.style.display = 'inline-flex';
+                adjustAvatarBtn.style.display = 'inline-flex';
+
+                if (botAvatarDataInput) {
+                    botAvatarDataInput.value = compressedBase64;
+                }
+
+                if (removeAvatarFlag) {
+                    removeAvatarFlag.value = 'false';
+                }
+
+                currentZoom = 100;
+                currentX = 0;
+                currentY = 0;
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     }
 });
-
 // ========== REMOVE AVATAR ==========
 if (removeAvatarBtn) {
     removeAvatarBtn.addEventListener('click', function() {
@@ -1030,6 +1061,10 @@ window.saveAvatarImage = function() {
         ctx.arc(PREVIEW_SIZE / 2, PREVIEW_SIZE / 2, PREVIEW_SIZE / 2, 0, Math.PI * 2);
         ctx.clip();
 
+        // Fill white background for JPEG compression
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+
         const scale = currentZoom / 100;
         const scaledWidth = img.width * scale;
         const scaledHeight = img.height * scale;
@@ -1039,7 +1074,8 @@ window.saveAvatarImage = function() {
 
         ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
 
-        uploadedAvatarUrl = canvas.toDataURL('image/png');
+        // COMPRESS: Convert to JPEG at 80% quality instead of uncompressed PNG
+        uploadedAvatarUrl = canvas.toDataURL('image/jpeg', 0.8);
 
         if (botAvatarDataInput) {
             botAvatarDataInput.value = uploadedAvatarUrl;
@@ -1057,14 +1093,6 @@ window.saveAvatarImage = function() {
 
     img.src = originalAvatarUrl || uploadedAvatarUrl;
 };
-
-if (avatarEditorModal) {
-    avatarEditorModal.addEventListener('click', function(e) {
-        if (e.target === avatarEditorModal) {
-            closeAvatarEditor();
-        }
-    });
-}
 
 // ========== SIDEBAR MENUS ==========
 const botsMenu = document.getElementById('botsMenu');

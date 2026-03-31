@@ -1,0 +1,2061 @@
+[
+  {
+    "intent": "greeting",
+    "tag": "greeting",
+    "patterns": [
+      "hi",
+      "hello",
+      "hey",
+      "good morning",
+      "good evening",
+      "good afternoon",
+      "hey there",
+      "hello there",
+      "hi bot",
+      "anyone here",
+      "is anyone there",
+      "hi how are you",
+      "hello how are you doing"
+    ],
+    "responses": [
+      "Hello! How can I assist you today?"
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "about_company",
+    "tag": "about_company",
+    "patterns": [
+      "what is td tech",
+      "tell me about td tech",
+      "what does td tech solutions do",
+      "about td tech",
+      "company information",
+      "who are you",
+      "tell me about your company",
+      "what kind of company is td tech",
+      "give company details",
+      "what services does your company provide"
+    ],
+    "responses": [
+      "TD Tech Solutions is a software development company that provides web, mobile, and enterprise technology solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "services",
+    "tag": "services",
+    "patterns": [
+      "what services do you provide",
+      "your services",
+      "what can you do",
+      "what solutions do you offer",
+      "do you provide development services",
+      "what type of work do you do",
+      "what are your offerings",
+      "can you develop software",
+      "do you build applications"
+    ],
+    "responses": [
+      "We provide web development, mobile app development, product development, and software consulting services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "web_development",
+    "tag": "web_development",
+    "patterns": [
+      "do you build websites",
+      "website development",
+      "web development service",
+      "can you create a website",
+      "i want a website",
+      "do you develop web applications",
+      "need web development",
+      "can you build my company website",
+      "do you design websites"
+    ],
+    "responses": [
+      "Yes, we develop custom websites and web applications tailored to your business needs."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "mobile_app",
+    "tag": "mobile_app",
+    "patterns": [
+      "do you develop mobile apps",
+      "mobile application development",
+      "android app development",
+      "ios app development",
+      "can you build mobile apps",
+      "i want to build an app",
+      "do you create mobile applications",
+      "app development services"
+    ],
+    "responses": [
+      "Yes, we develop mobile apps for Android, iOS, and cross-platform environments."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "contact",
+    "tag": "contact",
+    "patterns": [
+      "how can i contact you",
+      "contact details",
+      "your phone number",
+      "how do i reach you",
+      "email address",
+      "where can i contact td tech",
+      "how to talk with your team",
+      "how can i connect with you"
+    ],
+    "responses": [
+      "You can contact us via email at inquiry@tdtech.in or call +91 99252 92157."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "location",
+    "tag": "location",
+    "patterns": [
+      "where is your office",
+      "your company location",
+      "where are you located",
+      "office address",
+      "where is td tech solutions",
+      "company address",
+      "where is your headquarters"
+    ],
+    "responses": [
+      "Our office is located in Ahmedabad, Gujarat, India."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "pricing",
+    "tag": "pricing",
+    "patterns": [
+      "how much does a website cost",
+      "price for mobile app",
+      "what is your pricing",
+      "cost of development",
+      "how much do you charge",
+      "project cost",
+      "software development cost"
+    ],
+    "responses": [
+      "The cost depends on the project requirements. Please contact us to get a custom quote."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "goodbye",
+    "tag": "goodbye",
+    "patterns": [
+      "bye",
+      "goodbye",
+      "see you",
+      "talk to you later",
+      "thanks bye",
+      "have a nice day"
+    ],
+    "responses": [
+      "Goodbye! Have a great day."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_1",
+    "tag": "qa_1",
+    "patterns": [
+      "What is TD Tech Solutions?"
+    ],
+    "responses": [
+      "TD Tech Solutions is an offshore software development company based in India that helps SMEs with quality technology-driven solutions and services across the globe. We have over 15 years of experience in the industry."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_2",
+    "tag": "qa_2",
+    "patterns": [
+      "How long has TD Tech Solutions been in business?"
+    ],
+    "responses": [
+      "TD Tech Solutions has been a trusted development partner for more than 15 years."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_3",
+    "tag": "qa_3",
+    "patterns": [
+      "Where is TD Tech Solutions located?"
+    ],
+    "responses": [
+      "We are located at D-617, Ganesh Glory-11, Jagatpur Rd, S.G. Highway, Ahmedabad, Gujarat 382470, India."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_4",
+    "tag": "qa_4",
+    "patterns": [
+      "What is TD Tech's main focus?"
+    ],
+    "responses": [
+      "TD Tech Solutions focuses on building ideas into reality by providing customized software solutions that address specific business needs across various industries."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_5",
+    "tag": "qa_5",
+    "patterns": [
+      "What makes TD Tech different from other companies?"
+    ],
+    "responses": [
+      "We provide tailored solutions (not templates), deep technical expertise, transparent agile processes, business-focused mindset, commitment to quality, long-term partnership, and global-level quality with personal touch."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_6",
+    "tag": "qa_6",
+    "patterns": [
+      "How can I contact TD Tech Solutions?"
+    ],
+    "responses": [
+      "You can email us at inquiry@tdtech.in or call us at +91 99252 92157."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_7",
+    "tag": "qa_7",
+    "patterns": [
+      "What is TD Tech's email address?"
+    ],
+    "responses": [
+      "Our email address is inquiry@tdtech.in"
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_8",
+    "tag": "qa_8",
+    "patterns": [
+      "What is TD Tech's phone number?"
+    ],
+    "responses": [
+      "You can reach us at +91 99252 92157"
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_9",
+    "tag": "qa_9",
+    "patterns": [
+      "How do I get a consultation?"
+    ],
+    "responses": [
+      "You can contact us through our Contact Us page or reach out via email at inquiry@tdtech.in or call +91 99252 92157. We are available 24/7 to answer your questions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_10",
+    "tag": "qa_10",
+    "patterns": [
+      "Is TD Tech available for consultation?"
+    ],
+    "responses": [
+      "Yes, we are here to answer your questions 24/7. Contact us for a consultation."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_11",
+    "tag": "qa_11",
+    "patterns": [
+      "Does TD Tech offer free consultation?"
+    ],
+    "responses": [
+      "Yes, we offer consultations. Contact us at inquiry@tdtech.in or +91 99252 92157 to discuss your requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_12",
+    "tag": "qa_12",
+    "patterns": [
+      "What services does TD Tech Solutions provide?"
+    ],
+    "responses": [
+      "We provide Product Design & Development, Web App Development, Mobile App Development, Quality Assurance, and Resource Augmentation services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_13",
+    "tag": "qa_13",
+    "patterns": [
+      "What types of development services do you offer?"
+    ],
+    "responses": [
+      "We offer product design & development, web application development, mobile app development (iOS, Android, Flutter), quality assurance, and resource augmentation."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_14",
+    "tag": "qa_14",
+    "patterns": [
+      "Can you help with custom software development?"
+    ],
+    "responses": [
+      "Yes, we specialize in custom software development tailored to your specific business needs. We don't use templates; we build solutions that fit your requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_15",
+    "tag": "qa_15",
+    "patterns": [
+      "Do you offer end-to-end development services?"
+    ],
+    "responses": [
+      "Yes, we offer complete end-to-end development services from product design to deployment and ongoing support."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_16",
+    "tag": "qa_16",
+    "patterns": [
+      "What is Product Design & Development service?"
+    ],
+    "responses": [
+      "Our Product Design & Development service involves creating customized software solutions from concept to completion, focusing on user experience and business requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_17",
+    "tag": "qa_17",
+    "patterns": [
+      "Can you help design my product idea?"
+    ],
+    "responses": [
+      "Yes, we specialize in transforming ideas into reality through our Product Design & Development service."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_18",
+    "tag": "qa_18",
+    "patterns": [
+      "Do you provide UI/UX design services?"
+    ],
+    "responses": [
+      "Yes, UI/UX design is part of our Product Design & Development services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_19",
+    "tag": "qa_19",
+    "patterns": [
+      "What web development technologies do you use?"
+    ],
+    "responses": [
+      "We use .NET, React.js, and PHP for web application development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_20",
+    "tag": "qa_20",
+    "patterns": [
+      "Can you develop web applications?"
+    ],
+    "responses": [
+      "Yes, we provide comprehensive web app development services using modern technologies like React.js, .NET, and PHP."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_21",
+    "tag": "qa_21",
+    "patterns": [
+      "Do you build custom web applications?"
+    ],
+    "responses": [
+      "Yes, we build custom web applications tailored to your specific business requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_22",
+    "tag": "qa_22",
+    "patterns": [
+      "Can you develop enterprise web applications?"
+    ],
+    "responses": [
+      "Yes, we develop scalable enterprise-level web applications using .NET, React.js, and PHP."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_23",
+    "tag": "qa_23",
+    "patterns": [
+      "Do you use React for web development?"
+    ],
+    "responses": [
+      "Yes, React.js is one of the primary technologies we use for web app development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_24",
+    "tag": "qa_24",
+    "patterns": [
+      "Can you develop .NET applications?"
+    ],
+    "responses": [
+      "Yes, we have expertise in .NET web application development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_25",
+    "tag": "qa_25",
+    "patterns": [
+      "Do you work with PHP?"
+    ],
+    "responses": [
+      "Yes, PHP is one of the technologies we use for web app development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_26",
+    "tag": "qa_26",
+    "patterns": [
+      "What mobile app development services do you provide?"
+    ],
+    "responses": [
+      "We develop mobile applications for iOS, Android, and cross-platform apps using Flutter."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_27",
+    "tag": "qa_27",
+    "patterns": [
+      "Can you develop iOS apps?"
+    ],
+    "responses": [
+      "Yes, we provide native iOS app development services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_28",
+    "tag": "qa_28",
+    "patterns": [
+      "Do you develop Android apps?"
+    ],
+    "responses": [
+      "Yes, we develop native Android applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_29",
+    "tag": "qa_29",
+    "patterns": [
+      "Can you build cross-platform mobile apps?"
+    ],
+    "responses": [
+      "Yes, we develop cross-platform mobile apps using Flutter."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_30",
+    "tag": "qa_30",
+    "patterns": [
+      "What is Flutter development?"
+    ],
+    "responses": [
+      "Flutter is a framework for building cross-platform mobile apps that work on both iOS and Android. We use Flutter for hybrid mobile app development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_31",
+    "tag": "qa_31",
+    "patterns": [
+      "Do you develop native mobile apps?"
+    ],
+    "responses": [
+      "Yes, we develop native apps for both iOS and Android platforms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_32",
+    "tag": "qa_32",
+    "patterns": [
+      "Can you create hybrid mobile applications?"
+    ],
+    "responses": [
+      "Yes, we develop hybrid mobile applications using Flutter for cross-platform compatibility."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_33",
+    "tag": "qa_33",
+    "patterns": [
+      "Which is better - native or hybrid app development?"
+    ],
+    "responses": [
+      "It depends on your requirements. Native apps offer better performance, while hybrid apps are cost-effective and faster to develop for multiple platforms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_34",
+    "tag": "qa_34",
+    "patterns": [
+      "Do you provide Quality Assurance services?"
+    ],
+    "responses": [
+      "Yes, we provide comprehensive Quality Assurance services to ensure reliability and robustness of software solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_35",
+    "tag": "qa_35",
+    "patterns": [
+      "What does your QA service include?"
+    ],
+    "responses": [
+      "Our QA services include thorough testing, quality assurance processes, and ensuring software reliability before deployment."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_36",
+    "tag": "qa_36",
+    "patterns": [
+      "Do you offer software testing services?"
+    ],
+    "responses": [
+      "Yes, Quality Assurance and testing are core services we provide."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_37",
+    "tag": "qa_37",
+    "patterns": [
+      "How do you ensure quality in projects?"
+    ],
+    "responses": [
+      "We follow rigorous QA processes, thorough testing methodologies, and quality-focused development practices throughout the project lifecycle."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_38",
+    "tag": "qa_38",
+    "patterns": [
+      "What is Resource Augmentation?"
+    ],
+    "responses": [
+      "Resource Augmentation is a service where we provide skilled developers and IT professionals to augment your existing team."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_39",
+    "tag": "qa_39",
+    "patterns": [
+      "Can you provide dedicated developers?"
+    ],
+    "responses": [
+      "Yes, through our Resource Augmentation service, we can provide dedicated developers for your projects."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_40",
+    "tag": "qa_40",
+    "patterns": [
+      "Do you offer staff augmentation services?"
+    ],
+    "responses": [
+      "Yes, we provide Resource Augmentation services to help you scale your team with skilled professionals."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_41",
+    "tag": "qa_41",
+    "patterns": [
+      "Can I hire developers from your team?"
+    ],
+    "responses": [
+      "Yes, you can hire our developers through our Resource Augmentation service."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_42",
+    "tag": "qa_42",
+    "patterns": [
+      "What industries does TD Tech serve?"
+    ],
+    "responses": [
+      "We serve Fintech, Courier Services, E-commerce, Educational Industry, and Media & Entertainment sectors."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_43",
+    "tag": "qa_43",
+    "patterns": [
+      "Do you work with fintech companies?"
+    ],
+    "responses": [
+      "Yes, we have extensive experience in developing fintech solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_44",
+    "tag": "qa_44",
+    "patterns": [
+      "What fintech services do you provide?"
+    ],
+    "responses": [
+      "We offer tailored and secured financial services including mobile money, banking, subscriptions, loan management, and bill payments with a focus on confidentiality and quality."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_45",
+    "tag": "qa_45",
+    "patterns": [
+      "Can you develop courier management software?"
+    ],
+    "responses": [
+      "Yes, we provide advanced courier software to track goods from origin to destination with full customization."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_46",
+    "tag": "qa_46",
+    "patterns": [
+      "Do you build e-commerce platforms?"
+    ],
+    "responses": [
+      "Yes, we are a top Indian marketplace app developer with 15+ years of experience building secure, tailored e-commerce platforms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_47",
+    "tag": "qa_47",
+    "patterns": [
+      "Can you develop educational software?"
+    ],
+    "responses": [
+      "Yes, we provide modern educational software solutions for institutions to improve management, student engagement, and learning experiences."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_48",
+    "tag": "qa_48",
+    "patterns": [
+      "Do you work with media and entertainment companies?"
+    ],
+    "responses": [
+      "Yes, we use technology, expertise, and creativity to revolutionize entertainment experiences and accelerate growth in the entertainment business."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_49",
+    "tag": "qa_49",
+    "patterns": [
+      "What e-commerce solutions do you offer?"
+    ],
+    "responses": [
+      "We build secure, tailored marketplace platforms that connect buyers and sellers, enhancing transactions and user experience."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_50",
+    "tag": "qa_50",
+    "patterns": [
+      "Can you develop school management systems?"
+    ],
+    "responses": [
+      "Yes, we develop educational software solutions including school management systems, learning platforms, and student engagement tools."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_51",
+    "tag": "qa_51",
+    "patterns": [
+      "Do you develop payment gateway solutions?"
+    ],
+    "responses": [
+      "Yes, as part of our fintech services, we can develop secure payment solutions including payment gateways."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_52",
+    "tag": "qa_52",
+    "patterns": [
+      "Does TD Tech provide training courses?"
+    ],
+    "responses": [
+      "Yes, we offer training courses in Full Stack Development, MERN Stack, Mobile App Development, Python, and Quality Assurance."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_53",
+    "tag": "qa_53",
+    "patterns": [
+      "What training programs do you offer?"
+    ],
+    "responses": [
+      "We offer Full Stack Course, MERN Stack Course, Mobile App Development Course, Python Course, and Quality Assurance Course."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_54",
+    "tag": "qa_54",
+    "patterns": [
+      "Can I learn Full Stack Development at TD Tech?"
+    ],
+    "responses": [
+      "Yes, we offer a comprehensive Full Stack Development Course."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_55",
+    "tag": "qa_55",
+    "patterns": [
+      "Do you provide MERN Stack training?"
+    ],
+    "responses": [
+      "Yes, we offer MERN Stack Development Course."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_56",
+    "tag": "qa_56",
+    "patterns": [
+      "What is included in the Mobile App Development Course?"
+    ],
+    "responses": [
+      "Our Mobile App Development Course covers iOS and Android app development skills."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_57",
+    "tag": "qa_57",
+    "patterns": [
+      "Do you teach Python?"
+    ],
+    "responses": [
+      "Yes, we offer a Python Course."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_58",
+    "tag": "qa_58",
+    "patterns": [
+      "Can I learn software testing at TD Tech?"
+    ],
+    "responses": [
+      "Yes, we offer a Quality Assurance Course that covers software testing."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_59",
+    "tag": "qa_59",
+    "patterns": [
+      "Are the training courses online or offline?"
+    ],
+    "responses": [
+      "Please contact us at inquiry@tdtech.in for details about course delivery methods."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_60",
+    "tag": "qa_60",
+    "patterns": [
+      "How long are the training courses?"
+    ],
+    "responses": [
+      "Please contact us at inquiry@tdtech.in or call +91 99252 92157 for course duration details."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_61",
+    "tag": "qa_61",
+    "patterns": [
+      "Do you provide placement assistance after training?"
+    ],
+    "responses": [
+      "Please contact us for information about placement assistance and career support."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_62",
+    "tag": "qa_62",
+    "patterns": [
+      "What is TD Tech's development process?"
+    ],
+    "responses": [
+      "Our process includes 4 stages: 1) Discussion - understanding your requirements, 2) Ideas & Concepts - developing structured solutions, 3) Quality Assurance - thorough testing, 4) Deploy & Execution - implementation and launch."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_63",
+    "tag": "qa_63",
+    "patterns": [
+      "How do you start a project?"
+    ],
+    "responses": [
+      "We start with meaningful discussions focused on understanding your business requirements and growth drivers."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_64",
+    "tag": "qa_64",
+    "patterns": [
+      "Do you follow agile methodology?"
+    ],
+    "responses": [
+      "Yes, we follow agile methods to ensure flexibility, faster delivery, and continuous feedback, keeping you informed at every stage."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_65",
+    "tag": "qa_65",
+    "patterns": [
+      "What is your project delivery approach?"
+    ],
+    "responses": [
+      "We use a transparent and agile process with continuous feedback, ensuring flexibility and faster delivery while keeping clients informed throughout."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_66",
+    "tag": "qa_66",
+    "patterns": [
+      "How do you ensure project success?"
+    ],
+    "responses": [
+      "We ensure success through tailored solutions, deep technical expertise, transparent processes, quality assurance, and continuous client communication."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_67",
+    "tag": "qa_67",
+    "patterns": [
+      "Do you provide post-launch support?"
+    ],
+    "responses": [
+      "Yes, we stay with you beyond launch - scaling features, upgrading systems, and supporting your business long-term."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_68",
+    "tag": "qa_68",
+    "patterns": [
+      "What technologies does TD Tech work with?"
+    ],
+    "responses": [
+      "We work with React.js, .NET, PHP for web development; iOS, Android, Flutter for mobile; and various modern technologies for product development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_69",
+    "tag": "qa_69",
+    "patterns": [
+      "Do you build cloud-based solutions?"
+    ],
+    "responses": [
+      "Yes, we build scalable cloud systems and modern technology solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_70",
+    "tag": "qa_70",
+    "patterns": [
+      "Can you develop scalable applications?"
+    ],
+    "responses": [
+      "Yes, we specialize in building scalable, future-ready solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_71",
+    "tag": "qa_71",
+    "patterns": [
+      "Do you have experience with modern technologies?"
+    ],
+    "responses": [
+      "Yes, our team comprises expert developers with experience across modern technologies and frameworks."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_72",
+    "tag": "qa_72",
+    "patterns": [
+      "Can you integrate third-party APIs?"
+    ],
+    "responses": [
+      "Yes, we have extensive experience integrating third-party APIs and services into applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_73",
+    "tag": "qa_73",
+    "patterns": [
+      "How many clients has TD Tech served?"
+    ],
+    "responses": [
+      "We have served numerous clients globally over our 15+ years of experience."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_74",
+    "tag": "qa_74",
+    "patterns": [
+      "How many projects have you completed?"
+    ],
+    "responses": [
+      "We have completed a significant number of projects across various industries over 15+ years."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_75",
+    "tag": "qa_75",
+    "patterns": [
+      "Do you work with startups?"
+    ],
+    "responses": [
+      "Yes, we help SMEs (small and medium enterprises) and startups with quality technology-driven solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_76",
+    "tag": "qa_76",
+    "patterns": [
+      "Can you work with international clients?"
+    ],
+    "responses": [
+      "Yes, we have experience serving international clients and deliver global-level quality."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_77",
+    "tag": "qa_77",
+    "patterns": [
+      "Do you offer fixed-price projects?"
+    ],
+    "responses": [
+      "Please contact us to discuss project pricing models including fixed-price, time & material, or dedicated team options."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_78",
+    "tag": "qa_78",
+    "patterns": [
+      "What is your pricing model?"
+    ],
+    "responses": [
+      "We offer flexible pricing models based on project requirements. Contact us at inquiry@tdtech.in for detailed pricing."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_79",
+    "tag": "qa_79",
+    "patterns": [
+      "Do you sign NDAs?"
+    ],
+    "responses": [
+      "Please contact us to discuss confidentiality agreements and NDAs for your project."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_80",
+    "tag": "qa_80",
+    "patterns": [
+      "How do you handle intellectual property?"
+    ],
+    "responses": [
+      "Please contact us to discuss IP rights and ownership terms for your specific project."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_81",
+    "tag": "qa_81",
+    "patterns": [
+      "Can you help with my startup idea?"
+    ],
+    "responses": [
+      "Yes, we specialize in transforming ideas into reality and have extensive experience working with startups."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_82",
+    "tag": "qa_82",
+    "patterns": [
+      "Do you provide project estimates?"
+    ],
+    "responses": [
+      "Yes, contact us with your requirements and we'll provide a detailed project estimate."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_83",
+    "tag": "qa_83",
+    "patterns": [
+      "How long does it take to develop an app?"
+    ],
+    "responses": [
+      "Development time varies based on project complexity. Contact us with your requirements for a timeline estimate."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_84",
+    "tag": "qa_84",
+    "patterns": [
+      "Can you work on existing projects?"
+    ],
+    "responses": [
+      "Yes, we can work on enhancing, maintaining, or completing existing projects."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_85",
+    "tag": "qa_85",
+    "patterns": [
+      "Do you provide maintenance services?"
+    ],
+    "responses": [
+      "Yes, we provide long-term support, maintenance, and feature scaling services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_86",
+    "tag": "qa_86",
+    "patterns": [
+      "Can you redesign my existing application?"
+    ],
+    "responses": [
+      "Yes, we can redesign and modernize existing applications with improved UI/UX and functionality."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_87",
+    "tag": "qa_87",
+    "patterns": [
+      "Do you offer MVP development?"
+    ],
+    "responses": [
+      "Yes, we can develop Minimum Viable Products (MVPs) to help you validate your business idea."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_88",
+    "tag": "qa_88",
+    "patterns": [
+      "Can you develop a mobile banking app?"
+    ],
+    "responses": [
+      "Yes, we develop secure fintech solutions including mobile banking applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_89",
+    "tag": "qa_89",
+    "patterns": [
+      "Do you build online marketplaces?"
+    ],
+    "responses": [
+      "Yes, we build secure, tailored e-commerce and marketplace platforms with 15+ years of experience."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_90",
+    "tag": "qa_90",
+    "patterns": [
+      "Can you create a learning management system?"
+    ],
+    "responses": [
+      "Yes, we develop educational software solutions including learning management systems."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_91",
+    "tag": "qa_91",
+    "patterns": [
+      "Do you develop delivery tracking systems?"
+    ],
+    "responses": [
+      "Yes, we provide courier software with advanced tracking from origin to destination."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_92",
+    "tag": "qa_92",
+    "patterns": [
+      "Can you build a video streaming platform?"
+    ],
+    "responses": [
+      "Yes, we develop media and entertainment solutions including streaming platforms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_93",
+    "tag": "qa_93",
+    "patterns": [
+      "Do you create subscription-based apps?"
+    ],
+    "responses": [
+      "Yes, we develop subscription management systems as part of our fintech services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_94",
+    "tag": "qa_94",
+    "patterns": [
+      "Can you build a social media application?"
+    ],
+    "responses": [
+      "Yes, we can develop social media platforms and community applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_95",
+    "tag": "qa_95",
+    "patterns": [
+      "Do you develop CRM systems?"
+    ],
+    "responses": [
+      "Yes, we develop custom CRM and business management systems."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_96",
+    "tag": "qa_96",
+    "patterns": [
+      "Can you create inventory management software?"
+    ],
+    "responses": [
+      "Yes, we build custom inventory and warehouse management solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_97",
+    "tag": "qa_97",
+    "patterns": [
+      "Do you develop booking and reservation systems?"
+    ],
+    "responses": [
+      "Yes, we can create booking systems for various industries."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_98",
+    "tag": "qa_98",
+    "patterns": [
+      "Can you migrate my application to cloud?"
+    ],
+    "responses": [
+      "Yes, we can help migrate your applications to cloud platforms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_99",
+    "tag": "qa_99",
+    "patterns": [
+      "Do you work with databases?"
+    ],
+    "responses": [
+      "Yes, we work with various database technologies as part of our development services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_100",
+    "tag": "qa_100",
+    "patterns": [
+      "Can you integrate payment gateways?"
+    ],
+    "responses": [
+      "Yes, we have experience integrating various payment gateway solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_101",
+    "tag": "qa_101",
+    "patterns": [
+      "Do you provide API development?"
+    ],
+    "responses": [
+      "Yes, we develop RESTful APIs and backend services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_102",
+    "tag": "qa_102",
+    "patterns": [
+      "Can you develop PWAs (Progressive Web Apps)?"
+    ],
+    "responses": [
+      "Yes, we can develop Progressive Web Apps using modern web technologies."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_103",
+    "tag": "qa_103",
+    "patterns": [
+      "Do you work with microservices architecture?"
+    ],
+    "responses": [
+      "Yes, we develop scalable solutions using microservices and modern architectures."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_104",
+    "tag": "qa_104",
+    "patterns": [
+      "How can I track my project progress?"
+    ],
+    "responses": [
+      "We follow agile methods with continuous feedback, keeping you informed at every stage of development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_105",
+    "tag": "qa_105",
+    "patterns": [
+      "Do you provide regular updates?"
+    ],
+    "responses": [
+      "Yes, we maintain transparent communication and provide regular project updates."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_106",
+    "tag": "qa_106",
+    "patterns": [
+      "Can I speak directly with the development team?"
+    ],
+    "responses": [
+      "Yes, we facilitate direct communication between clients and our development team."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_107",
+    "tag": "qa_107",
+    "patterns": [
+      "What are your working hours?"
+    ],
+    "responses": [
+      "We are available to answer your questions 24/7. Contact us at inquiry@tdtech.in or +91 99252 92157."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_108",
+    "tag": "qa_108",
+    "patterns": [
+      "Do you offer emergency support?"
+    ],
+    "responses": [
+      "Please contact us at +91 99252 92157 to discuss emergency support requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_109",
+    "tag": "qa_109",
+    "patterns": [
+      "How responsive is your support team?"
+    ],
+    "responses": [
+      "We are committed to responsive communication and are available 24/7 to address your concerns."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_110",
+    "tag": "qa_110",
+    "patterns": [
+      "What is TD Tech's mission?"
+    ],
+    "responses": [
+      "Our mission is to build ideas into reality and provide businesses with the tools and support they need to succeed in today's rapidly changing digital world."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_111",
+    "tag": "qa_111",
+    "patterns": [
+      "Does TD Tech use templates?"
+    ],
+    "responses": [
+      "No, we don't believe in one-size-fits-all. We provide tailored solutions, not templates."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_112",
+    "tag": "qa_112",
+    "patterns": [
+      "How do you understand business requirements?"
+    ],
+    "responses": [
+      "We initiate meaningful discussions focused on topics that drive growth and support your business requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_113",
+    "tag": "qa_113",
+    "patterns": [
+      "What is your approach to quality?"
+    ],
+    "responses": [
+      "We execute every project with precision, ensuring high-quality, reliable, and scalable software solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_114",
+    "tag": "qa_114",
+    "patterns": [
+      "Do you focus on business outcomes?"
+    ],
+    "responses": [
+      "Yes, we have a business-focused mindset. We don't just write code - we solve problems and deliver technology that drives growth."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_115",
+    "tag": "qa_115",
+    "patterns": [
+      "Can you scale features after launch?"
+    ],
+    "responses": [
+      "Yes, we provide long-term partnership, scaling features and upgrading systems as your business grows."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_116",
+    "tag": "qa_116",
+    "patterns": [
+      "What fintech features can you develop?"
+    ],
+    "responses": [
+      "We develop mobile money, banking apps, subscription systems, loan management, bill payments, and other financial services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_117",
+    "tag": "qa_117",
+    "patterns": [
+      "How do you ensure security in fintech apps?"
+    ],
+    "responses": [
+      "We prioritize confidentiality, implement security best practices, and develop secured financial services solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_118",
+    "tag": "qa_118",
+    "patterns": [
+      "What courier features do you provide?"
+    ],
+    "responses": [
+      "We provide tracking from origin to destination, route optimization, delivery management, and full customization for courier operations."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_119",
+    "tag": "qa_119",
+    "patterns": [
+      "What e-commerce features can you build?"
+    ],
+    "responses": [
+      "We build complete marketplace platforms with seller management, payment integration, inventory, order tracking, and enhanced user experience."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_120",
+    "tag": "qa_120",
+    "patterns": [
+      "What educational features do you develop?"
+    ],
+    "responses": [
+      "We develop student management, course management, online learning platforms, assessment tools, and parent-teacher communication systems."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_121",
+    "tag": "qa_121",
+    "patterns": [
+      "What entertainment features can you create?"
+    ],
+    "responses": [
+      "We develop video streaming, content management, user engagement features, and entertainment platform solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_122",
+    "tag": "qa_122",
+    "patterns": [
+      "Why should I choose TD Tech Solutions?"
+    ],
+    "responses": [
+      "We offer 15+ years of experience, tailored solutions, deep technical expertise, transparent processes, quality commitment, and long-term partnership."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_123",
+    "tag": "qa_123",
+    "patterns": [
+      "What makes TD Tech reliable?"
+    ],
+    "responses": [
+      "Our 15+ years of experience, numerous satisfied clients, completed projects, and commitment to quality make us a reliable partner."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_124",
+    "tag": "qa_124",
+    "patterns": [
+      "Do you work with global clients?"
+    ],
+    "responses": [
+      "Yes, we serve clients across the globe with global-level quality and personal touch."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_125",
+    "tag": "qa_125",
+    "patterns": [
+      "What size companies do you work with?"
+    ],
+    "responses": [
+      "We help small and medium enterprises (SMEs) and also work with larger organizations across various industries."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_126",
+    "tag": "qa_126",
+    "patterns": [
+      "Can you handle complex projects?"
+    ],
+    "responses": [
+      "Yes, our team has deep technical expertise and experience handling complex, enterprise-level projects."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_127",
+    "tag": "qa_127",
+    "patterns": [
+      "Do you work with AI and Machine Learning?"
+    ],
+    "responses": [
+      "Please contact us to discuss AI/ML integration in your projects."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_128",
+    "tag": "qa_128",
+    "patterns": [
+      "Can you develop blockchain solutions?"
+    ],
+    "responses": [
+      "Please contact us to discuss blockchain development requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_129",
+    "tag": "qa_129",
+    "patterns": [
+      "Do you build IoT applications?"
+    ],
+    "responses": [
+      "Please contact us to discuss IoT solution development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_130",
+    "tag": "qa_130",
+    "patterns": [
+      "Can you develop chatbots?"
+    ],
+    "responses": [
+      "Please contact us to discuss chatbot and conversational AI development."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_131",
+    "tag": "qa_131",
+    "patterns": [
+      "How do I start working with TD Tech?"
+    ],
+    "responses": [
+      "Contact us at inquiry@tdtech.in or call +91 99252 92157 to discuss your requirements and get started."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_132",
+    "tag": "qa_132",
+    "patterns": [
+      "Do I need to have technical knowledge to work with you?"
+    ],
+    "responses": [
+      "No, we guide you through the entire process and explain technical aspects in business terms."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_133",
+    "tag": "qa_133",
+    "patterns": [
+      "Can you help refine my business idea?"
+    ],
+    "responses": [
+      "Yes, we help develop ideas and concepts through deeper analysis, refinement, and elaboration."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_134",
+    "tag": "qa_134",
+    "patterns": [
+      "Do you provide business consulting?"
+    ],
+    "responses": [
+      "Yes, we provide consultation to help you make informed technology decisions for your business."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_135",
+    "tag": "qa_135",
+    "patterns": [
+      "Can you help with technology stack selection?"
+    ],
+    "responses": [
+      "Yes, we help you choose the right technology stack based on your business requirements and goals."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_136",
+    "tag": "qa_136",
+    "patterns": [
+      "Do you handle app deployment?"
+    ],
+    "responses": [
+      "Yes, deployment and execution are part of our development process."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_137",
+    "tag": "qa_137",
+    "patterns": [
+      "Can you deploy to app stores?"
+    ],
+    "responses": [
+      "Yes, we handle deployment to Apple App Store and Google Play Store."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_138",
+    "tag": "qa_138",
+    "patterns": [
+      "Do you provide hosting services?"
+    ],
+    "responses": [
+      "Please contact us to discuss hosting and infrastructure requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_139",
+    "tag": "qa_139",
+    "patterns": [
+      "Can you help with server setup?"
+    ],
+    "responses": [
+      "Yes, we can help with server setup and configuration as part of deployment."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_140",
+    "tag": "qa_140",
+    "patterns": [
+      "Is TD Tech on social media?"
+    ],
+    "responses": [
+      "Yes, we are on LinkedIn, Instagram, and Facebook."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_141",
+    "tag": "qa_141",
+    "patterns": [
+      "How can I follow TD Tech on LinkedIn?"
+    ],
+    "responses": [
+      "You can follow us on LinkedIn at https://www.linkedin.com/company/td-tech-solutions/"
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_142",
+    "tag": "qa_142",
+    "patterns": [
+      "Does TD Tech have Instagram?"
+    ],
+    "responses": [
+      "Yes, you can find us on Instagram @tdtech_solutions"
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_143",
+    "tag": "qa_143",
+    "patterns": [
+      "Can I connect with TD Tech on Facebook?"
+    ],
+    "responses": [
+      "Yes, we are on Facebook as TDTechSolutionsIndia."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_144",
+    "tag": "qa_144",
+    "patterns": [
+      "What does TD Tech stand for?"
+    ],
+    "responses": [
+      "TD Tech Solutions is our complete name, providing technology-driven solutions and services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_145",
+    "tag": "qa_145",
+    "patterns": [
+      "Do you work on weekends?"
+    ],
+    "responses": [
+      "We are available 24/7 to answer your questions. Contact us at inquiry@tdtech.in or +91 99252 92157."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_146",
+    "tag": "qa_146",
+    "patterns": [
+      "Can you help with digital transformation?"
+    ],
+    "responses": [
+      "Yes, we help businesses with digital transformation through modern software solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_147",
+    "tag": "qa_147",
+    "patterns": [
+      "Do you provide UI/UX audits?"
+    ],
+    "responses": [
+      "Please contact us to discuss UI/UX audit and improvement services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_148",
+    "tag": "qa_148",
+    "patterns": [
+      "Can you optimize existing applications?"
+    ],
+    "responses": [
+      "Yes, we can optimize and improve performance of existing applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_149",
+    "tag": "qa_149",
+    "patterns": [
+      "Do you conduct code reviews?"
+    ],
+    "responses": [
+      "Please contact us to discuss code review and quality assessment services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_150",
+    "tag": "qa_150",
+    "patterns": [
+      "Can you provide technical documentation?"
+    ],
+    "responses": [
+      "Yes, we provide comprehensive technical documentation as part of our development process."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_151",
+    "tag": "qa_151",
+    "patterns": [
+      "Do you offer white-label solutions?"
+    ],
+    "responses": [
+      "Please contact us to discuss white-label development opportunities."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_152",
+    "tag": "qa_152",
+    "patterns": [
+      "Can I visit your office?"
+    ],
+    "responses": [
+      "Yes, our office is located at D-617, Ganesh Glory-11, Jagatpur Rd, S.G. Highway, Ahmedabad, Gujarat 382470."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_153",
+    "tag": "qa_153",
+    "patterns": [
+      "Do you attend tech events?"
+    ],
+    "responses": [
+      "Please follow us on social media for updates about our participation in tech events and conferences."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_154",
+    "tag": "qa_154",
+    "patterns": [
+      "How can I request a demo?"
+    ],
+    "responses": [
+      "Contact us at inquiry@tdtech.in or call +91 99252 92157 to request a demo of our solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_155",
+    "tag": "qa_155",
+    "patterns": [
+      "Do you provide case studies?"
+    ],
+    "responses": [
+      "Please contact us to request case studies and examples of our work."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_156",
+    "tag": "qa_156",
+    "patterns": [
+      "Can you provide references from past clients?"
+    ],
+    "responses": [
+      "Please contact us to discuss client references and testimonials."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_157",
+    "tag": "qa_157",
+    "patterns": [
+      "What industries have you worked with?"
+    ],
+    "responses": [
+      "We have worked with Fintech, E-commerce, Education, Media & Entertainment, Courier Services, and various other industries."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_158",
+    "tag": "qa_158",
+    "patterns": [
+      "Do you sign contracts?"
+    ],
+    "responses": [
+      "Yes, we work with formal contracts outlining project scope, timelines, and deliverables."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_159",
+    "tag": "qa_159",
+    "patterns": [
+      "What is your refund policy?"
+    ],
+    "responses": [
+      "Please contact us to discuss terms and conditions for specific projects."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_160",
+    "tag": "qa_160",
+    "patterns": [
+      "Can you work within my budget?"
+    ],
+    "responses": [
+      "We offer flexible solutions. Contact us to discuss your budget and requirements."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_161",
+    "tag": "qa_161",
+    "patterns": [
+      "Do you offer discounts?"
+    ],
+    "responses": [
+      "Please contact us to discuss pricing and any available offers for your project."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_162",
+    "tag": "qa_162",
+    "patterns": [
+      "How do I provide feedback?"
+    ],
+    "responses": [
+      "You can provide feedback through our continuous feedback process during development or contact us directly."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_163",
+    "tag": "qa_163",
+    "patterns": [
+      "What is your company's vision?"
+    ],
+    "responses": [
+      "Our vision is to provide businesses with the tools and support they need to succeed in today's rapidly changing digital world through quality technology-driven solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_164",
+    "tag": "qa_164",
+    "patterns": [
+      "Do you work remotely?"
+    ],
+    "responses": [
+      "Yes, we work with clients globally and can collaborate remotely throughout the project lifecycle."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_165",
+    "tag": "qa_165",
+    "patterns": [
+      "Can you help with app monetization strategies?"
+    ],
+    "responses": [
+      "Yes, we can help design monetization strategies including subscriptions, in-app purchases, and advertising integration."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_166",
+    "tag": "qa_166",
+    "patterns": [
+      "Do you provide analytics integration?"
+    ],
+    "responses": [
+      "Yes, we can integrate analytics tools to help you track user behavior and app performance."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_167",
+    "tag": "qa_167",
+    "patterns": [
+      "Can you develop multi-language applications?"
+    ],
+    "responses": [
+      "Yes, we can develop applications with multi-language support and localization."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_168",
+    "tag": "qa_168",
+    "patterns": [
+      "Do you handle app store optimization?"
+    ],
+    "responses": [
+      "Please contact us to discuss app store optimization and marketing support services."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_169",
+    "tag": "qa_169",
+    "patterns": [
+      "Can you develop admin panels?"
+    ],
+    "responses": [
+      "Yes, we develop comprehensive admin panels and dashboards as part of our solutions."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_170",
+    "tag": "qa_170",
+    "patterns": [
+      "Do you provide data migration services?"
+    ],
+    "responses": [
+      "Yes, we can handle data migration from legacy systems to new applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_171",
+    "tag": "qa_171",
+    "patterns": [
+      "Can you integrate CRM systems?"
+    ],
+    "responses": [
+      "Yes, we can integrate various CRM systems into your applications."
+    ],
+    "chatbot_id": 22
+  },
+  {
+    "intent": "qa_172",
+    "tag": "qa_172",
+    "patterns": [
+      "Do you develop real-time applications?"
+    ],
+    "responses": [
+      "Yes, we can develop real-time applications with live data synchronization."
+    ],
+    "chatbot_id": 22
+  }
+]

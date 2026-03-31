@@ -69,14 +69,14 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             flash('Please log in to access this page.', 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('login'))
 
         user = get_user_by_id(session['user_id'])
 
         if not user:
             session.clear()
             flash('Please log in again', 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('login'))
 
         return f(*args, **kwargs)
 

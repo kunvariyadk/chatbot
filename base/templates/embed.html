@@ -7,52 +7,59 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/embed.css') }}">
+
+    <style>
+        /* Base widget visibility overrides */
+        .force-show-widget {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) scale(1) !important;
+            pointer-events: auto !important;
+        }
+        .force-hide-widget {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Floating Launcher Button -->
-<!-- Floating Launcher Button -->
 <button class="launcher {% if bot_avatar_url %}has-avatar{% endif %}" id="launcher" title="Chat with {{ chatbot.bot_name }}">
     {% if bot_avatar_url %}
-        <!-- User Uploaded Avatar -->
         <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}" class="launcher-avatar">
     {% else %}
-        <!-- Default Message Icon (Theme Colored) -->
         <svg class="launcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
     {% endif %}
-
-    <!-- Close X Icon - ALWAYS present and visible when open -->
-    <svg class="launcher-close" viewBox="0 0 24 24" fill="none" stroke="{{ settings.themeColor }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="launcher-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
-
-    <!-- Help Message Tooltip with Emoji -->
     <div class="help-message" id="helpMessage">👋 How may I help you?</div>
 </button>
 
-<!-- Chat Widget Window -->
-<div class="widget" id="widget">
-    <!-- Header -->
-    <div class="header">
+<div class="widget force-hide-widget" id="widget">
+
+    <div class="header" id="widgetHeader">
         <div class="header-info">
             <div class="avatar">
                 {% if bot_avatar_url %}
                     <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}">
                 {% else %}
-                    <!-- Default Robot Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                        <rect x="16" y="24" width="32" height="28" rx="6" fill="{{ settings.themeColor }}"/>
-                        <line x1="32" y1="16" x2="32" y2="24" stroke="{{ settings.themeColor }}" stroke-width="2.5" stroke-linecap="round"/>
-                        <circle cx="32" cy="14" r="3" fill="{{ settings.themeColor }}"/>
+                        <rect x="16" y="24" width="32" height="28" rx="6" fill="{{ settings.themeColor or '#4F46E5' }}"/>
+                        <line x1="32" y1="16" x2="32" y2="24" stroke="{{ settings.themeColor or '#4F46E5' }}" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="32" cy="14" r="3" fill="{{ settings.themeColor or '#4F46E5' }}"/>
                         <circle cx="24" cy="34" r="3.5" fill="white"/>
                         <circle cx="40" cy="34" r="3.5" fill="white"/>
                         <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                        <rect x="10" y="30" width="6" height="14" rx="3" fill="{{ settings.themeColor }}" opacity="0.8"/>
-                        <rect x="48" y="30" width="6" height="14" rx="3" fill="{{ settings.themeColor }}" opacity="0.8"/>
+                        <rect x="10" y="30" width="6" height="14" rx="3" fill="{{ settings.themeColor or '#4F46E5' }}" opacity="0.8"/>
+                        <rect x="48" y="30" width="6" height="14" rx="3" fill="{{ settings.themeColor or '#4F46E5' }}" opacity="0.8"/>
                     </svg>
                 {% endif %}
             </div>
@@ -62,19 +69,18 @@
             </div>
         </div>
         <button class="close-btn" id="closeBtn" title="Close">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
     </div>
 
-    <!-- Messages Area -->
     <div class="messages" id="messages"></div>
 
-    <!-- Input Area -->
     <div class="input-area">
-        <label for="input"></label><input type="text" id="input" placeholder="Type your message..." autocomplete="off">
+        <label for="input" style="display:none;"></label>
+        <input type="text" id="input" placeholder="Type your message..." autocomplete="off">
         <button id="sendBtn" title="Send">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -85,9 +91,367 @@
 </div>
 
 <script>
-window.chatConfig = {{ settings | tojson | safe }};
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Load configuration from backend
+    const config = {{ settings | tojson | safe }};
+
+    // 2. Apply theme colors to core UI elements
+    document.getElementById('widgetHeader').style.background = config.themeColor || '#4F46E5';
+    document.getElementById('launcher').style.background = config.themeColor || '#4F46E5';
+    document.getElementById('messages').style.background = config.chatBackgroundColor || '#F7FAFC';
+
+    const sendBtn = document.getElementById('sendBtn');
+    if(sendBtn) {
+        sendBtn.style.background = config.themeColor || '#4F46E5';
+        sendBtn.style.color = '#fff';
+        sendBtn.style.border = 'none';
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       DYNAMIC INJECTED CSS (For perfect chat bubbles)
+    ═══════════════════════════════════════════════════════════ */
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .msg-row { display: flex; margin-bottom: 16px; width: 100%; font-family: 'Inter', sans-serif; align-items: flex-end; }
+        .msg-bot { justify-content: flex-start; }
+        .msg-user { justify-content: flex-end; }
+
+        .msg-avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; margin-right: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #e2e8f0; }
+        .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .msg-avatar svg { width: 16px; height: 16px; }
+
+        /* Sharp Top-Left for Bot */
+        .bubble-bot {
+            background: ${config.botMessageColor || '#fff'};
+            color: ${config.botTextColor || '#1a202c'};
+            padding: 12px 16px;
+            border-radius: 16px 16px 16px 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            max-width: 80%;
+            white-space: pre-wrap;
+            border: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .bubble-bot a { color: ${config.themeColor || '#4F46E5'}; text-decoration: underline; font-weight: 500; }
+
+        /* Sharp Bottom-Right for User */
+        .bubble-user { background: ${config.themeColor || '#4F46E5'}; color: ${config.userTextColor || '#fff'}; padding: 12px 16px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 80%; white-space: pre-wrap; }
+
+        /* 🌟 Buttons inside the single box 🌟 */
+        .flow-btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 14px;
+            width: 100%;
+            min-width: 220px;
+        }
+        .flow-btn {
+            background: ${config.themeColor || '#4F46E5'};
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            white-space: normal;
+        }
+        .flow-btn:hover {
+            filter: brightness(0.85);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Typing Dots */
+        .typing-dots { display: flex; align-items: center; height: 20px; gap: 4px; padding: 0 4px; }
+        .typing-dots span { width: 6px; height: 6px; background-color: ${config.botTextColor || '#1a202c'}; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; opacity: 0.6; }
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    `;
+    document.head.appendChild(style);
+
+    /* ══════════════════════════════════════════════════════════
+       WIDGET LOGIC & STATE
+    ═══════════════════════════════════════════════════════════ */
+    const launcher = document.getElementById('launcher');
+    const widget = document.getElementById('widget');
+    const closeBtn = document.getElementById('closeBtn');
+    const helpMessage = document.getElementById('helpMessage');
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+
+    let isChatInitialized = false;
+    let currentSessionId = null;
+
+    // Clean SVG Fallback for Chat Bubbles
+    const fallbackSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18">
+            <rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor || '#4F46E5'}"/>
+            <circle cx="24" cy="34" r="3.5" fill="white"/>
+            <circle cx="40" cy="34" r="3.5" fill="white"/>
+            <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>`;
+
+    const botAvatarHtml = config.botAvatar
+        ? `<img src="${config.botAvatar}" alt="Bot">`
+        : fallbackSvg;
+
+    // --- WIDGET TOGGLE ---
+    function toggleWidget() {
+        const isClosed = widget.classList.contains('force-hide-widget') || widget.style.display === 'none';
+
+        if (isClosed) {
+            // FORCE OPEN
+            widget.classList.remove('force-hide-widget');
+            widget.classList.add('force-show-widget');
+            launcher.classList.add('open');
+            if (helpMessage) helpMessage.style.display = 'none';
+
+            if (!isChatInitialized) {
+                initChat();
+                isChatInitialized = true;
+            }
+            if (inputEl) inputEl.focus();
+        } else {
+            // FORCE CLOSE
+            widget.classList.remove('force-show-widget');
+            widget.classList.add('force-hide-widget');
+            launcher.classList.remove('open');
+        }
+    }
+
+    launcher.addEventListener('click', toggleWidget);
+    closeBtn.addEventListener('click', toggleWidget);
+
+    // Fade out welcome tooltip after 5 seconds
+    setTimeout(() => {
+        if (helpMessage && !launcher.classList.contains('open')) {
+            helpMessage.style.opacity = '0';
+            setTimeout(() => helpMessage.remove(), 300);
+        }
+    }, 5000);
+
+    /* ══════════════════════════════════════════════════════════
+       CHAT RENDERING & LINK PARSING
+    ═══════════════════════════════════════════════════════════ */
+    function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+    function makeLinksClickable(text) {
+        if (!text) return '';
+        // 1. Convert Emails
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+        let formattedText = text.replace(emailRegex, '<a href="mailto:$1">$1</a>');
+        // 2. Convert URLs
+        const urlRegex = /(^|\s)((https?:\/\/|www\.)[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
+        formattedText = formattedText.replace(urlRegex, function(match, space, url) {
+            let hyperlink = url;
+            if (!hyperlink.match('^https?://')) hyperlink = 'https://' + hyperlink;
+            return space + '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+        });
+        // 3. Convert Phone Numbers
+        const phoneRegex = /(^|\s)(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}(\s|$)/g;
+        formattedText = formattedText.replace(phoneRegex, function(match, spaceBefore, fullMatch, spaceAfter) {
+            let cleanNumber = match.replace(/[^\d+]/g, '');
+            return spaceBefore + '<a href="tel:' + cleanNumber + '">' + match.trim() + '</a>' + (spaceAfter || '');
+        });
+        return formattedText;
+    }
+
+    function appendBotMessage(text) {
+        const formattedText = makeLinksClickable(text);
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot">${formattedText}</div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+
+    function appendUserMessage(text) {
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-user';
+        row.innerHTML = `<div class="bubble-user">${text}</div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+
+    function showTypingIndicator() {
+        const row = document.createElement('div');
+        row.id = "typingIndicator";
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot" style="padding: 14px 18px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+
+    // 🌟 View More Logic & URL Redirection Included 🌟
+    function renderButtons(buttons) {
+        if (!buttons || buttons.length === 0) return;
+        const btnContainer = document.createElement('div');
+        btnContainer.className = 'flow-btn-container';
+
+        buttons.forEach((btn, index) => {
+            const btnEl = document.createElement('button');
+            btnEl.className = 'flow-btn';
+            btnEl.textContent = btn.text;
+
+            // Hide any button after the first 3
+            if (index >= 3) {
+                btnEl.style.display = 'none';
+                btnEl.classList.add('hidden-flow-btn');
+            }
+
+            btnEl.onclick = () => {
+                // 🌟 Redirect logic for URL buttons
+                if (btn.type === 'url' && btn.value) {
+                    let targetUrl = btn.value.trim();
+                    if (!targetUrl.match(/^https?:\/\//i)) {
+                        targetUrl = 'https://' + targetUrl;
+                    }
+                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                }
+
+                // Log the action
+                sendChatRequest(btn.text, btn);
+            };
+            btnContainer.appendChild(btnEl);
+        });
+
+        // Add the "View More" button if needed
+        if (buttons.length > 3) {
+            const viewMoreBtn = document.createElement('button');
+            viewMoreBtn.className = 'flow-btn';
+            viewMoreBtn.innerHTML = `View More (${buttons.length - 3}) &darr;`;
+            viewMoreBtn.style.opacity = '0.85';
+
+            viewMoreBtn.onclick = () => {
+                const hiddenBtns = btnContainer.querySelectorAll('.hidden-flow-btn');
+                hiddenBtns.forEach(b => {
+                    b.style.display = 'block';
+                });
+                viewMoreBtn.remove();
+                scrollToBottom();
+            };
+            btnContainer.appendChild(viewMoreBtn);
+        }
+
+        // Put the buttons inside the last chat bubble
+        const botBubbles = messagesEl.querySelectorAll('.bubble-bot');
+        if (botBubbles.length > 0) {
+            const lastBubble = botBubbles[botBubbles.length - 1];
+            lastBubble.appendChild(btnContainer);
+        } else {
+            messagesEl.appendChild(btnContainer);
+        }
+
+        scrollToBottom();
+    }
+
+    function showMainMenu() {
+        setTimeout(() => {
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                appendBotMessage("Is there anything else I can help you with?");
+                if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons);
+            }, 600);
+        }, 1000);
+    }
+
+    // --- API CONNECTION ---
+    async function sendChatRequest(messageText, buttonActionObj = null) {
+        if (messageText) appendUserMessage(messageText);
+        if (inputEl) inputEl.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+        showTypingIndicator();
+
+        const payload = { message: messageText || "", is_voice: false };
+        if (buttonActionObj) payload.button_action = buttonActionObj;
+        if (currentSessionId) payload.session_id = currentSessionId;
+
+        try {
+            const response = await fetch(`/api/chat/${config.embedCode}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            hideTypingIndicator();
+
+            if (data.error) {
+                appendBotMessage("⚠️ Error: " + data.error);
+            } else {
+                if (data.session_id) currentSessionId = data.session_id;
+
+                // Formats links in the bot's text automatically
+                if (data.response) appendBotMessage(data.response);
+
+                if (data.nested_buttons && data.nested_buttons.length > 0) {
+                    renderButtons(data.nested_buttons);
+                } else if (buttonActionObj) {
+                    showMainMenu();
+                }
+            }
+        } catch (error) {
+            hideTypingIndicator();
+            appendBotMessage("⚠️ Sorry, I couldn't connect to the server.");
+        } finally {
+            if (inputEl) {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+            if (sendBtn) sendBtn.disabled = false;
+        }
+    }
+
+    function handleFreeTextSubmit() {
+        if (!inputEl) return;
+        const text = inputEl.value.trim();
+        if (!text) return;
+        inputEl.value = '';
+        sendChatRequest(text, null);
+    }
+
+    if (sendBtn) sendBtn.onclick = handleFreeTextSubmit;
+    if (inputEl) {
+        inputEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleFreeTextSubmit();
+        });
+    }
+
+    // --- INIT ---
+    function initChat() {
+        if (inputEl) inputEl.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        messagesEl.innerHTML = '';
+        showTypingIndicator();
+
+        setTimeout(() => {
+            hideTypingIndicator();
+            appendBotMessage(config.welcomeMessage);
+            if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                renderButtons(config.welcomeButtons);
+            }
+        }, 600);
+    }
+});
 </script>
-<script src="{{ url_for('static', filename='js/embed.js') }}"></script>
 
 </body>
 </html>

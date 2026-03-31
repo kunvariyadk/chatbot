@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staging Review — {{ chatbot.name }} · ChatBot Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/train.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/botdetails.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ── TWO COLUMN LAYOUT ── */
+        .staging-layout {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            align-items: flex-start;
+        }
+
+        .staging-content-left {
+            flex: 1;
+            min-width: 0; /* Prevents flex overflow */
+        }
+
+        .staging-preview-right {
+            width: 380px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 24px;
+        }
+
+        /* ── FULLY RESPONSIVE GRID (SMALLER CARDS) ── */
+        .staging-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Reduced from 300px */
+            gap: 16px; /* Reduced gap */
+        }
+
+        .staging-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px; /* Reduced padding */
+            display: flex;
+            flex-direction: column;
+            height: 160px; /* Reduced height from 240px */
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .staging-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ── TEXT TRUNCATION ── */
+        .staging-field label {
+            display: block; font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 4px;
+        }
+        .field-value {
+            font-size: 13px; line-height: 1.4; color: #334155;
+            display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+            word-break: break-word;
+        }
+        .field-value-q {
+            font-weight: 600; color: #0f172a;
+            -webkit-line-clamp: 2; margin-bottom: 12px;
+        }
+        .field-value-a {
+            -webkit-line-clamp: 2; /* Show fewer lines to save space */
+        }
+
+        .draft-badge {
+            background: #eff6ff; color: #3b82f6; font-size: 10px; font-weight: 700;
+            padding: 4px 8px; border-radius: 6px; margin-bottom: 10px; display: inline-block;
+        }
+
+        /* ── BUTTON CARDS & ACTIONS ── */
+        .staging-header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+        .btn-card-style {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 16px; background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 8px; color: #475569; font-weight: 600; font-size: 13.5px;
+            text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;
+        }
+        .btn-card-style:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        .btn-deploy-live {
+            background: #10b981; color: white; border: none; font-weight: 600;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+        .btn-deploy-live:hover { background: #059669; }
+
+        .btn-danger-card {
+            background: #fff; border: 1px solid #fecaca; color: #ef4444;
+            padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;
+        }
+
+        /* ── PROPER PAGING STYLES ── */
+        .pagination {
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-top: 20px; padding-bottom: 20px; flex-wrap: wrap;
+        }
+        .pagination button {
+            padding: 8px 14px; border: 1px solid #e2e8f0; background: #fff;
+            border-radius: 8px; color: #475569; font-weight: 500; font-size: 13.5px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
+        .pagination button.active { background: #4F46E5; color: white; border-color: #4F46E5; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .staging-info-banner {
+            background: #fef9e3; border-left: 5px solid #f59e0b;
+            padding: 16px 24px; margin: 24px 24px 0 24px; border-radius: 10px;
+        }
+
+        /* ── TEST CHAT WINDOW STYLES ── */
+        .chat-preview-box {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+            display: flex; flex-direction: column; height: 600px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;
+        }
+        .chat-header {
+            background: #4F46E5; color: white; padding: 16px; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .chat-body {
+            flex: 1; background: #f8fafc; padding: 16px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .chat-msg {
+            max-width: 85%; padding: 12px 16px; border-radius: 12px;
+            font-size: 13.5px; line-height: 1.5; word-wrap: break-word;
+        }
+        .chat-msg.user {
+            align-self: flex-end; background: #4F46E5; color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.bot {
+            align-self: flex-start; background: #fff; border: 1px solid #e2e8f0;
+            color: #334155; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .chat-footer {
+            padding: 16px; border-top: 1px solid #e2e8f0; background: #fff;
+            display: flex; gap: 8px; align-items: center;
+        }
+        .chat-input {
+            flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 24px;
+            outline: none; font-size: 14px; background: #f8fafc;
+        }
+        .chat-input:focus { border-color: #4F46E5; background: #fff; }
+        .chat-send {
+            background: #4F46E5; color: white; border: none; width: 40px; height: 40px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .chat-send:hover { background: #4338ca; }
+        .staging-matched-badge {
+            display: block; font-size: 10px; font-weight: 700; color: #10b981;
+            text-transform: uppercase; margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="toastContainer" class="toast-container"></div>
+<div class="dashboard-container">
+    <main class="main-content">
+
+        <div class="training-container">
+            <div class="staging-info-banner">
+                <p style="margin:0; color:#92400e; font-size:13.5px;"><strong>Staging Review — {{ chatbot.name }}</strong><br>Review and test your draft Q&A pairs. Once deployed, they merge into your production data.</p>
+            </div>
+
+            <div class="main-page-header" style="display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 10px; border-bottom: 1px solid #f1f5f9;">
+                <div>
+                    <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Staging Queue</h2>
+                    <p id="stagingSubtitle" style="color: #64748b; font-size: 13.5px; margin: 0;">Loading drafts...</p>
+                </div>
+                <div class="staging-header-actions">
+                    <a href="{{ url_for('train_chatbot', chatbot_id=chatbot.id) }}" class="btn-card-style">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Back to Training
+                    </a>
+                    <button class="btn-danger-card" onclick="openConfirm('discard')">Discard All</button>
+                    <button class="btn-deploy-live" id="btnDeploy" onclick="openConfirm('deploy')">Deploy to Live</button>
+                </div>
+            </div>
+
+            <div class="staging-layout">
+
+                <div class="staging-content-left">
+                    <div id="stagingCardsContainer" class="staging-cards-grid">
+                        <div style="text-align: center; grid-column: 1/-1; padding: 60px;"><div class="spinner"></div><p style="color: #64748b; margin-top: 10px;">Fetching drafts...</p></div>
+                    </div>
+                    <div id="paginationControls" class="pagination"></div>
+                </div>
+
+                <div class="staging-preview-right">
+                    <div class="chat-preview-box">
+                        <div class="chat-header">
+                            <span>Test Staging Data</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="chat-body" id="testChatBody">
+                            <div class="chat-msg bot">
+                                Hi! I am running in <strong>Test Mode</strong>. Ask me a question from the staging cards on the left to see how I respond based on your drafts!
+                            </div>
+                        </div>
+                        <div class="chat-footer">
+                            <input type="text" id="testChatInput" class="chat-input" placeholder="Type a test question..." onkeypress="if(event.key === 'Enter') sendTestMessage()">
+                            <button class="chat-send" onclick="sendTestMessage()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const CHATBOT_ID = {{ chatbot.id }};
+    let stagingItems = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 12; // Increased to 12 since cards are smaller
+
+    // Strictly mapping to your Staging Controller
+    async function loadStagingData() {
+        try {
+            const response = await fetch(`/chatbot/staging/${CHATBOT_ID}`);
+            const result = await response.json();
+            if (result.success) {
+                stagingItems = result.staging_pairs || [];
+                document.getElementById('stagingSubtitle').textContent = `${stagingItems.length} drafts waiting for review`;
+                renderCards();
+            }
+        } catch (err) { console.error("Error loading data", err); }
+    }
+
+    function renderCards() {
+        const container = document.getElementById('stagingCardsContainer');
+        if (stagingItems.length === 0) {
+            container.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:80px; color:#94a3b8;"><h3>✨ All caught up!</h3><p style="margin-top: 8px;">Queue is currently empty.</p></div>`;
+            document.getElementById('paginationControls').innerHTML = '';
+            return;
+        }
+
+        const startIdx = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = stagingItems.slice(startIdx, startIdx + PAGE_SIZE);
+
+        container.innerHTML = pageItems.map((pair, idx) => `
+            <div class="staging-card">
+                <div><span class="draft-badge">DRAFT #${startIdx + idx + 1}</span></div>
+                <div class="staging-field">
+                    <label>Question</label>
+                    <div class="field-value field-value-q">${pair.question}</div>
+                </div>
+                <div class="staging-field" style="margin-top: auto;">
+                    <label>Answer</label>
+                    <div class="field-value field-value-a">${pair.answer}</div>
+                </div>
+            </div>
+        `).join('');
+
+        renderPagination(stagingItems.length);
+    }
+
+    // Advanced Prev/Next Paging Logic
+    function renderPagination(total) {
+        const totalPages = Math.ceil(total / PAGE_SIZE);
+        const nav = document.getElementById('paginationControls');
+        if (totalPages <= 1) { nav.innerHTML = ''; return; }
+
+        let html = `<button onclick="goToPage(currentPage - 1)" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
+
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        if (endPage - startPage < 4) { startPage = Math.max(1, endPage - 4); }
+
+        for(let i = startPage; i <= endPage; i++) {
+            html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<span style="color: #94a3b8; padding: 0 8px;">...</span>`;
+            html += `<button onclick="goToPage(${totalPages})">${totalPages}</button>`;
+        }
+
+        html += `<button onclick="goToPage(currentPage + 1)" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
+        nav.innerHTML = html;
+    }
+
+    function goToPage(p) {
+        if(p >= 1 && p <= Math.ceil(stagingItems.length / PAGE_SIZE)) {
+            currentPage = p;
+            renderCards();
+        }
+    }
+
+    // ── LIVE PREVIEW TEST LOGIC ──
+    function sendTestMessage() {
+        const input = document.getElementById('testChatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Add user message to chat
+        appendChatMessage('user', text);
+        input.value = '';
+
+        // Simulate network delay
+        setTimeout(() => {
+            const lowerText = text.toLowerCase();
+
+            // Simple string matching simulation against staging data
+            const match = stagingItems.find(item =>
+                lowerText.includes(item.question.toLowerCase()) ||
+                item.question.toLowerCase().includes(lowerText)
+            );
+
+            if (match) {
+                appendChatMessage('bot', `<span class="staging-matched-badge">✓ Matched Staging Draft</span>${match.answer}`);
+            } else {
+                appendChatMessage('bot', "I couldn't find a close match in the staging drafts. Please try phrasing it closer to the drafted questions.");
+            }
+        }, 600);
+    }
+
+    function appendChatMessage(sender, html) {
+        const body = document.getElementById('testChatBody');
+        const div = document.createElement('div');
+        div.className = `chat-msg ${sender}`;
+        div.innerHTML = html;
+        body.appendChild(div);
+
+        // Auto scroll to bottom
+        body.scrollTop = body.scrollHeight;
+    }
+
+    // Deploy & Discard Logic
+    async function deployAll() {
+        const res = await fetch(`/chatbot/staging/deploy/${CHATBOT_ID}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            window.location.href = `/chatbot/train/${CHATBOT_ID}`;
+        }
+    }
+
+    async function discardAll() {
+        const res = await fetch(`/chatbot/staging/discard/${CHATBOT_ID}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) { location.reload(); }
+    }
+
+    function openConfirm(type) {
+        const msg = type === 'deploy'
+            ? `Merge all ${stagingItems.length} drafts into your live chatbot?`
+            : `Discard all ${stagingItems.length} drafts permanently?`;
+
+        if(confirm(msg)) {
+            if(type === 'deploy') deployAll();
+            else discardAll();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadStagingData);
+</script>
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Staging Review — {{ chatbot.name }} · ChatBot Builder</title>-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/train.css') }}">-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/botdetails.css') }}">-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">-->
+<!--    <style>-->
+<!--        /* ── FULLY RESPONSIVE GRID ── */-->
+<!--        .staging-cards-grid {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Automatically adjusts to screen size */-->
+<!--            gap: 20px;-->
+<!--            padding: 24px;-->
+<!--        }-->
+
+<!--        .staging-card {-->
+<!--            background: #fff;-->
+<!--            border: 1px solid #e2e8f0;-->
+<!--            border-radius: 12px;-->
+<!--            padding: 20px;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            height: 240px; /* Fixed height for perfectly uniform cards */-->
+<!--            transition: all 0.2s ease;-->
+<!--            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);-->
+<!--        }-->
+
+<!--        .staging-card:hover {-->
+<!--            border-color: #cbd5e1;-->
+<!--            box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.1);-->
+<!--            transform: translateY(-2px);-->
+<!--        }-->
+
+<!--        /* ── TEXT TRUNCATION (Keeps cards from breaking) ── */-->
+<!--        .staging-field label {-->
+<!--            display: block; font-size: 10.5px; font-weight: 800;-->
+<!--            text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 6px;-->
+<!--        }-->
+<!--        .field-value {-->
+<!--            font-size: 13.5px; line-height: 1.5; color: #334155;-->
+<!--            display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;-->
+<!--            word-break: break-word;-->
+<!--        }-->
+<!--        .field-value-q {-->
+<!--            font-weight: 600; color: #0f172a; font-size: 14.5px;-->
+<!--            -webkit-line-clamp: 2; margin-bottom: 16px;-->
+<!--        }-->
+<!--        .field-value-a {-->
+<!--            -webkit-line-clamp: 3;-->
+<!--        }-->
+
+<!--        .draft-badge {-->
+<!--            background: #eff6ff; color: #3b82f6; font-size: 10.5px; font-weight: 700;-->
+<!--            padding: 4px 10px; border-radius: 6px; margin-bottom: 16px; display: inline-block;-->
+<!--        }-->
+
+<!--        /* ── BUTTON CARDS & ACTIONS ── */-->
+<!--        .staging-header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }-->
+
+<!--        .btn-card-style {-->
+<!--            display: inline-flex; align-items: center; gap: 6px;-->
+<!--            padding: 10px 16px; background: #fff; border: 1px solid #e2e8f0;-->
+<!--            border-radius: 8px; color: #475569; font-weight: 600; font-size: 13.5px;-->
+<!--            text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;-->
+<!--        }-->
+<!--        .btn-card-style:hover { background: #f8fafc; border-color: #cbd5e1; }-->
+
+<!--        .btn-deploy-live {-->
+<!--            background: #10b981; color: white; border: none; font-weight: 600;-->
+<!--            padding: 10px 20px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);-->
+<!--        }-->
+<!--        .btn-deploy-live:hover { background: #059669; }-->
+
+<!--        .btn-danger-card {-->
+<!--            background: #fff; border: 1px solid #fecaca; color: #ef4444;-->
+<!--            padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;-->
+<!--        }-->
+
+<!--        /* ── PROPER PAGING STYLES ── */-->
+<!--        .pagination {-->
+<!--            display: flex; justify-content: center; align-items: center; gap: 8px;-->
+<!--            margin-top: 10px; padding-bottom: 40px; flex-wrap: wrap;-->
+<!--        }-->
+<!--        .pagination button {-->
+<!--            padding: 8px 14px; border: 1px solid #e2e8f0; background: #fff;-->
+<!--            border-radius: 8px; color: #475569; font-weight: 500; font-size: 13.5px;-->
+<!--            cursor: pointer; transition: all 0.2s;-->
+<!--        }-->
+<!--        .pagination button:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }-->
+<!--        .pagination button.active { background: #4F46E5; color: white; border-color: #4F46E5; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }-->
+<!--        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }-->
+
+<!--        .staging-info-banner {-->
+<!--            background: #fef9e3; border-left: 5px solid #f59e0b;-->
+<!--            padding: 16px 24px; margin-bottom: 24px; border-radius: 10px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div id="toastContainer" class="toast-container"></div>-->
+<!--<div class="dashboard-container">-->
+<!--    <main class="main-content">-->
+
+<!--        <div class="training-container">-->
+<!--            <div class="staging-info-banner">-->
+<!--                <p style="margin:0; color:#92400e; font-size:13.5px;"><strong>Staging Review — {{ chatbot.name }}</strong><br>Review and deploy your draft Q&A pairs. Once deployed, they merge into your production data.</p>-->
+<!--            </div>-->
+
+<!--            <div class="main-page-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px 10px; border-bottom: 1px solid #f1f5f9;">-->
+<!--                <div>-->
+<!--                    <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Staging Queue</h2>-->
+<!--                    <p id="stagingSubtitle" style="color: #64748b; font-size: 13.5px; margin: 0;">Loading drafts...</p>-->
+<!--                </div>-->
+<!--                <div class="staging-header-actions">-->
+<!--                    <a href="{{ url_for('train_chatbot', chatbot_id=chatbot.id) }}" class="btn-card-style">-->
+<!--                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>-->
+<!--                        Back to Training-->
+<!--                    </a>-->
+<!--                    <button class="btn-danger-card" onclick="openConfirm('discard')">Discard All</button>-->
+<!--                    <button class="btn-deploy-live" id="btnDeploy" onclick="openConfirm('deploy')">Deploy to Live</button>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div id="stagingCardsContainer" class="staging-cards-grid">-->
+<!--                <div style="text-align: center; grid-column: 1/-1; padding: 60px;"><div class="spinner"></div><p style="color: #64748b; margin-top: 10px;">Fetching drafts...</p></div>-->
+<!--            </div>-->
+
+<!--            <div id="paginationControls" class="pagination"></div>-->
+<!--        </div>-->
+<!--    </main>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    const CHATBOT_ID = {{ chatbot.id }};-->
+<!--    let stagingItems = [];-->
+<!--    let currentPage = 1;-->
+<!--    const PAGE_SIZE = 9; // Shows 9 cards per page (3x3 grid on large screens)-->
+
+<!--    // Strictly mapping to your Staging Controller-->
+<!--    async function loadStagingData() {-->
+<!--        try {-->
+<!--            const response = await fetch(`/chatbot/staging/${CHATBOT_ID}`);-->
+<!--            const result = await response.json();-->
+<!--            if (result.success) {-->
+<!--                stagingItems = result.staging_pairs || [];-->
+<!--                document.getElementById('stagingSubtitle').textContent = `${stagingItems.length} drafts waiting for review`;-->
+<!--                renderCards();-->
+<!--            }-->
+<!--        } catch (err) { console.error("Error loading data", err); }-->
+<!--    }-->
+
+<!--    function renderCards() {-->
+<!--        const container = document.getElementById('stagingCardsContainer');-->
+<!--        if (stagingItems.length === 0) {-->
+<!--            container.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:80px; color:#94a3b8;"><h3>✨ All caught up!</h3><p style="margin-top: 8px;">Queue is currently empty.</p></div>`;-->
+<!--            document.getElementById('paginationControls').innerHTML = '';-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const startIdx = (currentPage - 1) * PAGE_SIZE;-->
+<!--        const pageItems = stagingItems.slice(startIdx, startIdx + PAGE_SIZE);-->
+
+<!--        container.innerHTML = pageItems.map((pair, idx) => `-->
+<!--            <div class="staging-card">-->
+<!--                <div><span class="draft-badge">DRAFT #${startIdx + idx + 1}</span></div>-->
+<!--                <div class="staging-field">-->
+<!--                    <label>Question</label>-->
+<!--                    <div class="field-value field-value-q">${pair.question}</div>-->
+<!--                </div>-->
+<!--                <div class="staging-field" style="margin-top: auto;">-->
+<!--                    <label>Answer</label>-->
+<!--                    <div class="field-value field-value-a">${pair.answer}</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        `).join('');-->
+
+<!--        renderPagination(stagingItems.length);-->
+<!--    }-->
+
+<!--    // Advanced Prev/Next Paging Logic-->
+<!--    function renderPagination(total) {-->
+<!--        const totalPages = Math.ceil(total / PAGE_SIZE);-->
+<!--        const nav = document.getElementById('paginationControls');-->
+<!--        if (totalPages <= 1) { nav.innerHTML = ''; return; }-->
+
+<!--        let html = `<button onclick="goToPage(currentPage - 1)" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;-->
+
+<!--        let startPage = Math.max(1, currentPage - 2);-->
+<!--        let endPage = Math.min(totalPages, startPage + 4);-->
+<!--        if (endPage - startPage < 4) { startPage = Math.max(1, endPage - 4); }-->
+
+<!--        for(let i = startPage; i <= endPage; i++) {-->
+<!--            html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;-->
+<!--        }-->
+
+<!--        if (endPage < totalPages) {-->
+<!--            if (endPage < totalPages - 1) html += `<span style="color: #94a3b8; padding: 0 8px;">...</span>`;-->
+<!--            html += `<button onclick="goToPage(${totalPages})">${totalPages}</button>`;-->
+<!--        }-->
+
+<!--        html += `<button onclick="goToPage(currentPage + 1)" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;-->
+<!--        nav.innerHTML = html;-->
+<!--    }-->
+
+<!--    function goToPage(p) {-->
+<!--        if(p >= 1 && p <= Math.ceil(stagingItems.length / PAGE_SIZE)) {-->
+<!--            currentPage = p;-->
+<!--            renderCards();-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Deploy Logic (Merges and Redirects so you can preview the data)-->
+<!--    async function deployAll() {-->
+<!--        const res = await fetch(`/chatbot/staging/deploy/${CHATBOT_ID}`, { method: 'POST' });-->
+<!--        const data = await res.json();-->
+<!--        if (data.success) {-->
+<!--            // Once deployed successfully, redirect back to Training Overview to see the merged data-->
+<!--            window.location.href = `/chatbot/train/${CHATBOT_ID}`;-->
+<!--        }-->
+<!--    }-->
+
+<!--    async function discardAll() {-->
+<!--        const res = await fetch(`/chatbot/staging/discard/${CHATBOT_ID}`, { method: 'POST' });-->
+<!--        const data = await res.json();-->
+<!--        if (data.success) { location.reload(); }-->
+<!--    }-->
+
+<!--    function openConfirm(type) {-->
+<!--        const msg = type === 'deploy'-->
+<!--            ? `Merge all ${stagingItems.length} drafts into your live chatbot?`-->
+<!--            : `Discard all ${stagingItems.length} drafts permanently?`;-->
+
+<!--        if(confirm(msg)) {-->
+<!--            if(type === 'deploy') deployAll();-->
+<!--            else discardAll();-->
+<!--        }-->
+<!--    }-->
+
+<!--    document.addEventListener('DOMContentLoaded', loadStagingData);-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

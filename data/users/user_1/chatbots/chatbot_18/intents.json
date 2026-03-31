@@ -1,0 +1,13 @@
+{
+  "intents": [
+    {
+      "tag": "qa_1",
+      "patterns": [
+        "hii"
+      ],
+      "responses": [
+        "hekllo"
+      ]
+    }
+  ]
+}

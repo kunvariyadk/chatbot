@@ -149,7 +149,10 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; ba
     bottom: 95px;
     right: 20px;
     width: 420px;
-    height: 500px;
+    /* Increased height for better readability */
+    height: 560px;
+    /* Ensures it doesn't overflow the browser window height */
+    max-height: calc(100vh - 120px);
     background: white;
     border-radius: 16px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.18);
@@ -162,7 +165,6 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; ba
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
-
 .widget.open {
     opacity: 1;
     visibility: visible;
@@ -172,7 +174,8 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; ba
 /* ========== HEADER ========== */
 .header {
     padding: 18px 20px;
-    background: linear-gradient(135deg, var(--primary, #4F46E5) 0%, var(--primary-dark, #3730A3) 100%);
+    background: linear-gradient(135deg, var(--primary, #4F46E5) 0%, var(--primary-dark, rgba(55, 48, 163, 0.76)) 100%);
+    background-color: var(--primary, #4F46E5);
     color: white;
     display: flex;
     align-items: center;
@@ -247,7 +250,7 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; ba
     padding: 16px;
     overflow-y: auto;
     background: var(--bg-chat, #F7FAFC);
-    display: flex;
+    display: inline-block;
     flex-direction: column;
     gap: 14px;
 }

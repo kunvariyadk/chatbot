@@ -1,0 +1,47 @@
+{
+  "user_id": 1,
+  "chatbot_id": 22,
+  "trained_at": "2026-03-24T10:11:49.162996+00:00",
+  "accuracy": 0.5294117647058824,
+  "models": {
+    "svm": {
+      "accuracy": 0.5294117647058824,
+      "status": "success"
+    }
+  },
+  "total_intents": 17,
+  "total_patterns": 234,
+  "general_intents_included": true,
+  "classes": [
+    "about",
+    "about_company",
+    "capabilities",
+    "compliment",
+    "contact",
+    "goodbye",
+    "greeting",
+    "help",
+    "how_are_you",
+    "location",
+    "mobile_app",
+    "no",
+    "pricing",
+    "services",
+    "thanks",
+    "web_development",
+    "yes"
+  ],
+  "ml_trained": true,
+  "kb_created": true,
+  "augmented": true,
+  "augmentation_info": {
+    "enabled": true,
+    "min_patterns_per_intent": 10,
+    "techniques": [
+      "paraphrase",
+      "synonym",
+      "template",
+      "structural"
+    ]
+  }
+}

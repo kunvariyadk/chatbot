@@ -1,0 +1,101 @@
+[
+  {
+    "intent": "qa_1",
+    "tag": "qa_1",
+    "patterns": [
+      "Hello..."
+    ],
+    "responses": [
+      "Hello there! I'm glad you are here. How can I help you today?"
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_2",
+    "tag": "qa_2",
+    "patterns": [
+      "Hi, how are you"
+    ],
+    "responses": [
+      "I'm doing great, thank you for asking! How can I assist you today?"
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_3",
+    "tag": "qa_3",
+    "patterns": [
+      "What is your name?"
+    ],
+    "responses": [
+      "I am a virtual assistant chatbot designed to answer questions and help users."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_4",
+    "tag": "qa_4",
+    "patterns": [
+      "What can you do?"
+    ],
+    "responses": [
+      "I can answer questions, provide information, help with learning topics, and have friendly conversations."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_5",
+    "tag": "qa_5",
+    "patterns": [
+      "Can you help me with technology questions?"
+    ],
+    "responses": [
+      "Yes, I can help answer questions related to programming, technology, and general knowledge."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_6",
+    "tag": "qa_6",
+    "patterns": [
+      "Tell me a joke"
+    ],
+    "responses": [
+      "Sure! Why did the computer show up at work late? Because it had a hard drive."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_7",
+    "tag": "qa_7",
+    "patterns": [
+      "I'm feeling bored"
+    ],
+    "responses": [
+      "Maybe we can talk about something interesting or learn something new together."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_8",
+    "tag": "qa_8",
+    "patterns": [
+      "Thank you"
+    ],
+    "responses": [
+      "You're welcome! I'm always happy to help."
+    ],
+    "chatbot_id": 9
+  },
+  {
+    "intent": "qa_9",
+    "tag": "qa_9",
+    "patterns": [
+      "Goodbye"
+    ],
+    "responses": [
+      "Goodbye! Have a wonderful day and feel free to come back anytime."
+    ],
+    "chatbot_id": 9
+  }
+]

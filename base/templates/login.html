@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Chatbot Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="container">
         <div class="login-form">
             <div class="header">
                 <h2>Welcome Back</h2>
                 <p class="subtitle">Sign in to your account to continue</p>
-            </div>
-
-            <div class="alert alert-success" style="display: none;">
-                Login successful!
             </div>
 
             <form method="POST" id="loginForm">
@@ -50,10 +50,34 @@
             </form>
 
             <div class="signup-link">
-                Don't have an account? <a href=/register>Sign up</a>
+                Don't have an account? <a href="/register">Sign up</a>
             </div>
         </div>
     </div>
-<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+    <!-- Flask flash messages → toasts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    {% for category, message in messages %}
+                        {# Map Flask category names to toast types #}
+                        {% if category == 'error' %}
+                            showToast('error', 'Error', '{{ message }}');
+                        {% elif category == 'success' %}
+                            showToast('success', 'Success', '{{ message }}');
+                        {% elif category == 'warning' %}
+                            showToast('warning', 'Warning', '{{ message }}');
+                        {% else %}
+                            showToast('info', 'Notice', '{{ message }}');
+                        {% endif %}
+                    {% endfor %}
+                });
+            </script>
+        {% endif %}
+    {% endwith %}
+
 </body>
 </html>
