@@ -81,3 +81,33 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def premium_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+
+        user = get_user_by_id(session['user_id'])
+
+        # 1. Check if they have a subscription
+        if not user.subscription:
+            flash('Live Chat requires a premium subscription. Please upgrade.', 'warning')
+            return redirect(url_for('subscription_plans'))
+
+        # 2. Correctly get the plan name from the connected SubscriptionPlan table
+        try:
+            plan_name = user.subscription.plan.name.lower()
+        except AttributeError:
+            flash('Subscription verification error. Please contact support.', 'error')
+            return redirect(url_for('dashboard'))
+
+        # 3. Block if it's the free plan
+        if 'free' in plan_name:
+            flash('Live Chat requires a premium subscription. Please upgrade to access this feature.', 'warning')
+            return redirect(url_for('subscription_plans'))
+
+        return f(*args, **kwargs)
+
+    return decorated_function
