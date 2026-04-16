@@ -13,13 +13,16 @@ class ChatSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chatbot_id = db.Column(db.Integer, db.ForeignKey('chatbot.id'), nullable=True)
     session_token = db.Column(db.String(100), unique=True)
-
+    is_live = db.Column(db.Boolean, default=False)
+    # Add this inside your ChatSession class
+    status = db.Column(db.String(20), default='bot')
     # User identification
     user_name = db.Column(db.String(100))
     user_email = db.Column(db.String(120))
     user_ip = db.Column(db.String(50))
     user_agent = db.Column(db.Text)
-
+    visitor_name = db.Column(db.String(150), nullable=True)
+    visitor_contact = db.Column(db.String(150), nullable=True)
     # Session timing
     started_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     ended_at = db.Column(db.DateTime(timezone=True))
@@ -84,7 +87,7 @@ class ChatMessage(db.Model):
     session_id = db.Column(db.Integer, db.ForeignKey('chat_sessions.id'), nullable=False)
 
     # Message content
-    sender = db.Column(db.String(10))  # 'user' or 'bot'
+    sender = db.Column(db.Enum('user', 'bot', 'owner')) # 'user' or 'bot'
     message = db.Column(db.Text)
 
     # AI Analytics

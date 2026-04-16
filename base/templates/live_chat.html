@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat — ChatBot Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/live_chat.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-container">
+
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+
+        <div class="lc-hero">
+            <div class="lc-hero-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <div class="lc-hero-content">
+                <h1>Live Chat Dashboard</h1>
+                <p>Manage real-time conversations with your website visitors.</p>
+            </div>
+        </div>
+
+        {% if sessions_data %}
+        <div class="sessions-grid">
+            {% for data in sessions_data %}
+            <div class="session-card" style="display: flex; flex-direction: column; padding: 22px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2.5">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span style="font-size: 16px; font-weight: 700; color: #1a202c;">{{ data.session.visitor_name or 'Anonymous Visitor' }}</span>
+                    </div>
+                    {% if data.unread > 0 %}
+                    <span style="background: #fee2e2; color: #c53030; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">{{ data.unread }} new</span>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #718096; margin-bottom: 24px;">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <strong style="color: #4a5568;">{{ data.session.visitor_contact or 'No contact provided' }}</strong>
+                </span>
+                                <span style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Bot: {{ data.chatbot.name }}
+                </span>
+                                <span style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle
+                            cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Started: <span class="ist-short"
+                                   data-utc="{{ (data.session.started_at.isoformat() ~ 'Z') if data.session.started_at else '' }}"></span>
+                </span>
+                </div>
+                <div style="margin-top: auto;">
+                    <a href="{{ url_for('live_chat_session', session_id=data.session.id) }}" class="btn-open-chat">Open Chat Room →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3>No Active Chats</h3>
+            <p>Your AI assistant is handling everything right now.<br>When a visitor requests a human, it will appear here!</p>
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+<button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+</button>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    // ── Auto-refresh page every 15 s to pick up new sessions ───────
+    setTimeout(() => location.reload(), 15000);
+
+    // ── Sidebar unread badge via polling ────────────────────────────
+    async function refreshBadge() {
+        try {
+            const r = await fetch('/live-chat/unread-count');
+            const d = await r.json();
+            const badge = document.getElementById('sidebarBadge');
+            if (badge) {
+                if (d.unread > 0) {
+                    badge.textContent = d.unread;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        } catch(e) { console.error('Badge update failed:', e); }
+    }
+    setInterval(refreshBadge, 10000);
+    refreshBadge();
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const optsShort = { timeZone: 'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hour12: true };
+
+    document.querySelectorAll('.ist-short').forEach(el => {
+        if (!el.dataset.utc) return;
+
+        let ts = el.dataset.utc.replace('ZZ', 'Z').replace('+00:00Z', 'Z');
+
+        // Ensure it has the correct UTC formatting for JavaScript
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(ts)) {
+            ts = ts.replace(' ', 'T') + 'Z';
+        } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(ts)) {
+            ts += 'Z';
+        }
+
+        // Convert to IST and display
+        let d = new Date(ts);
+        if (!isNaN(d)) {
+            el.textContent = d.toLocaleTimeString('en-IN', optsShort);
+        }
+    });
+});
+</script>
+</body>
+</html>

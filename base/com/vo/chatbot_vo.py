@@ -72,7 +72,8 @@ class Chatbot(db.Model):
             self.welcome_buttons = '[]'
             return False
 
-        valid_types = ['url', 'intent', 'message']
+        # 🌟 UPGRADE: Added 'live_chat' to valid types
+        valid_types = ['url', 'intent', 'message', 'live_chat']
 
         def clean_node(btn):
             if not isinstance(btn, dict):
@@ -94,7 +95,6 @@ class Chatbot(db.Model):
                 'nested_buttons': []
             }
 
-            # 1. Gracefully migrate legacy 'submenu_items' if they exist
             legacy_subs = btn.get('submenu_items', [])
             if isinstance(legacy_subs, list):
                 for sub in legacy_subs:
@@ -111,17 +111,15 @@ class Chatbot(db.Model):
                             'nested_buttons': []
                         })
 
-            # 2. Process infinite nested_buttons recursively
             nested = btn.get('nested_buttons', [])
             if isinstance(nested, list):
                 for n_btn in nested:
-                    valid_nested = clean_node(n_btn)  # Recursive call
+                    valid_nested = clean_node(n_btn)
                     if valid_nested:
                         cleaned['nested_buttons'].append(valid_nested)
 
             return cleaned
 
-        # Process all top-level buttons
         validated_buttons = []
         for button in buttons_list:
             valid_btn = clean_node(button)
@@ -135,13 +133,10 @@ class Chatbot(db.Model):
         """Dynamic preprocessing"""
         if not text:
             return ""
-
         text = text.lower().strip()
         text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
-
         if self.training_file and 'faq' in (self.training_file or "").lower():
             text = text.replace('?', '')
-
         return text
 
     def __repr__(self):

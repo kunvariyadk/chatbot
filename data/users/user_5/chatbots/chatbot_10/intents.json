@@ -1,0 +1,22 @@
+{
+  "intents": [
+    {
+      "tag": "qa_1",
+      "patterns": [
+        "Hii"
+      ],
+      "responses": [
+        "Hello. How may I help you?"
+      ]
+    },
+    {
+      "tag": "qa_2",
+      "patterns": [
+        "Hey there.."
+      ],
+      "responses": [
+        "How can I help you today?"
+      ]
+    }
+  ]
+}

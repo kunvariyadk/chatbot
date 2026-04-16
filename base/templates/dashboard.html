@@ -8,169 +8,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-    <style>
-        /* ── Toast Notification System ── */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-            max-width: 320px;
-            width: calc(100% - 40px);
-        }
-        .toast {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 12px 14px;
-            pointer-events: all;
-            position: relative;
-            overflow: hidden;
-            transform: translateX(calc(100% + 30px));
-            opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.35s ease;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            border-left: 4px solid transparent;
-        }
-        .toast.show { transform: translateX(0); opacity: 1; }
-        .toast.hide { transform: translateX(calc(100% + 30px)); opacity: 0; }
-        .toast.success { border-left-color: #38a169; }
-        .toast.error   { border-left-color: #e53e3e; }
-        .toast.warning { border-left-color: #dd6b20; }
-        .toast.info    { border-left-color: #3182ce; }
-        .toast-icon-wrap {
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .toast.success .toast-icon-wrap { background: #f0fff4; }
-        .toast.error   .toast-icon-wrap { background: #fff5f5; }
-        .toast.warning .toast-icon-wrap { background: #fffaf0; }
-        .toast.info    .toast-icon-wrap { background: #ebf8ff; }
-        .toast-icon-wrap svg { width: 16px; height: 16px; }
-        .toast.success .toast-icon-wrap svg { stroke: #38a169; }
-        .toast.error   .toast-icon-wrap svg { stroke: #e53e3e; }
-        .toast.warning .toast-icon-wrap svg { stroke: #dd6b20; }
-        .toast.info    .toast-icon-wrap svg { stroke: #3182ce; }
-        .toast-body { flex: 1; min-width: 0; padding-top: 1px; }
-        .toast-title { font-size: 13px; font-weight: 600; color: #1a202c; margin: 0 0 2px; line-height: 1.3; }
-        .toast-msg   { font-size: 12px; color: #718096; margin: 0; line-height: 1.4; }
-        .toast-close {
-            background: none; border: none; cursor: pointer; color: #a0aec0;
-            font-size: 16px; line-height: 1; padding: 0; flex-shrink: 0;
-            width: 20px; height: 20px; display: flex; align-items: center;
-            justify-content: center; border-radius: 4px; margin-top: 1px;
-            transition: background 0.15s, color 0.15s;
-        }
-        .toast-close:hover { background: #edf2f7; color: #4a5568; }
-        .toast-progress {
-            position: absolute; bottom: 0; left: 0; height: 3px;
-            animation: toastShrink linear forwards;
-        }
-        .toast.success .toast-progress { background: #38a169; }
-        .toast.error   .toast-progress { background: #e53e3e; }
-        .toast.warning .toast-progress { background: #dd6b20; }
-        .toast.info    .toast-progress { background: #3182ce; }
-        @keyframes toastShrink { from { width: 100%; } to { width: 0%; } }
-        @media (max-width: 480px) {
-            .toast-container { top: 12px; right: 12px; left: 12px; max-width: 100%; width: auto; }
-        }
-    </style>
 </head>
 <body>
 
-<!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="dashboard-container">
 
-    <!-- ════════════ SIDEBAR ════════════ -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="8" fill="url(#grad)"/>
-                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                    <defs>
-                        <linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
-                            <stop offset="0%" stop-color="#667eea"/>
-                            <stop offset="100%" stop-color="#764ba2"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>ChatBot Builder</span>
-            </div>
-        </div>
+    {% include 'sidebar.html' %}
 
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <a href="/dashboard" class="nav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                    </svg>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Workspace</div>
-                <a href="{{ url_for('bots') }}" class="nav-item" id="botsMenu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    <span>Bots</span>
-                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Account</div>
-                <a href="#" class="nav-item" id="accountMenu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <span>My Account</span>
-                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </a>
-                <div class="submenu" id="accountSubmenu">
-                    <a href="/edit" class="submenu-item"><span class="dot"></span><span>Edit Profile</span></a>
-                    <a href="/change-password" class="submenu-item"><span class="dot"></span><span>Change Password</span></a>
-                    <a href="/subscription/manage" class="submenu-item"><span class="dot"></span><span>Subscription</span></a>
-                </div>
-            </div>
-        </nav>
-
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar">{{ user.username[0].upper() }}</div>
-                <div class="user-details">
-                    <div class="user-name">{{ user.username }}</div>
-                    <div class="user-email">{{ user.email }}</div>
-                </div>
-            </div>
-            <a href="/logout" class="logout-btn" title="Logout">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-            </a>
-        </div>
-    </aside>
-
-    <!-- ════════════ MAIN CONTENT ════════════ -->
     <main class="main-content">
 
-        <!-- Page header -->
         <div class="page-header">
             <div>
                 <h1>Welcome, {{ user.username }}!</h1>
@@ -186,7 +34,6 @@
             </a>
         </div>
 
-        <!-- ── Stats ── -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon blue">
@@ -222,9 +69,19 @@
                     <div class="stat-label">Inactive Chatbots</div>
                 </div>
             </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fffaf0; color:#dd6b20;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-value">{{ total_leads | default(0) }}</div>
+                    <div class="stat-label">Captured Leads</div>
+                </div>
+            </div>
         </div>
 
-        <!-- ── Row 1: Activity Chart + Donut ── -->
         <div class="dashboard-grid">
             <div class="dash-card">
                 <div class="dash-card-header">
@@ -296,28 +153,56 @@
             </div>
         </div>
 
-        <!-- ── Row 2: Activity Feed + Quick Actions ── -->
-        <div class="bottom-grid">
-            <div class="dash-card">
+        <div class="three-col-grid">
+
+            <div class="dash-card full-height-card">
                 <div class="dash-card-header">
-                    <h3>Recent Activity</h3>
-                    <a href="{{ url_for('bots') }}" style="font-size:11px;color:var(--brand-1);text-decoration:none;font-weight:600;">View all →</a>
+                    <h3>Recent Captured Leads</h3>
+                    <a href="{{ url_for('live_chat_dashboard') }}" style="font-size:12px;color:#4F46E5;text-decoration:none;font-weight:600;">Live Chat Dashboard →</a>
+                </div>
+                <div class="dash-card-body" style="background: #f8fafc; padding: 16px;">
+                    {% if recent_sessions %}
+                    <div class="visitor-list">
+                        {% for session in recent_sessions %}
+                        <div class="visitor-item">
+                            <div class="v-avatar">{{ session.visitor_name[0]|upper if session.visitor_name else 'U' }}</div>
+                            <div class="v-info">
+                                <div class="v-name">{{ session.visitor_name or 'Anonymous Visitor' }}</div>
+                                <div class="v-contact">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    {{ session.visitor_contact or 'No contact provided' }}
+                                </div>
+                            </div>
+                            <div class="v-bot">Session #{{ session.id }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="activity-empty">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:12px;">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <p>No leads captured yet.<br>When a visitor fills out the pre-chat form, they will appear here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="dash-card full-height-card">
+                <div class="dash-card-header">
+                    <h3>Recent Bot Activity</h3>
+                    <a href="{{ url_for('bots') }}" style="font-size:12px;color:#4F46E5;text-decoration:none;font-weight:600;">View all →</a>
                 </div>
                 <div class="dash-card-body">
                     {% if chatbots %}
                     <div class="activity-list" id="activityList">
-                        {% for chatbot in chatbots[:8] %}
+                        {% for chatbot in chatbots[:5] %}
                         <div class="activity-item">
                             <div class="activity-icon {{ 'train' if chatbot.is_trained else 'create' }}">
                                 {% if chatbot.is_trained %}
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                                 {% else %}
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                                 {% endif %}
                             </div>
                             <div class="activity-content">
@@ -336,59 +221,45 @@
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
-                        <p>No activity yet. Create your first chatbot!</p>
+                        <p>No bot activity yet. Create your first chatbot!</p>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            <div style="display:flex;flex-direction:column;gap:14px;">
-                <div class="dash-card">
-                    <div class="dash-card-header"><h3>Quick Actions</h3></div>
-                    <div class="dash-card-body">
-                        <div class="quick-actions-grid">
-                            <a href="/chatbot/create" class="quick-action-btn">
-                                <div class="qa-icon blue">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="12" y1="8" x2="12" y2="16"/>
-                                        <line x1="8" y1="12" x2="16" y2="12"/>
-                                    </svg>
-                                </div>
-                                <span class="qa-label">New Bot</span>
-                            </a>
-                            <a href="{{ url_for('bots') }}" class="quick-action-btn">
-                                <div class="qa-icon purple">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                    </svg>
-                                </div>
-                                <span class="qa-label">All Bots</span>
-                            </a>
-                            <a href="/edit" class="quick-action-btn">
-                                <div class="qa-icon green">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                    </svg>
-                                </div>
-                                <span class="qa-label">Profile</span>
-                            </a>
-                            <a href="/subscription/manage" class="quick-action-btn">
-                                <div class="qa-icon orange">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="5" width="20" height="14" rx="2"/>
-                                        <line x1="2" y1="10" x2="22" y2="10"/>
-                                    </svg>
-                                </div>
-                                <span class="qa-label">Subscription</span>
-                            </a>
-                        </div>
+            <div class="dash-card full-height-card">
+                <div class="dash-card-header"><h3>Quick Actions</h3></div>
+                <div class="dash-card-body">
+                    <div class="quick-actions-grid">
+                        <a href="/chatbot/create" class="quick-action-btn">
+                            <div class="qa-icon blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            </div>
+                            <span class="qa-label">New Bot</span>
+                        </a>
+                        <a href="{{ url_for('bots') }}" class="quick-action-btn">
+                            <div class="qa-icon purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <span class="qa-label">All Bots</span>
+                        </a>
+                        <a href="/edit" class="quick-action-btn">
+                            <div class="qa-icon green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <span class="qa-label">Profile</span>
+                        </a>
+                        <a href="/subscription/manage" class="quick-action-btn">
+                            <div class="qa-icon orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            </div>
+                            <span class="qa-label">Subscription</span>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </main>
 </div>
 
@@ -593,6 +464,37 @@ new Chart(document.getElementById('donutChart'), {
         }
     }
 });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuToggle');
+        const sidebarEl = document.getElementById('sidebar');
+        if (mobileMenuBtn && sidebarEl) {
+            mobileMenuBtn.addEventListener('click', () => sidebarEl.classList.toggle('open'));
+        }
+
+        // Account Dropdown Toggle
+        const accMenuBtn = document.getElementById('accountMenu');
+        const accSubMenu = document.getElementById('accountSubmenu');
+
+        if (accMenuBtn && accSubMenu) {
+            accMenuBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                this.classList.toggle('expanded');
+                accSubMenu.classList.toggle('open');
+
+                const chevron = this.querySelector('.chevron');
+                if (accSubMenu.classList.contains('open')) {
+                    accSubMenu.style.maxHeight = accSubMenu.scrollHeight + 'px';
+                    if (chevron) chevron.style.transform = 'rotate(90deg)';
+                } else {
+                    accSubMenu.style.maxHeight = '0';
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
 </script>
 </body>
 </html>

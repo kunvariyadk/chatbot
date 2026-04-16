@@ -1,0 +1,695 @@
+[
+  {
+    "intent": "qa_1",
+    "tag": "qa_1",
+    "patterns": [
+      "Hey"
+    ],
+    "responses": [
+      "Hello! How may I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_2",
+    "tag": "qa_2",
+    "patterns": [
+      "Hii"
+    ],
+    "responses": [
+      "Hii! I am here to help."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_3",
+    "tag": "qa_3",
+    "patterns": [
+      "Who are you?"
+    ],
+    "responses": [
+      "I am your friend - AI Assistant."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_4",
+    "tag": "qa_4",
+    "patterns": [
+      "What do you do?"
+    ],
+    "responses": [
+      "I work for TD Tech Solutions."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_5",
+    "tag": "qa_5",
+    "patterns": [
+      "Hi"
+    ],
+    "responses": [
+      "Hello! How can I help you today?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_6",
+    "tag": "qa_6",
+    "patterns": [
+      "Hello"
+    ],
+    "responses": [
+      "Hello! How can I help you today?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_7",
+    "tag": "qa_7",
+    "patterns": [
+      "Hey there"
+    ],
+    "responses": [
+      "Hello! How can I help you today?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_8",
+    "tag": "qa_8",
+    "patterns": [
+      "Hi there"
+    ],
+    "responses": [
+      "Hello! How can I help you today?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_9",
+    "tag": "qa_9",
+    "patterns": [
+      "Good morning"
+    ],
+    "responses": [
+      "Good morning! Hope you have a great day ahead!"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_10",
+    "tag": "qa_10",
+    "patterns": [
+      "Morning"
+    ],
+    "responses": [
+      "Good morning! Hope you have a great day ahead!"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_11",
+    "tag": "qa_11",
+    "patterns": [
+      "Good morning!"
+    ],
+    "responses": [
+      "Good morning! Hope you have a great day ahead!"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_12",
+    "tag": "qa_12",
+    "patterns": [
+      "Morning!"
+    ],
+    "responses": [
+      "Good morning! Hope you have a great day ahead!"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_13",
+    "tag": "qa_13",
+    "patterns": [
+      "Good afternoon"
+    ],
+    "responses": [
+      "Good afternoon! How can I assist you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_14",
+    "tag": "qa_14",
+    "patterns": [
+      "Afternoon"
+    ],
+    "responses": [
+      "Good afternoon! How can I assist you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_15",
+    "tag": "qa_15",
+    "patterns": [
+      "Good afternoon!"
+    ],
+    "responses": [
+      "Good afternoon! How can I assist you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_16",
+    "tag": "qa_16",
+    "patterns": [
+      "Good evening"
+    ],
+    "responses": [
+      "Good evening! How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_17",
+    "tag": "qa_17",
+    "patterns": [
+      "Evening"
+    ],
+    "responses": [
+      "Good evening! How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_18",
+    "tag": "qa_18",
+    "patterns": [
+      "Good evening!"
+    ],
+    "responses": [
+      "Good evening! How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_19",
+    "tag": "qa_19",
+    "patterns": [
+      "Yo"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_20",
+    "tag": "qa_20",
+    "patterns": [
+      "What's up"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_21",
+    "tag": "qa_21",
+    "patterns": [
+      "Sup"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_22",
+    "tag": "qa_22",
+    "patterns": [
+      "Yo bro"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_23",
+    "tag": "qa_23",
+    "patterns": [
+      "Hey buddy"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_24",
+    "tag": "qa_24",
+    "patterns": [
+      "Hey dude"
+    ],
+    "responses": [
+      "Yo! What’s up?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_25",
+    "tag": "qa_25",
+    "patterns": [
+      "How are you?"
+    ],
+    "responses": [
+      "I’m doing great! Thanks for asking 😊 How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_26",
+    "tag": "qa_26",
+    "patterns": [
+      "How's it going?"
+    ],
+    "responses": [
+      "I’m doing great! Thanks for asking 😊 How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_27",
+    "tag": "qa_27",
+    "patterns": [
+      "How are you doing?"
+    ],
+    "responses": [
+      "I’m doing great! Thanks for asking 😊 How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_28",
+    "tag": "qa_28",
+    "patterns": [
+      "What's going on?"
+    ],
+    "responses": [
+      "I’m doing great! Thanks for asking 😊 How can I help you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_29",
+    "tag": "qa_29",
+    "patterns": [
+      "I am back"
+    ],
+    "responses": [
+      "Welcome back! How can I assist you this time?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_30",
+    "tag": "qa_30",
+    "patterns": [
+      "Back again"
+    ],
+    "responses": [
+      "Welcome back! How can I assist you this time?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_31",
+    "tag": "qa_31",
+    "patterns": [
+      "Hello again"
+    ],
+    "responses": [
+      "Welcome back! How can I assist you this time?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "qa_32",
+    "tag": "qa_32",
+    "patterns": [
+      "Hey again"
+    ],
+    "responses": [
+      "Welcome back! How can I assist you this time?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "greeting",
+    "tag": "greeting",
+    "patterns": [
+      "how are you",
+      "greetings",
+      "howdy",
+      "hello there",
+      "hiya",
+      "heya",
+      "good day",
+      "hey bot",
+      "hi bot",
+      "hello bot",
+      "hi friend",
+      "hello friend",
+      "hey friend",
+      "wassup",
+      "whats up",
+      "how do you do",
+      "pleased to meet you",
+      "nice to meet you",
+      "top of the morning"
+    ],
+    "responses": [
+      "Hello! How can I help you today?",
+      "Hi there! What can I do for you?",
+      "Hey! How may I assist you?",
+      "Greetings! What would you like to know?",
+      "Hello! I'm here to help. What do you need?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "goodbye",
+    "tag": "goodbye",
+    "patterns": [
+      "bye",
+      "goodbye",
+      "see you later",
+      "talk to you later",
+      "catch you later",
+      "i'm leaving",
+      "gotta go",
+      "bye bye",
+      "farewell",
+      "take care",
+      "see ya",
+      "later",
+      "i have to go",
+      "leaving now",
+      "exit",
+      "quit",
+      "see you",
+      "until next time",
+      "signing off",
+      "peace out",
+      "im out",
+      "gtg",
+      "got to go",
+      "see you soon",
+      "talk later",
+      "catch ya later",
+      "adios",
+      "cya"
+    ],
+    "responses": [
+      "Goodbye! Have a great day!",
+      "See you later! Feel free to come back anytime.",
+      "Take care! I'm here whenever you need help.",
+      "Bye! Looking forward to our next chat.",
+      "Have a wonderful day! Come back soon!"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "thanks",
+    "tag": "thanks",
+    "patterns": [
+      "thanks",
+      "thank you",
+      "thanks a lot",
+      "i appreciate it",
+      "thank you so much",
+      "thanks for your help",
+      "appreciate it",
+      "thx",
+      "ty",
+      "thank u",
+      "many thanks",
+      "much appreciated",
+      "thanks a bunch",
+      "cheers",
+      "grateful",
+      "thanks alot",
+      "thank you very much",
+      "appreciate your help",
+      "thnx",
+      "tysm",
+      "tyvm",
+      "thanks mate",
+      "appreciate that",
+      "awesome thanks",
+      "perfect thanks",
+      "great thanks"
+    ],
+    "responses": [
+      "You're welcome! Glad I could help.",
+      "Happy to help! Let me know if you need anything else.",
+      "You're very welcome!",
+      "My pleasure! Feel free to ask anything else.",
+      "Anytime! I'm here to help."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "help",
+    "tag": "help",
+    "patterns": [
+      "help",
+      "i need help",
+      "can you help me",
+      "assist me",
+      "what can you do",
+      "how does this work",
+      "i'm confused",
+      "help me",
+      "i don't understand",
+      "support",
+      "assistance",
+      "guide me",
+      "show me how",
+      "explain",
+      "instructions",
+      "how do i",
+      "can you assist",
+      "need assistance",
+      "im lost",
+      "not sure what to do",
+      "need some help",
+      "can you explain",
+      "help please",
+      "assistance please"
+    ],
+    "responses": [
+      "I'm here to help! What do you need assistance with?",
+      "Of course! Please tell me what you'd like to know.",
+      "I'd be happy to help. What's your question?",
+      "Sure! What would you like help with?",
+      "I'm ready to assist. What can I explain for you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "about",
+    "tag": "about",
+    "patterns": [
+      "who are you",
+      "what are you",
+      "tell me about yourself",
+      "what do you do",
+      "what's your purpose",
+      "are you a bot",
+      "are you human",
+      "what is this",
+      "about you",
+      "your purpose",
+      "who made you",
+      "are you ai",
+      "are you real",
+      "what are you exactly",
+      "tell me about you",
+      "introduce yourself",
+      "who r u"
+    ],
+    "responses": [
+      "I'm an AI assistant here to help answer your questions!",
+      "I'm a helpful chatbot designed to assist you with information.",
+      "I'm an AI assistant trained to help you with your queries.",
+      "I'm here to provide you with helpful information and support!",
+      "I'm an intelligent assistant ready to help you with whatever you need."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "how_are_you",
+    "tag": "how_are_you",
+    "patterns": [
+      "how are you doing",
+      "how's it going",
+      "how are things",
+      "how do you feel",
+      "are you okay",
+      "how's your day",
+      "everything okay",
+      "you good",
+      "all good",
+      "how are you today",
+      "how have you been",
+      "doing well",
+      "hows it going",
+      "whats going on",
+      "how r u",
+      "u ok",
+      "you ok"
+    ],
+    "responses": [
+      "I'm doing great, thank you for asking! How can I help you?",
+      "I'm functioning perfectly! What can I do for you today?",
+      "All systems operational! What would you like to know?",
+      "I'm here and ready to help! What do you need?",
+      "Doing well! How can I assist you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "capabilities",
+    "tag": "capabilities",
+    "patterns": [
+      "what are your capabilities",
+      "tell me what you can do",
+      "your features",
+      "what do you know",
+      "what information do you have",
+      "can you help with",
+      "are you able to",
+      "what are you capable of",
+      "what features do you have",
+      "show me your skills",
+      "what skills do you have"
+    ],
+    "responses": [
+      "I can answer questions, provide information, and help you with various topics. What would you like to know?",
+      "I'm here to assist with your questions and provide helpful information. How can I help?",
+      "I can help you find information and answer your questions. What are you looking for?",
+      "I'm designed to provide assistance and answer queries. What do you need help with?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "yes",
+    "tag": "yes",
+    "patterns": [
+      "yes",
+      "yeah",
+      "yep",
+      "sure",
+      "okay",
+      "ok",
+      "alright",
+      "correct",
+      "right",
+      "affirmative",
+      "absolutely",
+      "definitely",
+      "of course",
+      "indeed",
+      "yup",
+      "uh huh",
+      "certainly",
+      "for sure",
+      "ya",
+      "yea",
+      "ye",
+      "aye",
+      "roger",
+      "totally"
+    ],
+    "responses": [
+      "Great! How can I help you further?",
+      "Excellent! What would you like to know?",
+      "Perfect! What's your next question?",
+      "Understood! How can I assist you?"
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "no",
+    "tag": "no",
+    "patterns": [
+      "no",
+      "nope",
+      "nah",
+      "not really",
+      "i don't think so",
+      "negative",
+      "no thanks",
+      "no thank you",
+      "that's not right",
+      "incorrect",
+      "nay",
+      "i don't",
+      "not at all",
+      "absolutely not",
+      "nuh uh",
+      "na",
+      "naw",
+      "nope not really"
+    ],
+    "responses": [
+      "No problem! Is there something else I can help with?",
+      "That's okay! What else would you like to know?",
+      "Understood! Let me know if you need anything else.",
+      "Alright! Feel free to ask me something different."
+    ],
+    "chatbot_id": 15
+  },
+  {
+    "intent": "compliment",
+    "tag": "compliment",
+    "patterns": [
+      "you're great",
+      "you're awesome",
+      "good job",
+      "well done",
+      "you're helpful",
+      "you're amazing",
+      "you're smart",
+      "nice work",
+      "excellent",
+      "you rock",
+      "fantastic",
+      "brilliant",
+      "superb",
+      "impressive",
+      "wonderful work",
+      "youre the best",
+      "you are great",
+      "you are awesome",
+      "love you",
+      "ur great",
+      "ur awesome"
+    ],
+    "responses": [
+      "Thank you! That's very kind of you to say!",
+      "I appreciate that! I'm here to help.",
+      "Thanks! I'm glad I could be helpful!",
+      "That means a lot! I'll keep doing my best to assist you."
+    ],
+    "chatbot_id": 15
+  }
+]

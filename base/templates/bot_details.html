@@ -31,8 +31,8 @@
             flex-wrap: wrap;
         }
         .theme-btn {
-            width: 38px;
-            height: 38px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             border: 2px solid #fff;
             cursor: pointer;
@@ -120,60 +120,7 @@
 
 <div class="dashboard-container">
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="8" fill="url(#grad)"/>
-                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                    <defs><linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
-                        <stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/>
-                    </linearGradient></defs>
-                </svg>
-                <span>ChatBot Builder</span>
-            </div>
-        </div>
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <a href="{{ url_for('dashboard') }}" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Workspace</div>
-                <a href="{{ url_for('bots') }}" class="nav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Bots</span>
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Account</div>
-                <a href="#" class="nav-item" id="accountMenu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>My Account</span>
-                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                </a>
-                <div class="submenu" id="accountSubmenu">
-                    <a href="{{ url_for('edit_profile') }}" class="submenu-item"><span class="dot"></span><span>Edit Profile</span></a>
-                    <a href="{{ url_for('change_password') }}" class="submenu-item"><span class="dot"></span><span>Change Password</span></a>
-                    <a href="{{ url_for('manage_subscription') }}" class="submenu-item"><span class="dot"></span><span>Subscription</span></a>
-                </div>
-            </div>
-        </nav>
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar">{{ session.username[0].upper() }}</div>
-                <div class="user-details">
-                    <div class="user-name">{{ session.username }}</div>
-                    <div class="user-email">{{ session.email }}</div>
-                </div>
-            </div>
-            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </a>
-        </div>
-    </aside>
+   {% include 'sidebar.html' %}
 
     <main class="main-content">
 
@@ -227,10 +174,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 <span>Preview</span>
             </button>
-            <button class="tab-btn" data-tab="deploy" onclick="openDeployModal()">
+
+            <button class="tab-btn" data-tab="deploy" onclick="handleDeployTab(this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
                 <span>Deploy</span>
             </button>
+
             <div class="tab-spacer"></div>
             <button class="tab-btn tab-delete" data-tab="delete" onclick="switchTab(this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -843,7 +792,8 @@ document.addEventListener('keydown', function(e) {
 })();
 
 /* ══ WELCOME BUTTONS ══ */
-var _eiButtons=[];
+// ★ BULLETPROOF SUBSCRIPTION CHECK
+const isPaidUser = {% if user and user.subscription and user.subscription.plan and 'free' not in user.subscription.plan.name|lower %} true {% else %} false {% endif %};var _eiButtons=[];
 (function initButtons(){
     var hiddenEl=document.getElementById('ei_welcome_buttons');
     var raw=hiddenEl?hiddenEl.getAttribute('data-raw'):'[]';
@@ -852,18 +802,26 @@ var _eiButtons=[];
 })();
 function eiAddButton(){_eiButtons.push({text:'',type:'message',value:''});eiRenderButtons();}
 function eiRemoveButton(i){_eiButtons.splice(i,1);eiRenderButtons();}
-function eiUpdateField(i,f,v){if(_eiButtons[i]){_eiButtons[i][f]=v;eiSyncJson();}}
-function eiValLabel(t){return t==='url'?'URL':t==='intent'?'Intent Tag':'Message Text';}
-function eiValPlaceholder(t){return t==='url'?'https://example.com':t==='intent'?'e.g., pricing_info':'e.g., Tell me about pricing';}
+function eiUpdateField(i,f,v){if(_eiButtons[i]){_eiButtons[i][f]=v;eiSyncJson();syncPreview();}}
+function eiValLabel(t){return t==='url'?'URL':t==='intent'?'Intent Tag':t==='live_chat'?'Transfer Message':'Message Text';}
+function eiValPlaceholder(t){return t==='url'?'https://example.com':t==='intent'?'e.g., pricing_info':t==='live_chat'?'e.g., Connecting you to an agent...':'e.g., Tell me about pricing';}
+
 function eiRenderButtons(){
     var list=document.getElementById('eiWbList');if(!list)return;
-    if(_eiButtons.length===0){list.innerHTML='<div class="ei-wb-empty">No buttons yet — click "Add Button" to add quick replies below the welcome message.</div>';eiSyncJson();return;}
-    list.innerHTML=_eiButtons.map(function(btn,i){return'<div class="ei-wb-item"><div class="ei-wb-item-head"><span class="ei-wb-num">Button '+(i+1)+'</span><button type="button" class="ei-btn-remove-wb" onclick="eiRemoveButton('+i+')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove</button></div><div class="ei-wb-fields"><div class="ei-wb-field"><label>Label</label><input type="text" placeholder="e.g., Get Started" value="'+eiEsc(btn.text)+'" oninput="eiUpdateField('+i+',\'text\',this.value)"></div><div class="ei-wb-field"><label>Action</label><select onchange="eiUpdateField('+i+',\'type\',this.value)"><option value="message"'+(btn.type==='message'?' selected':'')+'>Message</option><option value="url"'+(btn.type==='url'?' selected':'')+'>URL</option><option value="intent"'+(btn.type==='intent'?' selected':'')+'>Intent</option></select></div><div class="ei-wb-field ei-wb-full"><label>'+eiValLabel(btn.type)+'</label><input type="text" placeholder="'+eiValPlaceholder(btn.type)+'" value="'+eiEsc(btn.value)+'" oninput="eiUpdateField('+i+',\'value\',this.value)"></div></div></div>';}).join('');
+    if(_eiButtons.length===0){list.innerHTML='<div class="ei-wb-empty">No buttons yet — click "Add Button" to add quick replies below the welcome message.</div>';eiSyncJson();syncPreview();return;}
+
+    list.innerHTML=_eiButtons.map(function(btn,i){
+        // ★ conditionally inject the Live Agent option only if they are paid!
+        var liveChatOpt = isPaidUser ? '<option value="live_chat"'+(btn.type==='live_chat'?' selected':'')+'>Live Agent (Premium)</option>' : '';
+
+        return'<div class="ei-wb-item"><div class="ei-wb-item-head"><span class="ei-wb-num">Button '+(i+1)+'</span><button type="button" class="ei-btn-remove-wb" onclick="eiRemoveButton('+i+')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove</button></div><div class="ei-wb-fields"><div class="ei-wb-field"><label>Label</label><input type="text" placeholder="e.g., Get Started" value="'+eiEsc(btn.text)+'" oninput="eiUpdateField('+i+',\'text\',this.value)"></div><div class="ei-wb-field"><label>Action</label><select onchange="eiUpdateField('+i+',\'type\',this.value)"><option value="message"'+(btn.type==='message'?' selected':'')+'>Message</option><option value="url"'+(btn.type==='url'?' selected':'')+'>URL</option><option value="intent"'+(btn.type==='intent'?' selected':'')+'>Intent</option>' + liveChatOpt + '</select></div><div class="ei-wb-field ei-wb-full"><label>'+eiValLabel(btn.type)+'</label><input type="text" placeholder="'+eiValPlaceholder(btn.type)+'" value="'+eiEsc(btn.value)+'" oninput="eiUpdateField('+i+',\'value\',this.value)"></div></div></div>';
+    }).join('');
+
     eiSyncJson();
+    syncPreview();
 }
 function eiSyncJson(){var el=document.getElementById('ei_welcome_buttons');if(el)el.value=JSON.stringify(_eiButtons.map(function(b){return{text:b.text,type:b.type,value:b.value,has_submenu:false,submenu_items:[]};}));}
 function eiEsc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
 /* ══ PRESET THEME APPLIER ══ */
 function applyTheme(themeColor, bgColor, botBubbleColor, botTextColor, userTextColor) {
     document.getElementById('ei_theme').value = themeColor;
@@ -890,7 +848,7 @@ function syncPreview(){
 
 /* ══ SIDEBAR ══ */
 document.getElementById('mobileMenuToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('open');});
-document.getElementById('accountMenu').addEventListener('click',function(e){e.preventDefault();this.classList.toggle('expanded');document.getElementById('accountSubmenu').classList.toggle('open');});
+// document.getElementById('accountMenu').addEventListener('click',function(e){e.preventDefault();this.classList.toggle('expanded');document.getElementById('accountSubmenu').classList.toggle('open');});
 
 /* ══ TABS ══ */
 var _trainLoaded=false,_previewLoaded=false;
@@ -923,10 +881,30 @@ function buildQR(){var canvas=document.getElementById('qrCanvas');if(!canvas||ca
 function downloadQR(){var a=document.createElement('a');a.download='{{ chatbot.name }}-qr.png';a.href=document.getElementById('qrCanvas').toDataURL();a.click();}
 
 /* ══ DEPLOY MODAL ══ */
-var _isBotActive={{ 'true' if chatbot.is_active else 'false' }};
-function openDeployModal(){if(_isBotActive){window.location.href='{{ url_for("deploy_chatbot",chatbot_id=chatbot.id) }}';return;}document.getElementById('deployModalOverlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeDeployModal(){document.getElementById('deployModalOverlay').classList.remove('open');document.body.style.overflow='';}
-function confirmDeploy(){var btn=document.getElementById('deployModalConfirmBtn');btn.disabled=true;btn.innerHTML='Deploying…';window.location.href='{{ url_for("deploy_chatbot",chatbot_id=chatbot.id) }}';}
+var _isBotActive = {{ 'true' if chatbot.is_active else 'false' }};
+
+function handleDeployTab(btn) {
+    if (_isBotActive) {
+        // If already deployed, just open the tab normally to see the embed code
+        switchTab(btn);
+    } else {
+        // If not deployed yet, show the first-time confirmation modal
+        document.getElementById('deployModalOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeDeployModal() {
+    document.getElementById('deployModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function confirmDeploy() {
+    var btn = document.getElementById('deployModalConfirmBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Deploying…';
+    window.location.href = '{{ url_for("deploy_chatbot", chatbot_id=chatbot.id) }}';
+}
 
 /* ══ FLASK FLASH MESSAGES → TOASTS ══ */
 document.addEventListener('DOMContentLoaded', function() {

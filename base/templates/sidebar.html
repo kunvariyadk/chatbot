@@ -1,0 +1,126 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" width="45" height="35">
+            <span>ChatBot Builder</span>
+        </div>
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-section">
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Workspace</div>
+            <a href="{{ url_for('bots') }}"
+               class="nav-item {% if request.endpoint in ['bots', 'bot_detail', 'create_chatbot_route', 'edit_chatbot_route', 'deploy_chatbot', 'train_chatbot'] %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Bots</span>
+            </a>
+        </div>
+
+        {% if user and user.subscription and user.subscription.plan and 'free' not in user.subscription.plan.name|lower %}
+        <div class="nav-section">
+            <div class="nav-section-title">Support</div>
+            <a href="{{ url_for('live_chat_dashboard') }}"
+               class="nav-item {% if 'live_chat' in request.endpoint %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <circle cx="9" cy="10" r="1" fill="currentColor"/>
+                    <circle cx="12" cy="10" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="10" r="1" fill="currentColor"/>
+                </svg>
+                <span>Live Chat</span>
+                <span id="sidebarBadge"
+                      style="display:none; background:#e53e3e; color:#fff; border-radius:20px; padding:1px 8px; font-size:11px; font-weight:700; margin-left:auto;"></span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="nav-section">
+            <div class="nav-section-title">Account</div>
+            <a href="#"
+               class="nav-item {% if request.endpoint in ['edit_profile', 'change_password'] %}expanded{% endif %}"
+               id="accountMenu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>My Account</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     style="margin-left:auto; transition:transform 0.2s; {% if request.endpoint in ['edit_profile', 'change_password'] %}transform:rotate(90deg);{% endif %}">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </a>
+            <div class="submenu {% if request.endpoint in ['edit_profile', 'change_password'] %}open{% endif %}"
+                 id="accountSubmenu"
+                 style="overflow:hidden; transition:max-height 0.3s ease; padding-left:26px; {% if request.endpoint in ['edit_profile', 'change_password'] %}max-height:500px;{% else %}max-height:0;{% endif %}">
+                <a href="{{ url_for('edit_profile') }}" class="submenu-item"
+                   style="display:block; padding:10px; color:#718096; text-decoration:none; font-size:14px;">Profile
+                    Settings</a>
+                <a href="{{ url_for('change_password') }}" class="submenu-item"
+                   style="display:block; padding:10px; color:#718096; text-decoration:none; font-size:14px;">Change
+                    Password</a>
+                <a href="{{ url_for('manage_subscription') }}" class="submenu-item"
+                   style="display:block; padding:10px; color:#718096; text-decoration:none; font-size:14px;">Manage subscription</a>
+
+            </div>
+        </div>
+    </nav>
+    <div class="user-section">
+        <div class="user-info">
+            {% if user and user.username %}
+            <div class="user-avatar">{{ user.username[0].upper() }}</div>
+            <div class="user-details">
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-email">{{ user.email }}</div>
+            </div>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </a>
+    </div>
+</aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuBtn = document.getElementById('mobileMenuToggle');
+        const sidebarEl = document.getElementById('sidebar');
+        if (mobileMenuBtn && sidebarEl) {
+            mobileMenuBtn.addEventListener('click', () => sidebarEl.classList.toggle('open'));
+        }
+
+        const accMenuBtn = document.getElementById('accountMenu');
+        const accSubMenu = document.getElementById('accountSubmenu');
+        if (accMenuBtn && accSubMenu) {
+            accMenuBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                this.classList.toggle('expanded');
+                accSubMenu.classList.toggle('open');
+                const chevron = this.querySelector('.chevron');
+                if (accSubMenu.classList.contains('open')) {
+                    accSubMenu.style.maxHeight = '500px';
+                    if (chevron) chevron.style.transform = 'rotate(90deg)';
+                } else {
+                    accSubMenu.style.maxHeight = '0';
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
+</script>

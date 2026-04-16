@@ -8,75 +8,35 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        /* ── Exact Dashboard Dropdown CSS ── */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-left: 26px;
+            display: block !important; /* Forces it to exist for the animation */
+        }
+        .submenu.open {
+            max-height: 500px;
+        }
+        .nav-item .chevron {
+            margin-left: auto;
+            transition: transform 0.2s;
+        }
+        .nav-item.expanded .chevron {
+            transform: rotate(90deg);
+        }
+    </style>
 </head>
 <body>
 
-<!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="dashboard-container">
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="8" fill="url(#grad)"/>
-                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                    <defs><linearGradient id="grad" x1="0" y1="0" x2="40" y2="40">
-                        <stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/>
-                    </linearGradient></defs>
-                </svg>
-                <span>ChatBot Builder</span>
-            </div>
-        </div>
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <a href="{{ url_for('dashboard') }}" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Workspace</div>
-                <a href="{{ url_for('bots') }}" class="nav-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Bots</span>
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Account</div>
-                <a href="#" class="nav-item" id="accountMenu">
-                    <svg></svg>
-                    <span>My Account</span>
-                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </a>
-                <div class="submenu" id="accountSubmenu">
-                    <a href="/edit" class="submenu-item"><span class="dot"></span><span>Edit Profile</span></a>
-                    <a href="/change-password" class="submenu-item"><span
-                            class="dot"></span><span>Change Password</span></a>
-                    <a href="/subscription/manage" class="submenu-item"><span
-                            class="dot"></span><span>Subscription</span></a>
-                </div>
-            </div>
-        </nav>
-        <div class="user-section">
-            <div class="user-info">
-                <div class="user-avatar">{{ session.username[0].upper() }}</div>
-                <div class="user-details">
-                    <div class="user-name">{{ session.username }}</div>
-                    <div class="user-email">{{ session.email }}</div>
-                </div>
-            </div>
-            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </a>
-        </div>
-    </aside>
+    {% include 'sidebar.html' %}
 
-    <!-- ════════════ MAIN CONTENT ════════════ -->
     <main class="main-content">
 
         <header class="page-header">
@@ -95,7 +55,6 @@
 
         <div class="deploy-grid">
 
-            <!-- Embed Code Card -->
             <div class="deploy-card">
                 <div class="card-header">
                     <div class="card-icon">
@@ -122,7 +81,6 @@
                             <span class="btn-text">Copy Code</span>
                         </button>
                         <pre><code id="embedCode">{{ iframe_code }}</code></pre>
-
                     </div>
                     <div class="code-instructions">
                         <div class="instruction-item"><span class="step-badge">1</span><span>Copy the embed code above</span></div>
@@ -132,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Direct Link Card -->
             <div class="deploy-card">
                 <div class="card-header">
                     <div class="card-icon">
@@ -209,6 +166,18 @@
 </button>
 
 <script>
+/* ══ EXACT DASHBOARD MENU LOGIC ══ */
+document.getElementById('mobileMenuToggle').addEventListener('click', function () {
+    document.getElementById('sidebar').classList.toggle('open');
+});
+
+document.getElementById('accountMenu').addEventListener('click', function (e) {
+    e.preventDefault();
+    this.classList.toggle('expanded');
+    document.getElementById('accountSubmenu').classList.toggle('open');
+});
+
+
 /* ══ TOAST SYSTEM ══ */
 var toastIcons = {
     success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
@@ -216,27 +185,35 @@ var toastIcons = {
     warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
     info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
 };
+
 function showToast(type, title, msg, duration) {
     duration = duration || 4000;
-    var c = document.getElementById('toastContainer');
-    var t = document.createElement('div');
-    t.className = 'toast ' + type;
-    t.innerHTML = '<div class="toast-icon-wrap">' + (toastIcons[type]||toastIcons.info) + '</div>' +
-        '<div class="toast-body"><p class="toast-title">' + title + '</p><p class="toast-msg">' + msg + '</p></div>' +
+    var container = document.getElementById('toastContainer');
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML =
+        '<div class="toast-icon-wrap">' + (toastIcons[type] || toastIcons.info) + '</div>' +
+        '<div class="toast-body">' +
+            '<p class="toast-title">' + title + '</p>' +
+            '<p class="toast-msg">' + msg + '</p>' +
+        '</div>' +
         '<button class="toast-close" aria-label="Close">&#x2715;</button>' +
         '<div class="toast-progress" style="animation-duration:' + duration + 'ms;"></div>';
-    t.querySelector('.toast-close').addEventListener('click', function(){ removeToast(t); });
-    c.appendChild(t);
-    setTimeout(function(){ t.classList.add('show'); }, 20);
-    t._timer = setTimeout(function(){ removeToast(t); }, duration);
-}
-function removeToast(t) {
-    if (!t || t.classList.contains('hide')) return;
-    clearTimeout(t._timer); t.classList.remove('show'); t.classList.add('hide');
-    setTimeout(function(){ if(t.parentElement) t.remove(); }, 420);
+    toast.querySelector('.toast-close').addEventListener('click', function () { removeToast(toast); });
+    container.appendChild(toast);
+    setTimeout(function () { toast.classList.add('show'); }, 20);
+    toast._timer = setTimeout(function () { removeToast(toast); }, duration);
 }
 
-/* ══ COPY FUNCTIONS — replaced alert() with showToast() ══ */
+function removeToast(toast) {
+    if (!toast || toast.classList.contains('hide')) return;
+    clearTimeout(toast._timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    setTimeout(function () { if (toast.parentElement) toast.remove(); }, 420);
+}
+
+/* ══ COPY FUNCTIONS ══ */
 function copyEmbedCode() {
     var code = document.getElementById('embedCode').textContent;
     navigator.clipboard.writeText(code).then(function() {
@@ -274,31 +251,7 @@ function shareOnSocial() {
 
 function downloadQRCode() {
     showToast('info', 'Generating QR...', 'Your QR code is being prepared.');
-    /* deploy.js handles actual QR generation — toast is just feedback */
 }
-
-/* ══ SIDEBAR DROPDOWN FIX ══ */
-document.getElementById('accountMenu').addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation(); // Prevents the click from bubbling up
-
-    const submenu = document.getElementById('accountSubmenu');
-    const isExpanded = this.classList.contains('expanded');
-
-    // Toggle the arrow rotation class
-    this.classList.toggle('expanded');
-
-    // Toggle the submenu visibility
-    if (!isExpanded) {
-        submenu.style.display = 'block';
-        // Small delay to allow CSS transitions to trigger if you have them
-        setTimeout(() => submenu.classList.add('open'), 10);
-    } else {
-        submenu.classList.remove('open');
-        // Wait for transition to finish before hiding (match your CSS time)
-        setTimeout(() => submenu.style.display = 'none', 300);
-    }
-});
 
 /* ══ CHATBOT DATA for deploy.js ══ */
 window.CHATBOT_DATA = {
@@ -311,17 +264,13 @@ window.CHATBOT_DATA = {
 
 <script src="{{ url_for('static', filename='js/deploy.js') }}"></script>
 
-<!-- Flask flash messages → toasts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
 
     {% if category == 'error' or category == 'danger' %}
-
-    // Errors always show — they are important regardless of page refreshes
     showToast('error', 'Error', '{{ message }}');
 
     {% elif category == 'success' %}
@@ -337,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endfor %}
     {% endif %}
     {% endwith %}
-
 });
 </script>
 

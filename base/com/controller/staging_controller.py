@@ -366,6 +366,10 @@ print("✅ Staging controller loaded successfully!")
 # PAGE ROUTE — renders staging.html
 # ============================================================
 
+# ============================================================
+# PAGE ROUTE — renders staging.html
+# ============================================================
+
 @app.route('/chatbot/staging-page/<int:chatbot_id>', methods=['GET'])
 @login_required
 @subscription_required
@@ -373,6 +377,7 @@ def staging_page(chatbot_id):
     """Render the staging review page."""
     from flask import render_template
     from base.com.dao.user_dao import get_user_by_id
+    from base.com.vo.qa_pairs_staging_vo import QAPairStaging # Make sure we import the model
 
     chatbot = _owned_chatbot(chatbot_id)
     if not chatbot:
@@ -381,7 +386,29 @@ def staging_page(chatbot_id):
         return redirect(url_for('dashboard'))
 
     user = get_user_by_id(session['user_id'])
-    return render_template('staging.html', chatbot=chatbot, user=user)
+
+    # 1. Fetch all pending staging items for this specific chatbot
+    raw_staging_items = QAPairStaging.query.filter_by(
+        chatbot_id=chatbot.id,
+        status='pending'
+    ).all()
+
+    # 2. Convert the database objects into a clean list of dictionaries for JavaScript
+    staging_items_list = []
+    for item in raw_staging_items:
+        staging_items_list.append({
+            'id': item.id,
+            'question': item.question,
+            'answer': item.answer
+        })
+
+    # 3. Pass the data to the HTML template!
+    return render_template(
+        'staging.html',
+        chatbot=chatbot,
+        user=user,
+        staging_items=staging_items_list  # 👈 This makes the data appear on the page!
+    )
 
 # """
 # Staging Controller

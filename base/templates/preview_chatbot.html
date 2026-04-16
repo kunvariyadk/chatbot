@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/preview.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+
     {% if request.args.get('embed') == '1' %}
     <style>
         /* ── Embed mode: hide sidebar & outer chrome ── */
@@ -67,6 +69,40 @@
         .bot-name { font-weight: 600; font-size: 16px; line-height: 1.2; }
         .bot-status { font-size: 12px; opacity: 0.9; margin-top: 2px; }
 
+        /* Live chat mode banner */
+        .live-banner {
+            background: linear-gradient(90deg, #4F46E5, #7C3AED);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .live-banner.visible { display: flex; }
+        .live-banner-left { display: flex; align-items: center; gap: 6px; }
+        .live-banner-dot {
+            width: 7px; height: 7px; background: #68d391; border-radius: 50%;
+            animation: lbPulse 2s infinite;
+        }
+        @keyframes lbPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(104,211,145,0.5); }
+            50%      { box-shadow: 0 0 0 5px rgba(104,211,145,0); }
+        }
+        .btn-end-live {
+            background: rgba(255,255,255,0.2); color: #fff;
+            border: none; border-radius: 6px; padding: 4px 10px;
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-end-live:hover { background: rgba(255,255,255,0.35); }
+
+        .owner-typing-row { display: none; }
+        .owner-typing-row.visible { display: flex; }
+
         /* Messages Area */
         .chat-messages {
             flex: 1;
@@ -106,49 +142,48 @@
         .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .msg-avatar svg { width: 16px; height: 16px; }
 
-     .bubble-bot {
-    background: {{ chatbot.bot_message_color or '#FFFFFF' }};
-    color: {{ chatbot.bot_text_color or '#1A202C' }};
-    padding: 12px 16px;
-    border-radius: 16px 16px 16px 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    max-width: 80%;
-    white-space: pre-wrap;
-    border: 1px solid rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-
-    /* ADD THESE TWO LINES */
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-}
-
-.bubble-bot a {
-    color: {{ chatbot.theme_color or '#4F46E5' }};
-    text-decoration: underline;
-    font-weight: 500;
-
-    /* ADD THIS LINE TO BREAK LONG URLS */
-    word-break: break-all;
-}
+        .bubble-bot {
+            background: {{ chatbot.bot_message_color or '#FFFFFF' }};
+            color: {{ chatbot.bot_text_color or '#1A202C' }};
+            padding: 12px 16px;
+            border-radius: 16px 16px 16px 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            max-width: 80%;
+            white-space: pre-wrap;
+            border: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+        .bubble-bot a {
+            color: {{ chatbot.theme_color or '#4F46E5' }};
+            text-decoration: underline;
+            font-weight: 500;
+            word-break: break-all;
+        }
 
         /* Sharp Bottom-Right for User */
-        .bubble-user { background: {{ chatbot.theme_color or '#4F46E5' }}; color: {{ chatbot.user_text_color or '#FFFFFF' }}; padding: 12px 16px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: 80%; white-space: pre-wrap; }
+        .bubble-user { background: {{ chatbot.theme_color or '#4F46E5' }}; color: {{ chatbot.user_text_color or '#FFFFFF' }}; padding: 12px 16px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: 80%; white-space: pre-wrap; display: flex; flex-direction: column;}
+
+        .bubble-owner { background:#e6fffa; color:#234e52; padding:12px 16px; border-radius:16px 16px 16px 4px; font-size:14px; line-height:1.5; box-shadow:0 1px 3px rgba(0,0,0,0.06); max-width:80%; white-space:pre-wrap; border:1px solid #81e6d9; display: flex; flex-direction: column;}
+
+        .bubble-time { display:block; font-size:10px; opacity:0.65; margin-top:4px; text-align:right; font-weight:400; }
 
         /* 🌟 Buttons INSIDE the chat bubble 🌟 */
         .flow-btn-container {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            margin-top: 12px; /* Space between text and buttons */
+            margin-top: 12px;
             width: 100%;
             min-width: 200px;
         }
         .flow-btn {
-            background: {{ chatbot.theme_color or '#4F46E5' }}; /* Solid color */
-            color: #ffffff; /* White text */
+            background: {{ chatbot.theme_color or '#4F46E5' }};
+            color: #ffffff;
             border: none;
             padding: 10px 16px;
             border-radius: 8px;
@@ -162,10 +197,9 @@
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .flow-btn:hover {
-            filter: brightness(0.85);
-            transform: translateY(-1px);
-        }
+        .flow-btn:hover { filter: brightness(0.85); transform: translateY(-1px); }
+        .flow-btn.live-chat-btn { background:linear-gradient(135deg,#38a169,#276749)!important; }
+        .flow-btn.live-chat-btn:hover { filter:brightness(0.9); }
 
         /* Typing Dots */
         .typing-dots { display: flex; align-items: center; height: 20px; gap: 4px; padding: 0 4px; }
@@ -173,6 +207,8 @@
         .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
         .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .sys-divider { text-align:center; font-size:11px; color:#a0aec0; padding:4px 0; margin:4px 0; }
 
         /* Responsive */
         @media (max-width: 900px) {
@@ -184,50 +220,7 @@
 <body>
 <div class="dashboard-container">
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
-                    <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="white" opacity="0.9"/>
-                    <defs>
-                        <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
-                            <stop offset="0%" stop-color="#667eea"/>
-                            <stop offset="100%" stop-color="#764ba2"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>ChatBot Builder</span>
-            </div>
-        </div>
-
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <a href="{{ url_for('dashboard') }}" class="nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Workspace</div>
-                <a href="#" class="nav-item active" id="botsMenu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Bots</span>
-                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                </a>
-                <div class="submenu open" id="botsSubmenu">
-                    {% if chatbots %}
-                    {% for bot in chatbots %}
-                    <a href="{{ url_for('preview_chatbot', chatbot_id=bot.id) }}" class="submenu-item {% if bot.id == chatbot.id %}active{% endif %}">
-                        <span class="dot"></span><span>{{ bot.name }}</span>
-                        <span class="status-indicator {{ 'active' if bot.is_active else 'inactive' }}"></span>
-                    </a>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
-    </aside>
+    {% include 'sidebar.html' %}
 
     <main class="main-content">
         <div class="breadcrumb">
@@ -243,7 +236,7 @@
             <div class="preview-info">
                 <div class="info-card">
                     <h3 style="margin-top:0; color:#0f172a; font-size: 18px;">Chatbot Information</h3>
-                    <p style="color:#64748b; font-size: 14px; margin-bottom: 20px;">Test your chatbot's responses and interactive flow exactly as your users will see it.</p>
+                    <p style="color:#64748b; font-size: 14px; margin-bottom: 20px;">Test your chatbot's responses exactly as your users will see it.</p>
                     <div class="info-grid">
                         <div class="info-row"><span class="label">System Name</span><span class="value">{{ chatbot.name }}</span></div>
                         <div class="info-row"><span class="label">Display Name</span><span class="value">{{ chatbot.bot_name }}</span></div>
@@ -276,12 +269,22 @@
                             </div>
                             <div class="bot-details">
                                 <div class="bot-name">{{ chatbot.bot_name }}</div>
-                                <div class="bot-status"> Online</div>
+                                <div class="bot-status" id="headerStatus">Online</div>
                             </div>
                         </div>
                     </div>
 
+                    <div class="live-banner" id="liveBanner">
+                        <div class="live-banner-left">
+                            <span class="live-banner-dot"></span>
+                            Live Support
+                        </div>
+                        <button class="btn-end-live" id="userEndLiveBtn">End Chat</button>
+                    </div>
+
                     <div class="chat-messages" id="chatMessages" style="background: {{ chatbot.chat_background_color or '#F7FAFC' }};"></div>
+
+                    <div class="owner-typing-row msg-row msg-bot" id="ownerTypingRow" style="padding: 0 16px 8px; display:none;"></div>
 
                     <div class="chat-input-container">
                         <label for="userInput" style="display:none;"></label>
@@ -302,6 +305,8 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+
     const config = {
         embedCode:           "{{ chatbot.embed_code }}",
         themeColor:          "{{ chatbot.theme_color or '#4F46E5' }}",
@@ -311,222 +316,426 @@
         welcomeButtons:      {{ welcome_buttons | tojson | safe }}
     };
 
-    /* ══════════════════════════════════════════════════════════
-       LIVE CHAT WIDGET LOGIC
-    ═══════════════════════════════════════════════════════════ */
-    const chatMessages = document.getElementById('chatMessages');
-    const userInput = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
-    let currentSessionId = null;
+    const messagesEl     = document.getElementById('chatMessages');
+    const inputEl        = document.getElementById('userInput');
+    const sendBtn        = document.getElementById('sendBtn');
+    const liveBanner     = document.getElementById('liveBanner');
+    const headerStatus   = document.getElementById('headerStatus');
+    const userEndLiveBtn = document.getElementById('userEndLiveBtn');
 
-    const fallbackSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18">
-            <rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor}"/>
-            <circle cx="24" cy="34" r="3.5" fill="white"/>
-            <circle cx="40" cy="34" r="3.5" fill="white"/>
-            <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        </svg>`;
+    // ★ Session Management for Preview (1-Hour Expiration Timer) ★
+    const EXPIRY_TIME_MS = 60 * 60 * 1000;
+    const STORAGE_KEY = 'preview_chat_session_' + config.embedCode; // Isolated key for preview
 
-    const botAvatarHtml = config.botAvatar
-        ? `<img src="${config.botAvatar}" alt="Bot">`
-        : fallbackSvg;
-
-    function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    function getValidSession() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        try {
+            const data = JSON.parse(raw);
+            if (Date.now() - data.timestamp > EXPIRY_TIME_MS) {
+                localStorage.removeItem(STORAGE_KEY);
+                return null;
+            }
+            return data.id;
+        } catch (e) {
+            localStorage.removeItem(STORAGE_KEY);
+            return null;
+        }
     }
 
-    function appendBotMessage(text) {
-        const formattedText = makeLinksClickable(text);
+    function saveSession(id) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            id: id,
+            timestamp: Date.now()
+        }));
+    }
+
+    let isChatInitialized = false;
+    let currentSessionId = getValidSession();
+    let isLiveMode = false;
+    let socket = null;
+
+    const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18"><rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor||'#4F46E5'}"/><circle cx="24" cy="34" r="3.5" fill="white"/><circle cx="40" cy="34" r="3.5" fill="white"/><path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+    const botAvatarHtml = config.botAvatar ? `<img src="${config.botAvatar}" alt="Bot">` : fallbackSvg;
+
+    // ★ BULLETPROOF UTC -> IST WIDGET TIME FORMATTER
+    function formatTime(ts) {
+        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true };
+        if (!ts) return new Date().toLocaleTimeString('en-IN', options);
+        if (typeof ts === 'number') return new Date(ts > 10000000000 ? ts : ts * 1000).toLocaleTimeString('en-IN', options);
+        if (typeof ts === 'string') {
+            if (/^\d{1,2}:\d{2}$/.test(ts) || /^\d{1,2}:\d{2}:\d{2}$/.test(ts)) {
+                let [h, m] = ts.split(':');
+                let d = new Date();
+                d.setUTCHours(parseInt(h), parseInt(m), 0, 0);
+                return d.toLocaleTimeString('en-IN', options);
+            }
+            let cleanTs = ts;
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(cleanTs)) cleanTs = cleanTs.replace(' ', 'T') + 'Z';
+            else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(cleanTs)) cleanTs += 'Z';
+            let d = new Date(cleanTs);
+            if (!isNaN(d)) return d.toLocaleTimeString('en-IN', options);
+        }
+        return new Date().toLocaleTimeString('en-IN', options);
+    }
+
+    function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+    function makeLinksClickable(text) {
+        if (!text) return '';
+        let t = text.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi, '<a href="mailto:$1">$1</a>');
+        return t.replace(/(^|\s)((https?:\/\/|www\.)[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi, (m, sp, url) => {
+            let h = url; if (!h.match(/^https?:\/\//i)) h = 'https://' + h;
+            return sp + `<a href="${h}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+    }
+
+    function appendBotMessage(text, timeStr) {
+        const ts = timeStr || formatTime();
         const row = document.createElement('div');
         row.className = 'msg-row msg-bot';
-        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot">${formattedText}</div>`;
-        chatMessages.appendChild(row);
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div>
+                         <div class="bubble-bot">${makeLinksClickable(text)}<div class="bubble-time">${ts}</div></div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+        return row.querySelector('.bubble-bot');
+    }
+
+    function appendUserMessage(text, timeStr) {
+        const ts = timeStr || formatTime();
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-user';
+        row.innerHTML = `<div class="bubble-user">${text}<div class="bubble-time">${ts}</div></div>`;
+        messagesEl.appendChild(row);
         scrollToBottom();
     }
 
-    function appendUserMessage(text) {
+    function appendOwnerMessage(text, senderName, timeStr) {
+        const ts = timeStr || formatTime();
         const row = document.createElement('div');
-        row.className = 'msg-row msg-user';
-        row.innerHTML = `<div class="bubble-user">${text}</div>`;
-        chatMessages.appendChild(row);
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `
+            <div class="msg-avatar" style="background:#e6fffa; border-color:#81e6d9;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="bubble-owner">
+                <span style="font-size:10px;opacity:0.6;margin-bottom:3px;display:block;">${senderName || 'Support'} (Live Support)</span>
+                ${makeLinksClickable(text)}
+                <div class="bubble-time">${ts}</div>
+            </div>`;
+        messagesEl.appendChild(row);
         scrollToBottom();
     }
 
     function showTypingIndicator() {
         const row = document.createElement('div');
-        row.id = "typingIndicator";
+        row.id = 'typingIndicator';
         row.className = 'msg-row msg-bot';
-        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot" style="padding: 14px 18px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-        chatMessages.appendChild(row);
+        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot" style="padding:14px 18px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+    }
+    function hideTypingIndicator() {
+        const el = document.getElementById('typingIndicator');
+        if (el) el.remove();
+    }
+
+    function activateLiveMode() {
+        isLiveMode = true;
+        liveBanner.classList.add('visible');
+        if (headerStatus) headerStatus.textContent = '🟢 Live Support';
+        if (inputEl) inputEl.placeholder = 'Message the representative…';
+        connectSocket();
+    }
+
+    function deactivateLiveMode(msg) {
+        isLiveMode = false;
+        liveBanner.classList.remove('visible');
+        if (headerStatus) headerStatus.textContent = 'Online';
+        if (inputEl) inputEl.placeholder = 'Type your message…';
+        const d = document.createElement('div');
+        d.className = 'sys-divider';
+        d.textContent = msg || 'Live session ended. AI assistant resumed.';
+        messagesEl.appendChild(d);
+        if (socket) { socket.disconnect(); socket = null; }
         scrollToBottom();
     }
 
-    function hideTypingIndicator() {
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) indicator.remove();
+    function connectSocket() {
+        if (socket && socket.connected) return;
+        socket = io({ transports: ['websocket', 'polling'] });
+        socket.on('connect', () => {
+            if (currentSessionId) socket.emit('join_live_room', { session_id: currentSessionId });
+        });
+
+        socket.on('live_chat_ended', (data) => {
+            deactivateLiveMode(data.message);
+            setTimeout(() => {
+                const restartBubble = appendBotMessage("Live chat ended. The AI assistant has resumed. How else can I help you today?", formatTime());
+                if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                    renderButtons(config.welcomeButtons, restartBubble);
+                }
+            }, 600);
+        });
+
+        socket.on('new_live_message', (data) => {
+            if (data.sender_role === 'owner') appendOwnerMessage(data.message, data.sender_name, formatTime(data.timestamp));
+        });
     }
 
-   function renderButtons(buttons) {
+    function renderButtons(buttons, targetBubble = null) {
         if (!buttons || buttons.length === 0) return;
-        const btnContainer = document.createElement('div');
-        btnContainer.className = 'flow-btn-container';
+        const container = document.createElement('div');
+        container.className = 'flow-btn-container';
 
-        buttons.forEach((btn, index) => {
-            const btnEl = document.createElement('button');
-            btnEl.className = 'flow-btn';
-            btnEl.textContent = btn.text;
-
-            // Hide any button after the first 3
-            if (index >= 3) {
-                btnEl.style.display = 'none';
-                btnEl.classList.add('hidden-flow-btn');
-            }
-
-            btnEl.onclick = () => {
-                // 🌟 NEW: Check if the button is a URL type
+        buttons.forEach((btn, idx) => {
+            const el = document.createElement('button');
+            el.className = 'flow-btn' + (btn.type === 'live_chat' ? ' live-chat-btn' : '');
+            el.textContent = btn.text;
+            if (idx >= 3) { el.style.display = 'none'; el.classList.add('hidden-flow-btn'); }
+            el.onclick = () => {
                 if (btn.type === 'url' && btn.value) {
-                    // Format URL safely and open in a new tab
-                    let targetUrl = btn.value.trim();
-                    if (!targetUrl.match(/^https?:\/\//i)) {
-                        targetUrl = 'https://' + targetUrl;
-                    }
-                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                    let url = btn.value.trim();
+                    if (!url.match(/^https?:\/\//i)) url = 'https://' + url;
+                    window.open(url, '_blank');
                 }
 
-                // Still send the request so the bot logs the interaction
-                sendChatRequest(btn.text, btn);
+                // ★ CONDITIONAL: Render form for Live Chat Request
+                if (btn.type === 'live_chat' && !isLiveMode) {
+                    renderPreChatForm(btn);
+                } else {
+                    sendChatRequest(btn.text, btn);
+                }
             };
-            btnContainer.appendChild(btnEl);
+            container.appendChild(el);
         });
 
-        // Add the "View More" button if needed
         if (buttons.length > 3) {
-            const viewMoreBtn = document.createElement('button');
-            viewMoreBtn.className = 'flow-btn';
-            viewMoreBtn.innerHTML = `View More (${buttons.length - 3}) &darr;`;
-            viewMoreBtn.style.opacity = '0.85';
-
-            viewMoreBtn.onclick = () => {
-                const hiddenBtns = btnContainer.querySelectorAll('.hidden-flow-btn');
-                hiddenBtns.forEach(b => {
-                    b.style.display = 'block';
-                });
-                viewMoreBtn.remove();
-                scrollToBottom();
+            const more = document.createElement('button');
+            more.className = 'flow-btn';
+            more.innerHTML = `View More (${buttons.length - 3}) &darr;`;
+            more.onclick = () => {
+                container.querySelectorAll('.hidden-flow-btn').forEach(b => b.style.display = 'block');
+                more.remove(); scrollToBottom();
             };
-            btnContainer.appendChild(viewMoreBtn);
+            container.appendChild(more);
         }
 
-        // Put the buttons inside the last chat bubble
-        const botBubbles = chatMessages.querySelectorAll('.bubble-bot');
-        if (botBubbles.length > 0) {
-            const lastBubble = botBubbles[botBubbles.length - 1];
-            lastBubble.appendChild(btnContainer);
+        if (targetBubble) {
+            targetBubble.appendChild(container);
         } else {
-            chatMessages.appendChild(btnContainer);
+            const bubbles = messagesEl.querySelectorAll('.bubble-bot');
+            if (bubbles.length > 0) bubbles[bubbles.length - 1].appendChild(container);
+            else messagesEl.appendChild(container);
         }
-
         scrollToBottom();
     }
-    function showMainMenu() {
-        setTimeout(() => {
-            showTypingIndicator();
-            setTimeout(() => {
-                hideTypingIndicator();
-                appendBotMessage("Is there anything else I can help you with?");
-                if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons);
-            }, 600);
-        }, 1000);
+
+    // ★ NEW: Leads Form explicitly for the Preview window
+    function renderPreChatForm(btnObj) {
+        appendUserMessage(btnObj.text);
+        const row = document.createElement('div');
+        row.className = 'msg-row msg-bot';
+        row.innerHTML = `
+            <div class="msg-avatar">${botAvatarHtml}</div>
+            <div class="bubble-bot" style="width: 100%; max-width: 85%;">
+                <h4 style="margin:0 0 8px; font-size:15px; color:${config.themeColor||'#4F46E5'};">Almost connected!</h4>
+                <p style="margin:0 0 12px; font-size:13px;">Please provide your details so our team can assist you better.</p>
+                <input type="text" id="pcName" placeholder="Your Name" style="width:100%; padding:10px 12px; margin-bottom:8px; border:1px solid #e2e8f0; border-radius:8px; box-sizing:border-box; font-family:'Inter',sans-serif; font-size:13px; outline:none;" required>
+                <input type="text" id="pcContact" placeholder="Email or Phone Number" style="width:100%; padding:10px 12px; margin-bottom:12px; border:1px solid #e2e8f0; border-radius:8px; box-sizing:border-box; font-family:'Inter',sans-serif; font-size:13px; outline:none;" required>
+                <button id="pcSubmit" class="flow-btn live-chat-btn" style="margin:0;">Connect to Agent</button>
+            </div>`;
+        messagesEl.appendChild(row);
+        scrollToBottom();
+
+        if (inputEl) inputEl.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
+
+        document.getElementById('pcSubmit').onclick = function() {
+            const name = document.getElementById('pcName').value.trim();
+            const contact = document.getElementById('pcContact').value.trim();
+            if (!name || !contact) { alert('Please fill in both fields to continue.'); return; }
+            this.disabled = true;
+            this.textContent = 'Connecting...';
+            const infoMessage = `[Visitor Details] Name: ${name} | Contact: ${contact}`;
+            sendChatRequest(infoMessage, btnObj, true);
+        };
     }
 
-    function makeLinksClickable(text) {
-        if (!text) return '';
-        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
-        let formattedText = text.replace(emailRegex, '<a href="mailto:$1">$1</a>');
-        const urlRegex = /(^|\s)((https?:\/\/|www\.)[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
-        formattedText = formattedText.replace(urlRegex, function(match, space, url) {
-            let hyperlink = url;
-            if (!hyperlink.match('^https?://')) hyperlink = 'https://' + hyperlink;
-            return space + '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
-        });
-        const phoneRegex = /(^|\s)(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}(\s|$)/g;
-        formattedText = formattedText.replace(phoneRegex, function(match, spaceBefore, fullMatch, spaceAfter) {
-            let cleanNumber = match.replace(/[^\d+]/g, '');
-            return spaceBefore + '<a href="tel:' + cleanNumber + '">' + match.trim() + '</a>' + (spaceAfter || '');
-        });
-        return formattedText;
-    }
-
-    async function sendChatRequest(messageText, buttonActionObj = null) {
-        if (messageText) appendUserMessage(messageText);
-
-        userInput.disabled = true;
-        if(sendBtn) sendBtn.disabled = true;
+    // ★ UPDATE: Accepts the 'isSilent' parameter for hidden system messages
+    async function sendChatRequest(messageText, buttonActionObj = null, isSilent = false) {
+        if (messageText && !isSilent) appendUserMessage(messageText);
+        if (inputEl) inputEl.disabled = true;
+        if (sendBtn) sendBtn.disabled = true;
         showTypingIndicator();
 
-        const payload = { message: messageText || "", is_voice: false };
-        if (buttonActionObj) payload.button_action = buttonActionObj;
-        if (currentSessionId) payload.session_id = currentSessionId;
+        const payload = { message: messageText || '', is_voice: false };
+        if (buttonActionObj)  payload.button_action = buttonActionObj;
+        if (currentSessionId) payload.session_id    = currentSessionId;
 
         try {
             const response = await fetch(`/api/chat/${config.embedCode}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-
             const data = await response.json();
             hideTypingIndicator();
 
             if (data.error) {
                 appendBotMessage("⚠️ Error: " + data.error);
             } else {
-                if (data.session_id) currentSessionId = data.session_id;
+                if (data.session_id) {
+                    currentSessionId = data.session_id;
+                    saveSession(currentSessionId); // Update the expiry timer!
+                }
 
-                if (data.response) appendBotMessage(data.response);
+                if (data.is_live && !isLiveMode) {
+                    activateLiveMode();
+                    if (socket && currentSessionId) socket.emit('join_live_room', { session_id: currentSessionId });
+                }
+
+                if (data.response) appendBotMessage(data.response, formatTime());
 
                 if (data.nested_buttons && data.nested_buttons.length > 0) {
-                    renderButtons(data.nested_buttons);
-                } else if (buttonActionObj) {
-                    showMainMenu();
+                    renderButtons(data.nested_buttons, null);
+                }
+                // Main Menu loops back if a button flow ends here
+                else if (buttonActionObj && !isLiveMode) {
+                    setTimeout(() => {
+                        showTypingIndicator();
+                        setTimeout(() => {
+                            hideTypingIndicator();
+                            const restartBubble = appendBotMessage("Is there anything else I can help you with?", formatTime());
+                            if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                                renderButtons(config.welcomeButtons, restartBubble);
+                            }
+                        }, 600);
+                    }, 1000);
                 }
             }
-        } catch (error) {
+        } catch(err) {
             hideTypingIndicator();
-            appendBotMessage("⚠️ Sorry, I couldn't connect to the server.");
+            appendBotMessage("⚠️ Sorry, couldn't connect to server.");
         } finally {
-            userInput.disabled = false;
-            if(sendBtn) sendBtn.disabled = false;
-            userInput.focus();
+            if (inputEl) { inputEl.disabled = false; inputEl.focus(); }
+            if (sendBtn) sendBtn.disabled = false;
         }
     }
 
     function handleFreeTextSubmit() {
-        const text = userInput.value.trim();
+        if (!inputEl) return;
+        const text = inputEl.value.trim();
         if (!text) return;
-        userInput.value = '';
-        sendChatRequest(text, null);
+        inputEl.value = '';
+
+        if (isLiveMode && socket && currentSessionId) {
+            appendUserMessage(text);
+            saveSession(currentSessionId); // Update the expiry timer!
+            socket.emit('user_message_live', { session_id: currentSessionId, message: text });
+        } else {
+            sendChatRequest(text, null);
+        }
     }
 
-    if(sendBtn) sendBtn.onclick = handleFreeTextSubmit;
-    userInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') handleFreeTextSubmit(); });
+    if (sendBtn) sendBtn.onclick = handleFreeTextSubmit;
+    if (inputEl) inputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleFreeTextSubmit(); });
 
-    function initChat() {
-        userInput.disabled = false;
-        if(sendBtn) sendBtn.disabled = false;
-        chatMessages.innerHTML = '';
-        showTypingIndicator();
-
-        setTimeout(() => {
-            hideTypingIndicator();
-            appendBotMessage(config.welcomeMessage);
-            if (config.welcomeButtons && config.welcomeButtons.length > 0) {
-                renderButtons(config.welcomeButtons);
+    if (userEndLiveBtn) {
+        userEndLiveBtn.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to end the live chat?')) return;
+            if (socket && currentSessionId) {
+                socket.emit('user_message_live', { session_id: currentSessionId, message: '[User ended live chat]' });
             }
-        }, 600);
+            deactivateLiveMode('You ended the live chat. The AI assistant has resumed.');
+            try {
+                const response = await fetch(`/api/chat/${config.embedCode}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        message: '[User ended live chat]',
+                        button_action: { type: 'end_live_chat', value: 'ended' }
+                    })
+                });
+                const data = await response.json();
+
+                if (data.response) {
+                    const bubble = appendBotMessage(data.response, formatTime());
+                    if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                        renderButtons(config.welcomeButtons, bubble);
+                    }
+                }
+            } catch(err) {}
+        });
     }
 
+    async function initChat() {
+        if (inputEl) inputEl.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        messagesEl.innerHTML = '';
+
+        if (currentSessionId) {
+            try {
+                const res = await fetch(`/api/chat/${config.embedCode}/history?session_id=${currentSessionId}`);
+                const data = await res.json();
+
+                if (data.messages && data.messages.length > 0) {
+
+                    // 1. Put the Welcome message at the top to act as the start of history
+                    appendBotMessage(config.welcomeMessage, formatTime());
+
+                    // 2. Loop through and print the history
+                    data.messages.forEach(msg => {
+                        // ★ HIDES SYSTEM LOGS LIKE [VISITOR DETAILS] SO THEY DON'T RENDER
+                        if (msg.message.includes('[ User requested live support ]') ||
+                            msg.message.includes('[User ended live chat]') ||
+                            msg.message.includes('[Requested Live Chat]') ||
+                            msg.message.includes('[Visitor Details]')) return;
+
+                        if (msg.message === config.welcomeMessage) return;
+
+                        // Clean the [Button: ...] text so it shows up as a normal user message!
+                        let displayText = msg.message;
+                        if (displayText.startsWith('[Button: ')) {
+                            displayText = displayText.replace('[Button: ', '').replace(/]$/, '');
+                        }
+
+                        const timeStr = formatTime(msg.timestamp);
+
+                        if (msg.sender === 'user') appendUserMessage(displayText, timeStr);
+                        else appendBotMessage(displayText, timeStr);
+                    });
+
+                    // 3. Bring the buttons back at the bottom!
+                    if (data.is_live) {
+                        activateLiveMode();
+                    } else {
+                        setTimeout(() => {
+                            showTypingIndicator();
+                            setTimeout(() => {
+                                hideTypingIndicator();
+                                const restartBubble = appendBotMessage("Welcome back! Is there anything else I can help you with?", formatTime());
+                                if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+                                    renderButtons(config.welcomeButtons, restartBubble);
+                                }
+                            }, 500);
+                        }, 500);
+                    }
+                    scrollToBottom();
+                    return;
+                }
+            } catch (err) { console.error("History error:", err); }
+        }
+
+        // Fresh Chat Session Setup
+        const welcomeBubble = appendBotMessage(config.welcomeMessage, formatTime());
+        if (config.welcomeButtons && config.welcomeButtons.length > 0) {
+            renderButtons(config.welcomeButtons, welcomeBubble);
+        }
+    }
+
+    // Automatically trigger on load
     initChat();
+});
 </script>
 </body>
 </html>

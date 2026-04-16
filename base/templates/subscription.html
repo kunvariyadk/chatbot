@@ -6,10 +6,39 @@
     <title>Choose Your Plan - ChatBot Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/subscription.css') }}">
+
+    <style>
+        /* CSS for the new Back Button */
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .btn-back-dashboard {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .btn-back-dashboard:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 <body>
     <div class="subscription-container">
-        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
@@ -26,7 +55,6 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Header -->
         <div class="subscription-header">
             <div class="logo">
                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -41,15 +69,21 @@
                 </svg>
                 <span>ChatBot Builder</span>
             </div>
+
+            <a href="{{ url_for('dashboard') }}" class="btn-back-dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Dashboard
+            </a>
         </div>
 
-        <!-- Title Section -->
         <div class="title-section">
             <h1>Choose the Perfect Plan for Your Business</h1>
             <p>Start with a 14-day free trial. No credit card required.</p>
         </div>
 
-        <!-- Pricing Toggle -->
         <div class="billing-toggle">
             <span class="toggle-label" id="monthlyLabel">Monthly</span>
             <label class="switch">
@@ -59,9 +93,7 @@
             <span class="toggle-label" id="yearlyLabel">Yearly <span class="save-badge">Save 20%</span></span>
         </div>
 
-        <!-- Plans Grid -->
         <div class="plans-grid">
-            <!-- Free Trial Plan -->
             <div class="plan-card trial">
                 <div class="popular-badge">Start Here</div>
                 <div class="plan-header">
@@ -117,7 +149,6 @@
                 </div>
             </div>
 
-            <!-- Basic Plan -->
             <div class="plan-card">
                 <div class="plan-header">
                     <h3>Basic</h3>
@@ -170,10 +201,15 @@
                         </svg>
                         <span>Email Support</span>
                     </div>
+                     <div class="feature-item">
+                        <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                        </svg>
+                        <span>One To One Live Chat Support</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Moderate Plan -->
             <div class="plan-card popular">
                 <div class="popular-badge">Most Popular</div>
                 <div class="plan-header">
@@ -233,10 +269,15 @@
                         </svg>
                         <span>API Access</span>
                     </div>
+                     <div class="feature-item">
+                        <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                        </svg>
+                        <span>One To One Live Chat Support</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Advanced Plan -->
             <div class="plan-card enterprise">
                 <div class="popular-badge enterprise-badge">Enterprise</div>
                 <div class="plan-header">
@@ -302,6 +343,12 @@
                         </svg>
                         <span>SLA Guarantee</span>
                     </div>
+                     <div class="feature-item">
+                        <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                        </svg>
+                        <span>One To One Live Chat Support</span>
+                    </div>
                 </div>
 
                 <button class="contact-sales-btn" onclick="showContactSales()">
@@ -313,7 +360,6 @@
             </div>
         </div>
 
-        <!-- Features Comparison -->
         <div class="features-comparison">
             <h2>Compare All Features</h2>
             <div class="comparison-table">
@@ -389,7 +435,6 @@
             </div>
         </div>
 
-        <!-- FAQ Section -->
         <div class="faq-section">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-grid">
@@ -413,7 +458,6 @@
         </div>
     </div>
 
-    <!-- Contact Sales Modal -->
     <div id="contactSalesModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeContactSales()">&times;</span>

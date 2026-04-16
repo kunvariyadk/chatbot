@@ -1,0 +1,1465 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey",
+        "Good morning",
+        "Good afternoon",
+        "Good evening",
+        "Namaste",
+        "Greetings",
+        "Howdy",
+        "Sup",
+        "Yo",
+        "What's up",
+        "Hello there"
+      ],
+      "responses": [
+        "Hello! Welcome to TD Tech Solutions. How can I assist you today?",
+        "Hi there! Thank you for reaching out to TD Tech Solutions. What can I help you with?",
+        "Hey! Welcome to TD Tech Solutions. How may I help you today?",
+        "Greetings! Thank you for contacting TD Tech Solutions. How can I help you?"
+      ]
+    },
+    {
+      "tag": "how_are_you",
+      "patterns": [
+        "How are you?",
+        "How are you doing?",
+        "How's it going?",
+        "What's up?",
+        "How have you been?"
+      ],
+      "responses": [
+        "I'm doing great, thank you for asking! I'm here to help you with any questions about TD Tech Solutions. How can I assist you today?",
+        "I'm doing well, thanks! Ready to help you with your queries about our services. What would you like to know?",
+        "All good here! I'm ready to assist you with information about TD Tech Solutions. What can I help you with?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Bye",
+        "Goodbye",
+        "See you",
+        "Take care",
+        "Talk to you later",
+        "Catch you later",
+        "I'm leaving",
+        "Gotta go",
+        "See you later"
+      ],
+      "responses": [
+        "Goodbye! Thank you for contacting TD Tech Solutions. Feel free to reach out anytime at inquiry@tdtech.in or +91 99252 92157.",
+        "See you! Thank you for your interest in TD Tech Solutions. We're here whenever you need us.",
+        "Take care! Feel free to contact us anytime. Have a wonderful day!"
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thank you",
+        "Thanks",
+        "Thanks a lot",
+        "Thank you so much",
+        "I appreciate it",
+        "Thanks for your help",
+        "Appreciate it",
+        "Cheers"
+      ],
+      "responses": [
+        "You're very welcome! Is there anything else I can help you with?",
+        "You're welcome! Feel free to ask if you have any other questions.",
+        "My pleasure! Don't hesitate to reach out if you need anything else.",
+        "Happy to assist! Feel free to contact us anytime at inquiry@tdtech.in or +91 99252 92157."
+      ]
+    },
+    {
+      "tag": "company_info",
+      "patterns": [
+        "What is TD Tech Solutions?",
+        "Tell me about TD Tech",
+        "Who are you?",
+        "What does TD Tech do?",
+        "Tell me about your company",
+        "Company information",
+        "About TD Tech"
+      ],
+      "responses": [
+        "TD Tech Solutions is an offshore software development company based in India that helps SMEs with quality technology-driven solutions and services across the globe. We have over 15 years of experience in the industry.",
+        "We are TD Tech Solutions - a trusted development partner for various industries worldwide for more than 15 years. We offer customized solutions that address specific business needs."
+      ]
+    },
+    {
+      "tag": "company_experience",
+      "patterns": [
+        "How long has TD Tech been in business?",
+        "Years of experience",
+        "How experienced are you?",
+        "When was TD Tech established?",
+        "How old is your company?"
+      ],
+      "responses": [
+        "TD Tech Solutions has been a trusted development partner for more than 15 years, serving clients across various industries worldwide.",
+        "We have over 15 years of experience in software development and IT solutions."
+      ]
+    },
+    {
+      "tag": "location",
+      "patterns": [
+        "Where is TD Tech located?",
+        "Your office address",
+        "Where are you located?",
+        "TD Tech address",
+        "Office location",
+        "Where is your office?",
+        "Can I visit your office?"
+      ],
+      "responses": [
+        "We are located at D-617, Ganesh Glory-11, Jagatpur Rd, S.G. Highway, Ahmedabad, Gujarat 382470, India. You're welcome to visit us!",
+        "Our office is at D-617, Ganesh Glory-11, Jagatpur Rd, S.G. Highway, Ahmedabad, Gujarat 382470, India."
+      ]
+    },
+    {
+      "tag": "contact_email",
+      "patterns": [
+        "What is your email?",
+        "Email address",
+        "How can I email you?",
+        "Contact email",
+        "Your email ID",
+        "TD Tech email"
+      ],
+      "responses": [
+        "You can email us at inquiry@tdtech.in",
+        "Our email address is inquiry@tdtech.in. Feel free to reach out with your queries!"
+      ]
+    },
+    {
+      "tag": "contact_phone",
+      "patterns": [
+        "What is your phone number?",
+        "Contact number",
+        "How can I call you?",
+        "Phone number",
+        "TD Tech phone",
+        "Your number"
+      ],
+      "responses": [
+        "You can reach us at +91 99252 92157",
+        "Our phone number is +91 99252 92157. We're available 24/7!"
+      ]
+    },
+    {
+      "tag": "contact_methods",
+      "patterns": [
+        "How can I contact TD Tech?",
+        "Contact information",
+        "How to reach you?",
+        "Ways to contact",
+        "Get in touch",
+        "Contact details"
+      ],
+      "responses": [
+        "You can contact us via email at inquiry@tdtech.in or call us at +91 99252 92157. We're available 24/7 to assist you!",
+        "We're available through multiple channels: Email: inquiry@tdtech.in, Phone: +91 99252 92157. Feel free to reach out anytime!"
+      ]
+    },
+    {
+      "tag": "consultation",
+      "patterns": [
+        "Can I get a consultation?",
+        "Do you offer consultation?",
+        "I need consultation",
+        "Free consultation",
+        "Book a consultation",
+        "Schedule a meeting"
+      ],
+      "responses": [
+        "Yes, we offer consultations! We're here to answer your questions 24/7. Contact us at inquiry@tdtech.in or call +91 99252 92157 to discuss your requirements.",
+        "Absolutely! We provide free consultations to understand your needs. Reach out at inquiry@tdtech.in or +91 99252 92157."
+      ]
+    },
+    {
+      "tag": "services_list",
+      "patterns": [
+        "What services do you offer?",
+        "Your services",
+        "What do you provide?",
+        "List of services",
+        "What can you do for me?",
+        "Services offered"
+      ],
+      "responses": [
+        "We provide Product Design & Development, Web App Development, Mobile App Development, Quality Assurance, and Resource Augmentation services.",
+        "Our services include: 1) Product Design & Development 2) Web App Development 3) Mobile App Development 4) Quality Assurance 5) Resource Augmentation"
+      ]
+    },
+    {
+      "tag": "product_design",
+      "patterns": [
+        "What is product design and development?",
+        "Product design service",
+        "Do you design products?",
+        "Product development",
+        "Can you help design my product?",
+        "UI/UX design"
+      ],
+      "responses": [
+        "Our Product Design & Development service involves creating customized software solutions from concept to completion, focusing on user experience and business requirements. We transform ideas into reality!",
+        "Yes, we specialize in Product Design & Development, including UI/UX design. We help you bring your ideas to life with user-centric solutions."
+      ]
+    },
+    {
+      "tag": "web_development",
+      "patterns": [
+        "Do you develop websites?",
+        "Web development",
+        "Can you build web applications?",
+        "Website development service",
+        "Web app development",
+        "Custom web development"
+      ],
+      "responses": [
+        "Yes, we provide comprehensive web app development services using modern technologies like React.js, .NET, and PHP.",
+        "Absolutely! We build custom web applications tailored to your specific business requirements using React.js, .NET, and PHP."
+      ]
+    },
+    {
+      "tag": "web_technologies",
+      "patterns": [
+        "What technologies do you use for web?",
+        "Web development tech stack",
+        "Which frameworks do you use?",
+        "React development",
+        "Do you use .NET?",
+        "PHP development"
+      ],
+      "responses": [
+        "We use React.js, .NET, and PHP for web application development, choosing the best technology based on your project requirements.",
+        "Our web development tech stack includes React.js for modern frontends, .NET for enterprise solutions, and PHP for versatile web applications."
+      ]
+    },
+    {
+      "tag": "mobile_development",
+      "patterns": [
+        "Do you develop mobile apps?",
+        "Mobile app development",
+        "Can you build apps?",
+        "iOS development",
+        "Android development",
+        "App development service"
+      ],
+      "responses": [
+        "Yes! We develop mobile applications for iOS, Android, and cross-platform apps using Flutter.",
+        "We provide comprehensive mobile app development services including native iOS, native Android, and cross-platform Flutter development."
+      ]
+    },
+    {
+      "tag": "ios_development",
+      "patterns": [
+        "Can you develop iOS apps?",
+        "iPhone app development",
+        "iOS development service",
+        "Apple app development",
+        "Do you build iOS apps?"
+      ],
+      "responses": [
+        "Yes, we provide native iOS app development services for iPhones and iPads.",
+        "Absolutely! We develop high-quality native iOS applications tailored to your requirements."
+      ]
+    },
+    {
+      "tag": "android_development",
+      "patterns": [
+        "Do you develop Android apps?",
+        "Android app development",
+        "Can you build Android applications?",
+        "Google Play apps"
+      ],
+      "responses": [
+        "Yes, we develop native Android applications for smartphones and tablets.",
+        "Absolutely! We build robust Android apps optimized for various devices and Android versions."
+      ]
+    },
+    {
+      "tag": "flutter_development",
+      "patterns": [
+        "Do you use Flutter?",
+        "Cross-platform development",
+        "Flutter app development",
+        "Hybrid mobile apps",
+        "What is Flutter?"
+      ],
+      "responses": [
+        "Yes, we develop cross-platform mobile apps using Flutter, which allows your app to run on both iOS and Android with a single codebase.",
+        "Flutter is a framework for building cross-platform apps. We use it to develop hybrid mobile applications that work seamlessly on both iOS and Android."
+      ]
+    },
+    {
+      "tag": "quality_assurance",
+      "patterns": [
+        "Do you provide QA services?",
+        "Quality assurance",
+        "Software testing",
+        "Do you test applications?",
+        "QA testing service",
+        "Quality testing"
+      ],
+      "responses": [
+        "Yes, we provide comprehensive Quality Assurance services to ensure reliability and robustness of software solutions through thorough testing.",
+        "Absolutely! Quality Assurance is a core service we provide, including rigorous testing and quality-focused development practices."
+      ]
+    },
+    {
+      "tag": "resource_augmentation",
+      "patterns": [
+        "What is resource augmentation?",
+        "Staff augmentation",
+        "Can you provide developers?",
+        "Hire dedicated developers",
+        "Team augmentation",
+        "Do you provide dedicated resources?"
+      ],
+      "responses": [
+        "Resource Augmentation is a service where we provide skilled developers and IT professionals to augment your existing team on a dedicated basis.",
+        "Yes, through our Resource Augmentation service, we provide dedicated developers and tech professionals to strengthen your team."
+      ]
+    },
+    {
+      "tag": "industries_served",
+      "patterns": [
+        "What industries do you serve?",
+        "Which industries do you work with?",
+        "Industry expertise",
+        "Sectors you serve",
+        "Industries"
+      ],
+      "responses": [
+        "We serve Fintech, Courier Services, E-commerce, Educational Industry, and Media & Entertainment sectors.",
+        "Our expertise spans across Fintech, E-commerce, Education, Media & Entertainment, and Courier Services industries."
+      ]
+    },
+    {
+      "tag": "fintech",
+      "patterns": [
+        "Do you work with fintech?",
+        "Fintech services",
+        "Financial software development",
+        "Banking app development",
+        "Payment solutions",
+        "Fintech solutions"
+      ],
+      "responses": [
+        "Yes, we offer tailored and secured fintech services including mobile money, banking, subscriptions, loan management, and bill payments with a focus on confidentiality and quality.",
+        "We have extensive experience in fintech, developing secure solutions for mobile banking, payment systems, loan management, and subscription services."
+      ]
+    },
+    {
+      "tag": "ecommerce",
+      "patterns": [
+        "Do you build e-commerce platforms?",
+        "E-commerce development",
+        "Online marketplace",
+        "Shopping app development",
+        "E-commerce solutions"
+      ],
+      "responses": [
+        "Yes! We are a top Indian marketplace app developer with 15+ years of experience building secure, tailored e-commerce platforms that connect buyers and sellers.",
+        "We build comprehensive e-commerce solutions including online marketplaces, shopping platforms, and seller management systems."
+      ]
+    },
+    {
+      "tag": "courier_services",
+      "patterns": [
+        "Courier management software",
+        "Do you develop courier solutions?",
+        "Delivery tracking system",
+        "Logistics software",
+        "Courier app development"
+      ],
+      "responses": [
+        "Yes, we provide advanced courier software to track goods from origin to destination, offering full customization tailored to your business operations.",
+        "We develop comprehensive courier management solutions with tracking, route optimization, and delivery management features."
+      ]
+    },
+    {
+      "tag": "education",
+      "patterns": [
+        "Educational software",
+        "Do you develop education apps?",
+        "E-learning platform",
+        "School management system",
+        "LMS development",
+        "Education solutions"
+      ],
+      "responses": [
+        "Yes, we provide modern educational software solutions for institutions to improve management, student engagement, and learning experiences with scalable digital platforms.",
+        "We develop educational solutions including learning management systems, school management software, and student engagement platforms."
+      ]
+    },
+    {
+      "tag": "media_entertainment",
+      "patterns": [
+        "Media and entertainment solutions",
+        "Do you develop entertainment apps?",
+        "Video streaming platform",
+        "Media software",
+        "OTT platform development"
+      ],
+      "responses": [
+        "Yes! We use technology, expertise, and creativity to revolutionize entertainment experiences, including video streaming, content management, and user engagement features.",
+        "We develop media and entertainment solutions including streaming platforms, content management systems, and interactive entertainment applications."
+      ]
+    },
+    {
+      "tag": "training_courses",
+      "patterns": [
+        "Do you provide training?",
+        "Training courses",
+        "What courses do you offer?",
+        "Learning programs",
+        "IT training",
+        "Coding courses"
+      ],
+      "responses": [
+        "Yes! We offer training courses in Full Stack Development, MERN Stack, Mobile App Development, Python, and Quality Assurance.",
+        "We provide comprehensive training programs: 1) Full Stack Development 2) MERN Stack Development 3) Mobile App Development 4) Python Course 5) Quality Assurance Course"
+      ]
+    },
+    {
+      "tag": "fullstack_course",
+      "patterns": [
+        "Full stack development course",
+        "Full stack training",
+        "Can I learn full stack?",
+        "Full stack program"
+      ],
+      "responses": [
+        "Yes, we offer a comprehensive Full Stack Development Course. Contact us at inquiry@tdtech.in or +91 99252 92157 for course details and enrollment.",
+        "Our Full Stack Development Course covers end-to-end web development. Reach out to learn more about curriculum and schedule!"
+      ]
+    },
+    {
+      "tag": "mern_course",
+      "patterns": [
+        "MERN stack course",
+        "MERN training",
+        "MongoDB React training",
+        "MERN stack program"
+      ],
+      "responses": [
+        "Yes, we offer a MERN Stack Development Course covering MongoDB, Express.js, React, and Node.js. Contact us for more details!",
+        "Our MERN Stack Course teaches you to build modern web applications. Reach out at inquiry@tdtech.in for course information."
+      ]
+    },
+    {
+      "tag": "mobile_course",
+      "patterns": [
+        "Mobile app development course",
+        "App development training",
+        "Learn mobile development",
+        "iOS Android course"
+      ],
+      "responses": [
+        "We offer a Mobile App Development Course covering iOS and Android development. Contact us at inquiry@tdtech.in for enrollment details!",
+        "Yes! Our Mobile App Development Course teaches you to build native and cross-platform apps. Reach out for more information."
+      ]
+    },
+    {
+      "tag": "python_course",
+      "patterns": [
+        "Python course",
+        "Python training",
+        "Learn Python",
+        "Python programming course"
+      ],
+      "responses": [
+        "Yes, we offer a Python Course. Contact us at inquiry@tdtech.in or +91 99252 92157 for course details and schedule!",
+        "Our Python Course covers programming fundamentals and advanced concepts. Reach out to learn more!"
+      ]
+    },
+    {
+      "tag": "qa_course",
+      "patterns": [
+        "Quality assurance course",
+        "QA training",
+        "Software testing course",
+        "Learn QA testing"
+      ],
+      "responses": [
+        "Yes, we offer a Quality Assurance Course covering software testing methodologies and tools. Contact us for details!",
+        "Our QA Course teaches comprehensive testing skills. Reach out at inquiry@tdtech.in for enrollment information."
+      ]
+    },
+    {
+      "tag": "development_process",
+      "patterns": [
+        "What is your development process?",
+        "How do you work?",
+        "Development methodology",
+        "Your work process",
+        "Project process"
+      ],
+      "responses": [
+        "Our process includes 4 stages: 1) Discussion - understanding requirements, 2) Ideas & Concepts - developing solutions, 3) Quality Assurance - thorough testing, 4) Deploy & Execution - implementation and launch.",
+        "We follow a transparent agile process: Discussion \u2192 Ideas & Concepts \u2192 Quality Assurance \u2192 Deploy & Execution, keeping you informed at every stage."
+      ]
+    },
+    {
+      "tag": "agile_methodology",
+      "patterns": [
+        "Do you use agile?",
+        "Agile development",
+        "Scrum methodology",
+        "Agile process"
+      ],
+      "responses": [
+        "Yes, we follow agile methods to ensure flexibility, faster delivery, and continuous feedback, keeping you informed at every stage.",
+        "Absolutely! We use agile methodology for transparent, flexible development with regular updates and iterations."
+      ]
+    },
+    {
+      "tag": "why_choose_tdtech",
+      "patterns": [
+        "Why should I choose TD Tech?",
+        "Why TD Tech?",
+        "What makes you different?",
+        "Your advantages",
+        "Why work with you?"
+      ],
+      "responses": [
+        "Choose us for: 1) Tailored solutions (not templates) 2) 15+ years experience 3) Deep technical expertise 4) Transparent agile process 5) Business-focused mindset 6) Quality commitment 7) Long-term partnership 8) Global-level quality with personal touch.",
+        "We deliver tailored solutions with 15+ years of experience, expert developers, transparent processes, and long-term partnership - not just code, but business growth."
+      ]
+    },
+    {
+      "tag": "custom_solutions",
+      "patterns": [
+        "Do you provide custom solutions?",
+        "Customized software",
+        "Tailored development",
+        "Do you use templates?",
+        "Custom development"
+      ],
+      "responses": [
+        "We don't believe in one-size-fits-all. Our approach is centered around understanding your unique business needs and delivering custom software that fits perfectly - no templates!",
+        "Yes! We provide 100% customized solutions tailored to your specific requirements. We don't use generic templates."
+      ]
+    },
+    {
+      "tag": "post_launch_support",
+      "patterns": [
+        "Do you provide support after launch?",
+        "Maintenance service",
+        "Post-deployment support",
+        "Ongoing support",
+        "After launch services"
+      ],
+      "responses": [
+        "Yes! We stay with you beyond launch - scaling features, upgrading systems, and supporting your business long-term.",
+        "Absolutely! We provide ongoing maintenance, feature updates, and long-term support to ensure your success."
+      ]
+    },
+    {
+      "tag": "project_estimate",
+      "patterns": [
+        "Can you provide an estimate?",
+        "Project cost",
+        "How much does it cost?",
+        "Pricing",
+        "What are your rates?",
+        "Cost estimation"
+      ],
+      "responses": [
+        "Project costs vary based on requirements and complexity. Contact us at inquiry@tdtech.in or +91 99252 92157 with your requirements for a detailed estimate!",
+        "We offer flexible pricing based on project scope. Reach out with your requirements and we'll provide a detailed quote."
+      ]
+    },
+    {
+      "tag": "project_timeline",
+      "patterns": [
+        "How long does it take?",
+        "Project duration",
+        "Development timeline",
+        "How long to build an app?",
+        "Time to complete"
+      ],
+      "responses": [
+        "Development time varies based on project complexity and features. Contact us with your requirements and we'll provide a realistic timeline!",
+        "Project duration depends on scope and complexity. Share your requirements at inquiry@tdtech.in for an accurate timeline estimate."
+      ]
+    },
+    {
+      "tag": "availability",
+      "patterns": [
+        "Are you available?",
+        "Working hours",
+        "When are you open?",
+        "Are you open now?",
+        "24/7 support?"
+      ],
+      "responses": [
+        "We are available 24/7 to answer your questions! Contact us at inquiry@tdtech.in or +91 99252 92157 anytime.",
+        "Yes! We're available round the clock. Reach out anytime at +91 99252 92157 or inquiry@tdtech.in."
+      ]
+    },
+    {
+      "tag": "global_clients",
+      "patterns": [
+        "Do you work internationally?",
+        "International clients",
+        "Do you work with global clients?",
+        "Overseas projects",
+        "Can you work remotely?"
+      ],
+      "responses": [
+        "Yes! We have experience serving international clients across the globe and deliver global-level quality with personal touch.",
+        "Absolutely! We work with clients worldwide and can collaborate remotely throughout the project lifecycle."
+      ]
+    },
+    {
+      "tag": "company_size",
+      "patterns": [
+        "What size companies do you work with?",
+        "Do you work with startups?",
+        "Enterprise clients",
+        "Small business",
+        "SME support"
+      ],
+      "responses": [
+        "We help small and medium enterprises (SMEs) and startups, as well as larger organizations across various industries.",
+        "We specialize in helping SMEs and startups but also work with enterprise clients. We scale our services to fit your needs!"
+      ]
+    },
+    {
+      "tag": "technologies_general",
+      "patterns": [
+        "What technologies do you use?",
+        "Tech stack",
+        "Technologies you work with",
+        "Programming languages",
+        "Frameworks you use"
+      ],
+      "responses": [
+        "We work with React.js, .NET, PHP for web; iOS, Android, Flutter for mobile; and various modern technologies including cloud platforms and databases.",
+        "Our tech stack includes modern web and mobile technologies: React.js, .NET, PHP, iOS, Android, Flutter, cloud solutions, and more!"
+      ]
+    },
+    {
+      "tag": "mvp_development",
+      "patterns": [
+        "Can you build an MVP?",
+        "MVP development",
+        "Minimum viable product",
+        "Prototype development",
+        "Quick product launch"
+      ],
+      "responses": [
+        "Yes! We can develop Minimum Viable Products (MVPs) to help you validate your business idea quickly and cost-effectively.",
+        "Absolutely! MVP development is one of our specialties. We help you launch fast and iterate based on user feedback."
+      ]
+    },
+    {
+      "tag": "existing_project",
+      "patterns": [
+        "Can you work on existing projects?",
+        "Improve my current app",
+        "Fix my application",
+        "Continue existing project",
+        "Enhance my software"
+      ],
+      "responses": [
+        "Yes, we can work on enhancing, maintaining, or completing existing projects. We can also modernize and improve your current applications!",
+        "Absolutely! We take on existing projects for enhancement, bug fixes, feature additions, or complete redesigns."
+      ]
+    },
+    {
+      "tag": "payment_gateway",
+      "patterns": [
+        "Can you integrate payment gateway?",
+        "Payment integration",
+        "Payment processing",
+        "Online payment",
+        "Payment solutions"
+      ],
+      "responses": [
+        "Yes! We have extensive experience integrating various payment gateway solutions including Razorpay, Stripe, PayPal, and others.",
+        "Absolutely! Payment gateway integration is part of our fintech expertise. We implement secure payment solutions tailored to your needs."
+      ]
+    },
+    {
+      "tag": "api_development",
+      "patterns": [
+        "Do you develop APIs?",
+        "API development",
+        "REST API",
+        "Backend development",
+        "API integration"
+      ],
+      "responses": [
+        "Yes, we develop RESTful APIs and backend services, as well as integrate third-party APIs into applications.",
+        "Absolutely! API development and integration are core services we provide for scalable backend solutions."
+      ]
+    },
+    {
+      "tag": "cloud_solutions",
+      "patterns": [
+        "Do you build cloud solutions?",
+        "Cloud development",
+        "Cloud migration",
+        "AWS development",
+        "Cloud platforms"
+      ],
+      "responses": [
+        "Yes! We build scalable cloud-based solutions and can help migrate your applications to cloud platforms.",
+        "Absolutely! We develop cloud-native applications and provide cloud migration services for scalability and reliability."
+      ]
+    },
+    {
+      "tag": "social_media",
+      "patterns": [
+        "Are you on social media?",
+        "Social media links",
+        "LinkedIn",
+        "Instagram",
+        "Facebook",
+        "Follow you online"
+      ],
+      "responses": [
+        "Yes! Follow us on LinkedIn (TD Tech Solutions), Instagram (@tdtech_solutions), and Facebook (TDTechSolutionsIndia).",
+        "We're active on social media! Connect with us on LinkedIn, Instagram @tdtech_solutions, and Facebook for updates and insights."
+      ]
+    },
+    {
+      "tag": "nda_confidentiality",
+      "patterns": [
+        "Do you sign NDA?",
+        "Confidentiality agreement",
+        "Non-disclosure agreement",
+        "Privacy protection",
+        "Intellectual property"
+      ],
+      "responses": [
+        "Yes, we sign NDAs and confidentiality agreements. Contact us at inquiry@tdtech.in to discuss your IP and confidentiality requirements.",
+        "Absolutely! We prioritize confidentiality and are happy to sign NDAs. We respect and protect your intellectual property."
+      ]
+    },
+    {
+      "tag": "portfolio",
+      "patterns": [
+        "Can I see your work?",
+        "Portfolio",
+        "Past projects",
+        "Examples",
+        "Case studies",
+        "Show me your projects"
+      ],
+      "responses": [
+        "Please contact us at inquiry@tdtech.in or +91 99252 92157 to request our portfolio, case studies, and examples of our work!",
+        "We'd be happy to share our portfolio and case studies. Reach out at inquiry@tdtech.in for detailed project examples."
+      ]
+    },
+    {
+      "tag": "client_references",
+      "patterns": [
+        "Can you provide references?",
+        "Client testimonials",
+        "Customer reviews",
+        "Client feedback",
+        "References from past clients"
+      ],
+      "responses": [
+        "Please contact us at inquiry@tdtech.in or +91 99252 92157 to request client references and testimonials.",
+        "We'd be happy to share client feedback and references. Reach out to us for detailed testimonials!"
+      ]
+    },
+    {
+      "tag": "chatbot_identity",
+      "patterns": [
+        "Who are you?",
+        "What are you?",
+        "Are you a bot?",
+        "Are you human?",
+        "What's your name?"
+      ],
+      "responses": [
+        "I'm TD Tech Solutions' virtual assistant, here to help you with information about our services, training courses, and how we can help transform your business ideas into reality.",
+        "I'm an AI assistant for TD Tech Solutions, designed to answer your questions about our software development services and connect you with our team when needed."
+      ]
+    },
+    {
+      "tag": "chatbot_capabilities",
+      "patterns": [
+        "What can you do?",
+        "How can you help me?",
+        "What do you know?",
+        "Your capabilities",
+        "What information do you have?"
+      ],
+      "responses": [
+        "I can help you with information about TD Tech Solutions' services, training programs, technologies we use, industries we serve, and connect you with our team for consultations. What would you like to know?",
+        "I have comprehensive knowledge about our development services, training courses, project process, technologies, and how we can help your business. Ask me anything!"
+      ]
+    },
+    {
+      "tag": "affirmative",
+      "patterns": [
+        "Yes",
+        "Yeah",
+        "Sure",
+        "Okay",
+        "Ok",
+        "Alright",
+        "Fine",
+        "Right",
+        "Correct",
+        "Exactly"
+      ],
+      "responses": [
+        "Great! How can I help you further?",
+        "Wonderful! What else would you like to know?",
+        "Perfect! Is there anything specific you'd like to know about our services?"
+      ]
+    },
+    {
+      "tag": "negative",
+      "patterns": [
+        "No",
+        "Nope",
+        "Not now",
+        "Maybe later",
+        "Not really",
+        "No thanks"
+      ],
+      "responses": [
+        "No problem! If you have any other questions in the future, feel free to reach out to us.",
+        "That's perfectly fine! We're here if you need anything. Have a great day!",
+        "Understood! Contact us at inquiry@tdtech.in whenever you're ready."
+      ]
+    },
+    {
+      "tag": "understanding",
+      "patterns": [
+        "I understand",
+        "Got it",
+        "Makes sense",
+        "Clear",
+        "I see",
+        "Understood"
+      ],
+      "responses": [
+        "Great! Is there anything else you'd like to know?",
+        "Wonderful! Feel free to ask if you have more questions.",
+        "Perfect! Let me know if you need any clarification."
+      ]
+    },
+    {
+      "tag": "apology",
+      "patterns": [
+        "Sorry",
+        "My bad",
+        "Excuse me",
+        "Pardon me",
+        "Apologies"
+      ],
+      "responses": [
+        "No need to apologize! How can I assist you?",
+        "Not a problem at all! What can I help you with?",
+        "No worries! How may I help you today?"
+      ]
+    },
+    {
+      "tag": "wait",
+      "patterns": [
+        "Wait",
+        "Hold on",
+        "Give me a minute",
+        "One moment",
+        "Just a second"
+      ],
+      "responses": [
+        "Take your time! I'm here whenever you're ready.",
+        "Sure, no problem! I'll be right here.",
+        "Absolutely! Take all the time you need."
+      ]
+    },
+    {
+      "tag": "repeat",
+      "patterns": [
+        "Can you repeat that?",
+        "Say that again",
+        "I didn't understand",
+        "What do you mean?",
+        "Can you explain?",
+        "More details please"
+      ],
+      "responses": [
+        "Of course! Let me know which information you'd like me to repeat or explain better.",
+        "Sure! What part would you like me to clarify?",
+        "I apologize for the confusion. What would you like me to explain in more detail?"
+      ]
+    },
+    {
+      "tag": "help",
+      "patterns": [
+        "Help",
+        "I need help",
+        "Can you help me?",
+        "I have a question",
+        "I want to know",
+        "Assist me"
+      ],
+      "responses": [
+        "I'd be happy to help! What would you like to know about TD Tech Solutions?",
+        "Of course! I'm here to assist. What do you need help with?",
+        "Sure! Please go ahead and ask your question."
+      ]
+    },
+    {
+      "tag": "interest",
+      "patterns": [
+        "Interesting",
+        "Tell me more",
+        "That's great",
+        "Awesome",
+        "Cool",
+        "Nice",
+        "Perfect",
+        "Excellent",
+        "Wow"
+      ],
+      "responses": [
+        "Glad you find it interesting! Would you like to know more?",
+        "Great! Is there anything else you'd like to explore?",
+        "Thank you! How else can I assist you?"
+      ]
+    },
+    {
+      "tag": "confusion",
+      "patterns": [
+        "I'm not sure",
+        "I don't know",
+        "Maybe",
+        "I'm confused",
+        "Hmmm",
+        "Hmm"
+      ],
+      "responses": [
+        "That's okay! Let me help you figure it out. What are you trying to accomplish?",
+        "No problem! I'm here to help. What questions do you have?",
+        "I understand. Would you like more information to help you decide?"
+      ]
+    },
+    {
+      "tag": "urgency",
+      "patterns": [
+        "Urgent",
+        "Emergency",
+        "ASAP",
+        "Immediately",
+        "Right now",
+        "Quick"
+      ],
+      "responses": [
+        "I understand this is urgent. Please contact our team directly at +91 99252 92157 for immediate assistance. We're available 24/7!",
+        "For urgent matters, please call us at +91 99252 92157 or email inquiry@tdtech.in. We'll respond promptly!"
+      ]
+    },
+    {
+      "tag": "browsing",
+      "patterns": [
+        "Just browsing",
+        "Just looking",
+        "Looking around",
+        "Exploring",
+        "Checking out"
+      ],
+      "responses": [
+        "That's perfectly fine! Feel free to ask any questions as you browse. I'm here to help!",
+        "Great! Take your time. Let me know if you have any questions about our services."
+      ]
+    },
+    {
+      "tag": "compliment",
+      "patterns": [
+        "You're helpful",
+        "Good job",
+        "You're smart",
+        "Great service",
+        "You're amazing",
+        "Well done"
+      ],
+      "responses": [
+        "Thank you! I'm glad I could help. Is there anything else you'd like to know?",
+        "Thank you for the kind words! How else can I assist you today?",
+        "We appreciate your feedback! Any other questions?"
+      ]
+    },
+    {
+      "tag": "frustration",
+      "patterns": [
+        "This isn't working",
+        "I'm frustrated",
+        "This is difficult",
+        "This is hard",
+        "I'm stuck"
+      ],
+      "responses": [
+        "I apologize for the inconvenience. Please contact our team directly at inquiry@tdtech.in or +91 99252 92157 for personalized assistance.",
+        "I'm sorry you're experiencing frustration. Let me connect you with our team who can better assist you. Call +91 99252 92157 or email inquiry@tdtech.in."
+      ]
+    },
+    {
+      "tag": "language",
+      "patterns": [
+        "Do you speak English?",
+        "Can you speak Hindi?",
+        "I don't speak English well",
+        "Language support",
+        "Other languages"
+      ],
+      "responses": [
+        "I primarily communicate in English, but our team can assist you in multiple languages. Contact us at +91 99252 92157 for support in your preferred language!",
+        "I communicate in English, but we have multilingual team members. Reach out at inquiry@tdtech.in for assistance in other languages."
+      ]
+    },
+    {
+      "tag": "off_topic",
+      "patterns": [
+        "What time is it?",
+        "Where am I?",
+        "Tell me a joke",
+        "How's the weather?",
+        "What's your favorite color?"
+      ],
+      "responses": [
+        "I'm focused on helping you with TD Tech Solutions services! What can I assist you with regarding our development services or training programs?",
+        "While that's interesting, I'm here to help with information about TD Tech Solutions. What would you like to know about our services?"
+      ]
+    },
+    {
+      "tag": "verification",
+      "patterns": [
+        "Really?",
+        "Are you sure?",
+        "Is that true?",
+        "Confirm",
+        "Verify"
+      ],
+      "responses": [
+        "Yes! All the information I provide is accurate. For additional verification, feel free to contact us at inquiry@tdtech.in or +91 99252 92157.",
+        "Absolutely! For any specific confirmations about our services, you can directly reach our team."
+      ]
+    },
+    {
+      "tag": "ending",
+      "patterns": [
+        "That's all",
+        "Nothing else",
+        "I'm done",
+        "That's it",
+        "No more questions"
+      ],
+      "responses": [
+        "Great! Thank you for your interest in TD Tech Solutions. Contact us anytime at inquiry@tdtech.in or +91 99252 92157.",
+        "Perfect! Thank you for chatting with us. We're here 24/7 if you need anything else. Have a great day!",
+        "Wonderful! Feel free to reach out anytime you need assistance. Have a wonderful day!"
+      ]
+    },
+    {
+      "tag": "feedback",
+      "patterns": [
+        "How do I provide feedback?",
+        "Feedback",
+        "Suggestions",
+        "Complaints",
+        "Review"
+      ],
+      "responses": [
+        "We value your feedback! You can share your thoughts by contacting us at inquiry@tdtech.in or calling +91 99252 92157.",
+        "We'd love to hear from you! Please send your feedback to inquiry@tdtech.in. Your input helps us improve!"
+      ]
+    },
+    {
+      "tag": "pricing_model",
+      "patterns": [
+        "What is your pricing model?",
+        "Fixed price or hourly?",
+        "Pricing structure",
+        "Payment terms",
+        "How do you charge?"
+      ],
+      "responses": [
+        "We offer flexible pricing models including fixed-price, time & material, and dedicated team options based on your project requirements. Contact us at inquiry@tdtech.in for detailed pricing!",
+        "Our pricing is tailored to your needs - we offer various models including fixed cost and flexible arrangements. Reach out to discuss what works best for you!"
+      ]
+    },
+    {
+      "tag": "data_security",
+      "patterns": [
+        "How do you ensure security?",
+        "Data security",
+        "Is my data safe?",
+        "Security measures",
+        "Data protection"
+      ],
+      "responses": [
+        "We prioritize security and confidentiality in all our projects, especially for fintech and sensitive applications. We implement industry-standard security practices and can sign NDAs for your protection.",
+        "Security is paramount! We follow best practices for data protection, implement secure coding standards, and ensure confidentiality throughout development."
+      ]
+    },
+    {
+      "tag": "startup_help",
+      "patterns": [
+        "Can you help with my startup?",
+        "Startup idea",
+        "I have a startup",
+        "New business idea",
+        "Launch my product"
+      ],
+      "responses": [
+        "Yes! We specialize in transforming startup ideas into reality. We have extensive experience working with startups to build MVPs and scale products. Let's discuss your idea!",
+        "Absolutely! We love helping startups. From MVP development to full product launch, we can guide you through the journey. Contact us at inquiry@tdtech.in!"
+      ]
+    },
+    {
+      "tag": "team_size",
+      "patterns": [
+        "How big is your team?",
+        "Team size",
+        "Number of developers",
+        "Your team",
+        "Company size"
+      ],
+      "responses": [
+        "We have a skilled team of expert developers with diverse expertise across modern technologies. Contact us at inquiry@tdtech.in to discuss team composition for your specific project!",
+        "Our team comprises experienced developers, designers, and QA professionals. We can scale the team based on your project requirements."
+      ]
+    },
+    {
+      "tag": "deployment",
+      "patterns": [
+        "Do you handle deployment?",
+        "App deployment",
+        "Deploy to app store",
+        "Publishing",
+        "Launch support"
+      ],
+      "responses": [
+        "Yes! Deployment and execution are part of our development process. We handle deployment to web servers, app stores (Apple App Store and Google Play), and provide launch support.",
+        "Absolutely! We manage the complete deployment process including server setup, app store submission, and going live."
+      ]
+    },
+    {
+      "tag": "maintenance_cost",
+      "patterns": [
+        "How much is maintenance?",
+        "Maintenance cost",
+        "Ongoing costs",
+        "Monthly fees",
+        "Support pricing"
+      ],
+      "responses": [
+        "Maintenance costs vary based on the scope of support needed. We offer flexible maintenance packages. Contact us at inquiry@tdtech.in for a customized maintenance quote!",
+        "We provide various maintenance and support packages tailored to your needs. Reach out to discuss pricing for ongoing support."
+      ]
+    },
+    {
+      "tag": "technology_recommendation",
+      "patterns": [
+        "Which technology should I use?",
+        "Best tech stack",
+        "Technology advice",
+        "Recommend technology",
+        "What tech is best?"
+      ],
+      "responses": [
+        "The best technology depends on your specific requirements, scalability needs, and business goals. We can help you choose the right tech stack during our consultation. Contact us at inquiry@tdtech.in!",
+        "We'd be happy to recommend the optimal technology stack for your project. Share your requirements and we'll provide expert guidance!"
+      ]
+    },
+    {
+      "tag": "project_start",
+      "patterns": [
+        "How do I get started?",
+        "Start a project",
+        "Begin working",
+        "Onboarding process",
+        "How to start?"
+      ],
+      "responses": [
+        "Getting started is easy! Contact us at inquiry@tdtech.in or call +91 99252 92157 to discuss your requirements. We'll schedule a consultation and take it from there!",
+        "To start: 1) Contact us with your requirements 2) Schedule a consultation 3) We'll provide an estimate 4) Sign agreement 5) Kickoff! Reach out at inquiry@tdtech.in to begin!"
+      ]
+    },
+    {
+      "tag": "response_time",
+      "patterns": [
+        "How quickly do you respond?",
+        "Response time",
+        "How fast do you reply?",
+        "Quick response",
+        "Turnaround time"
+      ],
+      "responses": [
+        "We are available 24/7 and strive to respond to all inquiries promptly. Contact us at inquiry@tdtech.in or +91 99252 92157 for quick assistance!",
+        "We prioritize quick responses! Reach out at inquiry@tdtech.in or call +91 99252 92157 and we'll get back to you as soon as possible."
+      ]
+    },
+    {
+      "tag": "contract_terms",
+      "patterns": [
+        "Do you sign contracts?",
+        "Contract terms",
+        "Agreement",
+        "Legal documents",
+        "Terms and conditions"
+      ],
+      "responses": [
+        "Yes, we work with formal contracts outlining project scope, timelines, deliverables, and terms. Contact us at inquiry@tdtech.in to discuss contract details!",
+        "We provide comprehensive contracts for all projects. Reach out to discuss terms and conditions specific to your project."
+      ]
+    },
+    {
+      "tag": "refund_policy",
+      "patterns": [
+        "What is your refund policy?",
+        "Refunds",
+        "Money back guarantee",
+        "Cancellation policy",
+        "Return policy"
+      ],
+      "responses": [
+        "Our refund and cancellation policies are outlined in our project agreements. Contact us at inquiry@tdtech.in to discuss terms and conditions for your specific project.",
+        "Terms vary by project type. Please reach out at inquiry@tdtech.in to discuss our policies and project-specific terms."
+      ]
+    },
+    {
+      "tag": "budget_flexibility",
+      "patterns": [
+        "Can you work within my budget?",
+        "Budget constraints",
+        "Limited budget",
+        "Affordable solutions",
+        "Cost effective"
+      ],
+      "responses": [
+        "We offer flexible solutions to work within various budgets. Contact us at inquiry@tdtech.in to discuss your budget and we'll propose the best approach!",
+        "Yes! We can tailor solutions to fit your budget. Share your requirements and budget range, and we'll work out a suitable plan."
+      ]
+    },
+    {
+      "tag": "analytics_integration",
+      "patterns": [
+        "Do you integrate analytics?",
+        "Analytics tools",
+        "Tracking implementation",
+        "Google Analytics",
+        "App analytics"
+      ],
+      "responses": [
+        "Yes! We can integrate various analytics tools including Google Analytics, Firebase Analytics, Mixpanel, and others to help you track user behavior and app performance.",
+        "Absolutely! Analytics integration is part of our development services. We implement tracking solutions tailored to your needs."
+      ]
+    },
+    {
+      "tag": "multilingual_apps",
+      "patterns": [
+        "Can you develop multi-language apps?",
+        "Multilingual support",
+        "Localization",
+        "Multiple languages",
+        "Translation support"
+      ],
+      "responses": [
+        "Yes! We can develop applications with multi-language support and localization for global audiences.",
+        "Absolutely! We implement multilingual capabilities and localization to make your app accessible to users worldwide."
+      ]
+    },
+    {
+      "tag": "admin_panel",
+      "patterns": [
+        "Do you develop admin panels?",
+        "Admin dashboard",
+        "Backend panel",
+        "Management console",
+        "Control panel"
+      ],
+      "responses": [
+        "Yes! We develop comprehensive admin panels and dashboards as part of our solutions, giving you full control over your application.",
+        "Absolutely! Custom admin panels with role-based access, analytics, and management features are part of our development services."
+      ]
+    },
+    {
+      "tag": "data_migration",
+      "patterns": [
+        "Can you migrate data?",
+        "Data migration",
+        "Transfer data",
+        "Move data",
+        "Legacy system migration"
+      ],
+      "responses": [
+        "Yes! We handle data migration from legacy systems to new applications, ensuring data integrity and minimal downtime.",
+        "Absolutely! We provide data migration services with careful planning and execution to ensure smooth transition."
+      ]
+    },
+    {
+      "tag": "real_time_apps",
+      "patterns": [
+        "Can you build real-time apps?",
+        "Real-time features",
+        "Live updates",
+        "Chat functionality",
+        "Live data sync"
+      ],
+      "responses": [
+        "Yes! We can develop real-time applications with live data synchronization, chat features, notifications, and real-time updates.",
+        "Absolutely! We build real-time applications using technologies like WebSockets for instant updates and live collaboration."
+      ]
+    },
+    {
+      "tag": "demo_request",
+      "patterns": [
+        "Can I see a demo?",
+        "Request demo",
+        "Show me a demo",
+        "Product demo",
+        "Live demo"
+      ],
+      "responses": [
+        "We'd be happy to provide a demo! Contact us at inquiry@tdtech.in or call +91 99252 92157 to schedule a demo session.",
+        "Sure! Reach out at inquiry@tdtech.in to request a demo of our solutions and capabilities."
+      ]
+    },
+    {
+      "tag": "white_label",
+      "patterns": [
+        "Do you offer white label solutions?",
+        "White label development",
+        "Rebrandable products",
+        "White label apps"
+      ],
+      "responses": [
+        "Please contact us at inquiry@tdtech.in to discuss white-label development opportunities and solutions.",
+        "We can discuss white-label options for your needs. Reach out at inquiry@tdtech.in for more information!"
+      ]
+    },
+    {
+      "tag": "code_review",
+      "patterns": [
+        "Do you do code reviews?",
+        "Code audit",
+        "Review my code",
+        "Code quality check",
+        "Technical audit"
+      ],
+      "responses": [
+        "Yes! We provide code review and quality assessment services. Contact us at inquiry@tdtech.in to discuss your requirements.",
+        "Absolutely! We offer code audits, reviews, and quality assessments. Reach out to learn more about our review services."
+      ]
+    },
+    {
+      "tag": "documentation",
+      "patterns": [
+        "Do you provide documentation?",
+        "Technical documentation",
+        "User manual",
+        "API documentation",
+        "Developer docs"
+      ],
+      "responses": [
+        "Yes! We provide comprehensive technical documentation, user manuals, and API documentation as part of our development process.",
+        "Absolutely! Complete documentation is included in our deliverables to ensure smooth handover and maintenance."
+      ]
+    },
+    {
+      "tag": "optimization",
+      "patterns": [
+        "Can you optimize my app?",
+        "Performance optimization",
+        "Speed improvement",
+        "App optimization",
+        "Make it faster"
+      ],
+      "responses": [
+        "Yes! We can optimize and improve the performance of existing applications including speed, efficiency, and user experience.",
+        "Absolutely! We provide optimization services for web and mobile apps to enhance performance and user satisfaction."
+      ]
+    },
+    {
+      "tag": "ui_ux_audit",
+      "patterns": [
+        "Can you audit my UI/UX?",
+        "UX review",
+        "Design audit",
+        "Improve user experience",
+        "UI/UX assessment"
+      ],
+      "responses": [
+        "Yes! We provide UI/UX audits and improvement recommendations. Contact us at inquiry@tdtech.in to discuss your application.",
+        "Absolutely! We can assess your current UI/UX and provide actionable recommendations for improvement."
+      ]
+    },
+    {
+      "tag": "digital_transformation",
+      "patterns": [
+        "Can you help with digital transformation?",
+        "Digitalize my business",
+        "Digital solutions",
+        "Modernize business",
+        "Digital strategy"
+      ],
+      "responses": [
+        "Yes! We help businesses with digital transformation through modern software solutions, process automation, and technology integration.",
+        "Absolutely! We guide businesses through digital transformation with tailored technology solutions that drive growth and efficiency."
+      ]
+    },
+    {
+      "tag": "monetization",
+      "patterns": [
+        "App monetization strategies",
+        "How to make money from app?",
+        "Revenue model",
+        "In-app purchases",
+        "Subscription model"
+      ],
+      "responses": [
+        "We can help design monetization strategies including subscriptions, in-app purchases, advertising integration, and freemium models based on your business goals.",
+        "Yes! We assist with implementing various monetization strategies - subscriptions, one-time purchases, ads, or hybrid models."
+      ]
+    },
+    {
+      "tag": "crm_integration",
+      "patterns": [
+        "Can you integrate CRM?",
+        "CRM integration",
+        "Salesforce integration",
+        "Connect CRM system",
+        "CRM development"
+      ],
+      "responses": [
+        "Yes! We can integrate various CRM systems like Salesforce, HubSpot, Zoho, or develop custom CRM solutions for your business.",
+        "Absolutely! CRM integration and custom CRM development are part of our expertise."
+      ]
+    },
+    {
+      "tag": "push_notifications",
+      "patterns": [
+        "Can you implement push notifications?",
+        "Push notification service",
+        "Mobile notifications",
+        "Alert system",
+        "Notification setup"
+      ],
+      "responses": [
+        "Yes! We implement push notification systems for mobile and web apps to keep your users engaged and informed.",
+        "Absolutely! Push notifications, in-app notifications, and email alerts are standard features we implement."
+      ]
+    }
+  ]
+}

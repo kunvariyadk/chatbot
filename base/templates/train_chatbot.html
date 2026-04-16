@@ -158,7 +158,8 @@
 
                     <div class="search-results-header">
                         <div class="results-info">
-                            Showing <strong id="resultsCount">0</strong> of <strong id="totalCount">0</strong> Q&amp;A pairs
+                            Showing <strong id="resultsCount">0</strong> of <strong id="totalCount">0</strong> Q&amp;A
+                            pairs
                         </div>
                         <div class="sort-options">
                             <label for="sortSelect">Sort by:</label>
@@ -167,6 +168,8 @@
                                 <option value="oldest">Oldest First</option>
                                 <option value="az">A–Z (Question)</option>
                                 <option value="za">Z–A (Question)</option>
+                                <option value="all">View All (One Page)
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -652,6 +655,9 @@
 <script>
 let flowData = [];
 
+// ★ BULLETPROOF SUBSCRIPTION CHECK
+const isPaidUser = {% if user and user.subscription and user.subscription.plan and 'free' not in user.subscription.plan.name|lower %} true {% else %} false {% endif %};
+
 function generateId() { return Math.random().toString(36).substr(2, 9); }
 function escapeHtml(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -750,12 +756,27 @@ function renderFlow() {
         nodes.forEach((node, index) => {
             let valueLabel = 'Bot Reply Message';
             let valuePlaceholder = 'Type what the bot should say...';
-            if (node.type === 'url') { valueLabel = 'URL to Open'; valuePlaceholder = 'https://...'; }
-            if (node.type === 'intent') { valueLabel = 'Intent Tag'; valuePlaceholder = 'e.g., pricing'; }
+            if (node.type === 'url') {
+                valueLabel = 'URL to Open';
+                valuePlaceholder = 'https://...';
+            }
+            if (node.type === 'intent') {
+                valueLabel = 'Intent Tag';
+                valuePlaceholder = 'e.g., pricing';
+            }
+            if (node.type === 'live_chat') {
+                valueLabel = 'Transfer Message';
+                valuePlaceholder = 'e.g., Please hold, connecting to a human...';
+            }
 
             const branchClass = level === 0 ? 'main-badge' : 'nested-badge';
             const branchText = level === 0 ? `Main Button ${index + 1}` : `↳ Option ${index + 1}`;
             const depthClass = level <= 3 ? `level-${level}` : 'level-3';
+
+            // ★ INJECT LIVE CHAT OPTION ONLY IF USER IS ON A PAID TIER
+            const liveChatOption = isPaidUser
+                ? `<option value="live_chat" ${node.type === 'live_chat' ? 'selected' : ''}>Transfer to Live Agent (Premium)</option>`
+                : '';
 
             html += `
             <div class="flow-node ${depthClass}">
@@ -777,13 +798,20 @@ function renderFlow() {
                             <option value="message" ${node.type === 'message' ? 'selected' : ''}>Show More Options</option>
                             <option value="url" ${node.type === 'url' ? 'selected' : ''}>Open URL (Ends)</option>
                             <option value="intent" ${node.type === 'intent' ? 'selected' : ''}>Trigger Intent (Ends)</option>
+                            ${liveChatOption}
                         </select>
                     </div>
+
                     <div class="node-field">
                         <label>${valueLabel}</label>
-                        <input type="text" placeholder="${valuePlaceholder}" value="${escapeHtml(node.value)}" oninput="updateNode('${node.id}', 'value', this.value)">
+                        <textarea
+                            placeholder="${valuePlaceholder}"
+                            oninput="updateNode('${node.id}', 'value', this.value)"
+                            rows="2"
+                            style="width: 100%; resize: vertical; font-family: inherit; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;"
+                        >${escapeHtml(node.value)}</textarea>
                     </div>
-                </div>`;
+                    </div>`;
 
             if (node.type === 'message') {
                 html += `<div class="nested-flow">`;
@@ -835,7 +863,7 @@ async function saveFlowData() {
     const btn = document.getElementById('btnSaveFlow');
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff;margin-right:6px;"></div> Saving...';
-
+``
     try {
         const response = await fetch(`/chatbot/save-flow/${CHATBOT_ID}`, {
             method: 'POST',
@@ -859,16 +887,11 @@ async function saveFlowData() {
     }
 }
 
-/* ══════════════════════════════════════════════════
-   INTERACTIVE FLOW: JSON UPLOAD, VALIDATION & COPY
-══════════════════════════════════════════════════ */
-
 function toggleFlowFormatExample() {
     const el = document.getElementById('flowFormatExample');
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-// 🌟 NEW: Function to copy JSON format to clipboard
 function copyFlowFormat() {
     const codeText = document.getElementById('flowJsonTemplate').textContent;
     navigator.clipboard.writeText(codeText).then(() => {
@@ -876,18 +899,17 @@ function copyFlowFormat() {
         const originalHTML = btn.innerHTML;
 
         btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
-        btn.style.color = '#10b981'; // Green text
-        btn.style.borderColor = '#10b981'; // Green border
+        btn.style.color = '#10b981';
+        btn.style.borderColor = '#10b981';
 
         setTimeout(() => {
             btn.innerHTML = originalHTML;
-            btn.style.color = ''; // Reverts to CSS default
+            btn.style.color = '';
             btn.style.borderColor = '';
         }, 2000);
     });
 }
 
-// Ensure nested structures get unique IDs so the UI logic doesn't break
 function applyIdsToUploadedFlow(nodes) {
     nodes.forEach(node => {
         if (!node.id) node.id = generateId();
@@ -898,22 +920,13 @@ function applyIdsToUploadedFlow(nodes) {
     });
 }
 
-// Strict Validator
 function validateFlowJSONStructure(data) {
     if (!Array.isArray(data)) return false;
-
     function checkNodes(nodes) {
         for (let node of nodes) {
-            // Must be an object
             if (typeof node !== 'object' || node === null) return false;
-
-            // Must have a 'text' property
             if (!node.hasOwnProperty('text') || typeof node.text !== 'string') return false;
-
-            // Must have a valid 'type'
-            if (!node.hasOwnProperty('type') || !['message', 'url', 'intent'].includes(node.type)) return false;
-
-            // Validate nested_buttons if they exist
+            if (!node.hasOwnProperty('type') || !['message', 'url', 'intent', 'live_chat'].includes(node.type)) return false;
             if (node.hasOwnProperty('nested_buttons')) {
                 if (!Array.isArray(node.nested_buttons)) return false;
                 if (!checkNodes(node.nested_buttons)) return false;
@@ -921,11 +934,9 @@ function validateFlowJSONStructure(data) {
         }
         return true;
     }
-
     return checkNodes(data);
 }
 
-// File Input Listener
 document.getElementById('flowJsonInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -934,15 +945,10 @@ document.getElementById('flowJsonInput').addEventListener('change', function(e) 
     reader.onload = function(evt) {
         try {
             const uploadedData = JSON.parse(evt.target.result);
-
             if (validateFlowJSONStructure(uploadedData)) {
-                // Apply IDs and default missing arrays
                 applyIdsToUploadedFlow(uploadedData);
-
-                // Replace existing flow with new data
                 flowData = uploadedData;
                 renderFlow();
-
                 showFlowAlert('JSON imported successfully! Click "Save Flow" to apply.', true);
             } else {
                 showFlowAlert('Invalid JSON structure. Please check "View Format".', false);
@@ -950,8 +956,6 @@ document.getElementById('flowJsonInput').addEventListener('change', function(e) 
         } catch (err) {
             showFlowAlert('Error parsing file. Make sure it is a valid JSON file.', false);
         }
-
-        // Clear input so the user can upload the same file again if they tweak it
         e.target.value = '';
     };
     reader.readAsText(file);
@@ -1106,14 +1110,25 @@ function checkStagingCount() {
         })
         .catch(function(){});
 }
-
 (function patchUploadHandlers() {
     var _origShowAlert = window.showAlert;
 
     function afterUpload(data) {
-        if (data && data.staged) {
-            sessionStorage.removeItem('stagingBannerDismissed_' + CHATBOT_ID);
-            checkStagingCount();
+        if (data && data.success) {
+            // ★ FIX: PREVENT BLANK SCREEN ON FIRST UPLOAD ★
+            // If the main page is currently hidden, it means this was the bot's very first training.
+            // We do a quick reload to reveal the main page and update the "Not Trained" badge to "Trained"!
+            var mainPage = document.getElementById('mainPage');
+            if (mainPage && mainPage.style.display === 'none') {
+                window.location.reload();
+                return;
+            }
+
+            // Normal behavior for subsequent uploads
+            if (data.staged) {
+                sessionStorage.removeItem('stagingBannerDismissed_' + CHATBOT_ID);
+                checkStagingCount();
+            }
         }
     }
 
@@ -1146,10 +1161,111 @@ function checkStagingCount() {
     };
 })();
 
-document.addEventListener('DOMContentLoaded', function() {
-    checkStagingCount();
-});
 
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sortSelect = document.getElementById('sortSelect');
+    const pagination = document.getElementById('qaPagination');
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function(e) {
+            if (e.target.value === 'all' && window.__qaFullData) {
+                // If "View All", hide pagination and render everything!
+                if (pagination) pagination.style.display = 'none';
+                renderAllCardsBypass(window.__qaFullData);
+            } else {
+                // Restore pagination and trigger normal train.js sorting
+                if (pagination) pagination.style.display = 'flex';
+                if (typeof window.filterAndSortQA === 'function') {
+                    window.filterAndSortQA();
+                } else if (typeof window.changeQAPage === 'function') {
+                    window.changeQAPage(1);
+                }
+            }
+        });
+    }
+
+    // Search override: Ensure the search bar still filters live while in "View All" mode
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            if (sortSelect && sortSelect.value === 'all' && window.__qaFullData) {
+                const term = e.target.value.toLowerCase();
+                const filtered = window.__qaFullData.filter(pair =>
+                    pair.question.toLowerCase().includes(term) ||
+                    pair.answer.toLowerCase().includes(term)
+                );
+                renderAllCardsBypass(filtered);
+            }
+        });
+    }
+
+    // Custom renderer that ignores the 10-item limit
+   // Custom renderer that ignores the 10-item limit AND uses the correct CSS classes
+    function renderAllCardsBypass(data) {
+        const container = document.getElementById('qaCardsContainer');
+        if (!container) return;
+
+        if (data.length === 0) {
+            container.innerHTML = '<div class="qa-cards-empty" style="grid-column: 1/-1;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><h3>No matches found</h3><p>Try adjusting your search terms.</p></div>';
+            return;
+        }
+
+        let html = '';
+        data.forEach((pair, index) => {
+            html += `
+            <div class="qa-card" id="qa-item-${pair.id}">
+                <div class="qa-card-meta" style="border-top: none; padding-top: 0; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border-soft);">
+                    <div class="qa-card-timestamp" style="font-weight: 600; color: var(--text-mid);">
+                        Item #${index + 1}
+                    </div>
+                    <div class="qa-card-actions">
+                        <button class="btn-edit-card" title="Edit" onclick="editQa(${pair.id})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn-delete-card" title="Delete" onclick="deleteQa(${pair.id})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="qa-view-${pair.id}">
+                    <div class="qa-card-question">
+                        <div class="qa-card-label">Question</div>
+                        <div class="qa-card-text" style="font-weight: 600;">${escapeHtmlBypass(pair.question)}</div>
+                    </div>
+                    <div class="qa-card-answer">
+                        <div class="qa-card-label">Answer</div>
+                        <div class="qa-card-text">${escapeHtmlBypass(pair.answer)}</div>
+                    </div>
+                </div>
+
+                <div id="qa-edit-${pair.id}" class="d-none" style="display:none;">
+                    <div style="margin-bottom: 8px;">
+                        <div class="qa-card-label">Edit Question</div>
+                        <input type="text" class="qa-edit-input" id="edit-q-${pair.id}" value="${escapeHtmlBypass(pair.question)}" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; margin-top: 4px;">
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <div class="qa-card-label">Edit Answer</div>
+                        <textarea class="qa-edit-textarea" id="edit-a-${pair.id}" rows="3" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; margin-top: 4px; resize: vertical;">${escapeHtmlBypass(pair.answer)}</textarea>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="saveQa(${pair.id})">Save</button>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="cancelEdit(${pair.id})">Cancel</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+        document.getElementById('resultsCount').textContent = data.length;
+    }
+
+    function escapeHtmlBypass(s) {
+        if(!s) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+});
 </script>
 
 </body>

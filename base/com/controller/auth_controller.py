@@ -254,10 +254,11 @@ def register():
 #     return render_template('login.html')
 
 
-@app.route('/dashboard',methods=['GET'])
+@app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     """User dashboard - shows chatbots and subscription info"""
+    import os
     user = get_user_by_id(session['user_id'])
 
     # Get all chatbots for this user
@@ -272,13 +273,38 @@ def dashboard():
     user_folder = os.path.join(current_app.config['USER_DATA_FOLDER'], f'user_{user.id}')
     ml_model_trained = os.path.exists(os.path.join(user_folder, 'chatbot_model.h5'))
 
-    # Subscription warnings
+    # Subscription warnings & Premium Check
     subscription_warning = None
+    is_premium = False  # ★ NEW: Default to False
+
     if user.subscription:
+        # ★ NEW: Check if the user is on a paid plan
+        if user.subscription.plan and 'free' not in user.subscription.plan.name.lower():
+            is_premium = True
+
         if user.subscription.is_trial and user.subscription.days_remaining() <= 3:
             subscription_warning = f"Your trial expires in {user.subscription.days_remaining()} days!"
         elif user.subscription.status == 'cancelled':
             subscription_warning = f"Your subscription is cancelled and will end in {user.subscription.days_remaining()} days."
+
+    # ── ★ ONLY QUERY LEADS IF USER IS PREMIUM ★ ──
+    total_leads = 0
+    recent_sessions = []
+
+    if is_premium:
+        from base.com.vo.session_vo import ChatSession
+        chatbot_ids = [bot.id for bot in chatbots]
+
+        if chatbot_ids:
+            total_leads = ChatSession.query.filter(
+                ChatSession.chatbot_id.in_(chatbot_ids),
+                ChatSession.visitor_name.isnot(None)
+            ).count()
+
+            recent_sessions = ChatSession.query.filter(
+                ChatSession.chatbot_id.in_(chatbot_ids),
+                ChatSession.visitor_name.isnot(None)
+            ).order_by(ChatSession.started_at.desc()).limit(15).all()
 
     return render_template(
         'dashboard.html',
@@ -287,7 +313,10 @@ def dashboard():
         total_chatbots=total_chatbots,
         active_chatbots=active_chatbots,
         ml_model_trained=ml_model_trained,
-        subscription_warning=subscription_warning
+        subscription_warning=subscription_warning,
+        total_leads=total_leads,
+        recent_sessions=recent_sessions,
+        is_premium=is_premium  # 👈 Pass the flag to HTML!
     )
 
 

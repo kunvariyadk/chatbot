@@ -6,6 +6,7 @@ Fixes:
   3. Avatar path stored as /data/users/... matching the new serve route
   4. edit_chatbot_route redirects to bot_detail with chatbot_id after save
   5. _validate_buttons is now RECURSIVE to support infinite Nested Flow Builder
+  6. Added 'live_chat' to valid_types to allow Live Agent transfers!
 """
 from base import app, db
 from flask import (render_template, request, redirect, url_for,
@@ -30,12 +31,8 @@ from base.com.controller.decorators import subscription_required
 # FIX 1 — Serve avatar/user files stored under data/users/
 # ================================================================
 @app.route('/data/users/<path:filepath>')
-@login_required
 def serve_user_file(filepath):
     """Serve user-uploaded files (avatars etc.) from the data/users folder."""
-    if 'user_id' not in session:
-        abort(403)
-
     base_dir = os.path.normpath(os.path.join(os.getcwd(), 'data', 'users'))
     full_path = os.path.normpath(os.path.join(base_dir, filepath))
 
@@ -87,7 +84,9 @@ def _validate_buttons(raw_json):
     Supports infinite recursive branching (nested_buttons) and
     automatically migrates legacy 'submenu_items'.
     """
-    valid_types = ['url', 'intent', 'message']
+    # ★ FIX: Added 'live_chat' so the backend accepts the Live Agent Transfer buttons!
+    valid_types = ['url', 'intent', 'message', 'live_chat']
+
     try:
         buttons_list = json.loads(raw_json) if raw_json else []
         if not isinstance(buttons_list, list):
@@ -159,9 +158,21 @@ def _validate_buttons(raw_json):
 @app.route('/bot/<int:chatbot_id>')
 @login_required
 def bot_detail(chatbot_id):
+    # 1. Grab the currently logged-in user from the database
+    user = get_user_by_id(session['user_id'])
+
+    # 2. Get the chatbot
     chatbot = Chatbot.query.get_or_404(chatbot_id)
-    iframe_code = f'<iframe src="{request.host_url}embed/{chatbot.embed_code}" ...></iframe>'
-    return render_template('bot_details.html', chatbot=chatbot, iframe_code=iframe_code)
+
+    # (Optional but recommended security check to ensure users can't view other people's bots)
+    if chatbot.user_id != user.id:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('dashboard'))
+
+    iframe_code = f'<iframe src="{request.host_url}embed/{chatbot.embed_code}" width="100%" height="600" frameborder="0"></iframe>'
+
+    # 3. Pass the 'user' object to the template so the sidebar subscription check works!
+    return render_template('bot_details.html', chatbot=chatbot, iframe_code=iframe_code, user=user)
 
 
 # ================================================================
@@ -305,8 +316,6 @@ def edit_chatbot_route(chatbot_id):
                 if db_path:
                     chatbot.bot_avatar = db_path
 
-            # 🛑 DELETED the welcome_buttons line here so it NEVER overwrites your Train page data!
-
             chatbot.use_ml_model = request.form.get('use_ml_model') == 'on'
             chatbot.updated_at = datetime.now(timezone.utc)
             db.session.commit()
@@ -333,18 +342,33 @@ def edit_chatbot_route(chatbot_id):
 def delete_chatbot_route(chatbot_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
+
     user = get_user_by_id(session['user_id'])
     chatbot = get_chatbot_by_id(chatbot_id)
+
     if not chatbot or chatbot.user_id != session['user_id']:
         flash('Unauthorized access', 'error')
         return redirect(url_for('dashboard'))
+
     if chatbot.training_file:
         fp = os.path.join(app.config['UPLOAD_FOLDER'], chatbot.training_file)
         if os.path.exists(fp):
             os.remove(fp)
+
+    # ★ THE FIX: Manually delete LiveChatMessages attached to this bot's sessions before deleting the bot
+    from base.com.vo.session_vo import ChatSession
+    from base.com.vo.live_chat_vo import LiveChatMessage
+
+    sessions = ChatSession.query.filter_by(chatbot_id=chatbot.id).all()
+    for s in sessions:
+        LiveChatMessage.query.filter_by(session_id=s.id).delete()
+
+    # Now it is safe to delete the chatbot
     db.session.delete(chatbot)
+
     if user.subscription:
         user.subscription.decrement_chatbot_count()
+
     db.session.commit()
     flash('Chatbot deleted successfully!', 'success')
     return redirect(url_for('dashboard'))
@@ -510,3 +534,18 @@ def save_flow_route(chatbot_id):
         print(f"❌ Error saving flow: {e}")
         return jsonify({'success': False, 'message': f'Server error: {str(e)}'}), 500
 
+
+@app.route('/chatbot/train/<int:chatbot_id>', methods=['GET'])
+@login_required
+def train_chatbot_route(chatbot_id):
+    # 1. Grab the logged-in user so the sidebar knows their subscription tier!
+    user = get_user_by_id(session['user_id'])
+
+    chatbot = get_chatbot_by_id(chatbot_id)
+
+    if not chatbot or chatbot.user_id != session['user_id']:
+        flash('Unauthorized access', 'error')
+        return redirect(url_for('dashboard'))
+
+    # 2. Pass user=user to the template
+    return render_template('train_chatbot.html', chatbot=chatbot, user=user)

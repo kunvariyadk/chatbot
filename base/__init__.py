@@ -6,7 +6,6 @@ import os
 import warnings
 from datetime import timedelta
 from pathlib import Path
-
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +13,7 @@ from flask_mail import Mail
 from concurrent.futures import ThreadPoolExecutor
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
+from flask_socketio import SocketIO
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -30,6 +30,16 @@ app = Flask(__name__,
             static_folder='static',
             template_folder='templates')
 
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode='gevent',
+    ping_timeout=60,
+    ping_interval=25,
+    logger=False,
+    engineio_logger=False
+)
+
 # ============================================
 # SECRET KEY CONFIGURATION
 # ============================================
@@ -45,13 +55,13 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.secret_key = SECRET_KEY
 
 # ============================================
-# ENVIRONMENT CONFIGURATION (MOVED UP)
+# ENVIRONMENT CONFIGURATION
 # ============================================
 flask_env = os.getenv('FLASK_ENV', 'development')
 
 if flask_env == 'production':
-    app.config['DEBUG'] = False  # FIXED: Should be False in production
-    app.config['TESTING'] = False  # FIXED: Should be False in production
+    app.config['DEBUG'] = False
+    app.config['TESTING'] = False
     print("🔒 Running in PRODUCTION mode")
 else:
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
@@ -134,23 +144,23 @@ ALLOWED_EXTENSIONS = set(ext.strip() for ext in allowed_ext_str.split(','))
 MAX_FILE_SIZE = int(os.getenv('MAX_FILE_SIZE', '2097152'))  # 2MB
 
 # ============================================
-# EMAIL CONFIGURATION
+# EMAIL CONFIGURATION (PROPERLY ORDERED)
 # ============================================
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 465))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'False').lower() == 'true'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'True').lower() == 'true'
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False').lower() == 'true'
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_FROM_ADDRESS')
 
-if app.config['MAIL_USERNAME']:
-    print(f"✅ Email configured: {app.config['MAIL_USERNAME']}")
+if app.config['MAIL_PASSWORD']:
+    print(f"✅ Email configured: {app.config['MAIL_USERNAME']} (Password Loaded from .env!)")
 else:
-    print("⚠️  Email not configured")
+    print("⚠️  Email not configured - Password is BLANK!")
 
 # ============================================
-# PERFORMANCE & CACHING (FIXED)
+# PERFORMANCE & CACHING
 # ============================================
 # Version for cache busting
 app.config['VERSION'] = os.getenv('APP_VERSION', '1.0.0')
@@ -166,7 +176,7 @@ else:
     print("✅ Static file caching: DISABLED (development mode)")
 
 # ============================================
-# SECURITY HEADERS (IMPROVED)
+# SECURITY HEADERS
 # ============================================
 @app.after_request
 def add_security_headers(response):
@@ -198,6 +208,8 @@ def add_security_headers(response):
 db = SQLAlchemy(app)
 app.app_context().push()
 migrate = Migrate(app, db)
+
+# MUST BE INITIALIZED AFTER app.config ABOVE
 mail = Mail(app)
 
 # Thread pool executor for async tasks
@@ -222,7 +234,7 @@ def from_json_filter(s):
         return {}
 
 # ============================================
-# TEMPLATE CONTEXT PROCESSORS (NEW)
+# TEMPLATE CONTEXT PROCESSORS
 # ============================================
 @app.context_processor
 def inject_version():
@@ -314,7 +326,6 @@ from base.com.vo import (
 # REGISTER CONTROLLERS (Blueprints)
 # ============================================
 from base.com.controller import *
-
 
 # ============================================
 # EXPORT FOR EXTERNAL USE

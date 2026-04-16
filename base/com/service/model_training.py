@@ -20,7 +20,7 @@ import time
 
 # ✅ FIX: log_file is not exported from base/__init__.py
 # Read it directly from the environment variable, same source as __init__.py uses
-log_file = os.getenv('LOG_FILE')   # None if not set — that's fine, the except block checks `if log_file:`
+log_file = os.getenv('LOG_FILE')  # None if not set — that's fine, the except block checks `if log_file:`
 
 # ML imports with fallbacks
 SKLEARN_AVAILABLE = True
@@ -46,6 +46,7 @@ def _lazy_import_sklearn():
     from sklearn.metrics import accuracy_score, classification_report
     from sklearn.calibration import CalibratedClassifierCV
     from sklearn.metrics.pairwise import cosine_similarity
+
 
 # Load environment variables
 env_path = Path('.') / '.env'
@@ -80,8 +81,8 @@ class PatternAugmenter:
         # augmentation on 69/100 intents, generating generic phrases like
         # "what is hi", "tell me about goodbye" that are nearly identical
         # across all intents and destroy classifier accuracy.
-        self.min_patterns_threshold = 3      # avg patterns/intent below this → augment
-        self.max_intents_for_augment = 10    # only augment if dataset has ≤ 10 intents
+        self.min_patterns_threshold = 3  # avg patterns/intent below this → augment
+        self.max_intents_for_augment = 10  # only augment if dataset has ≤ 10 intents
 
     def should_augment(self, intents: List[Dict]) -> bool:
         if not intents:
@@ -268,8 +269,10 @@ def augment_training_data(intents_data: Dict, min_patterns: int = 10) -> Dict:
 def get_user_folder(user_id: int) -> str:
     return os.path.join(USER_DATA_FOLDER, f'user_{user_id}')
 
+
 def get_chatbot_folder(user_id: int, chatbot_id: int) -> str:
     return os.path.join(get_user_folder(user_id), 'chatbots', f'chatbot_{chatbot_id}')
+
 
 def get_chatbot_model_folder(user_id: int, chatbot_id: int) -> str:
     return os.path.join(get_chatbot_folder(user_id, chatbot_id), 'models')
@@ -482,7 +485,7 @@ def merge_general_intents(user_intents: Dict) -> Dict:
             print("⚠ No user intents - using only general intents")
             return GENERAL_INTENTS.copy()
 
-        user_intents_list    = user_intents.get('intents', [])
+        user_intents_list = user_intents.get('intents', [])
         general_intents_list = GENERAL_INTENTS['intents']
 
         # Build set of existing user intent tags (case-insensitive)
@@ -521,8 +524,8 @@ def merge_general_intents(user_intents: Dict) -> Dict:
                 continue
 
             merged_intent = {
-                'tag':       general_intent['tag'],
-                'patterns':  clean_patterns,
+                'tag': general_intent['tag'],
+                'patterns': clean_patterns,
                 'responses': general_intent.get('responses', [])
             }
             merged_intents.append(merged_intent)
@@ -682,8 +685,8 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
         print(f"{'=' * 70}")
 
         chatbot_folder = get_chatbot_folder(user_id, chatbot_id)
-        intents_path   = os.path.join(chatbot_folder, 'intents.json')
-        models_dir     = ensure_model_folder(user_id, chatbot_id)
+        intents_path = os.path.join(chatbot_folder, 'intents.json')
+        models_dir = ensure_model_folder(user_id, chatbot_id)
 
         if not os.path.exists(intents_path):
             raise FileNotFoundError(f"Intents not found: {intents_path}")
@@ -783,7 +786,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
         le = LabelEncoder()
         le.fit(tags)
         y_train_encoded = le.transform(y_train)
-        y_test_encoded  = le.transform(y_test)
+        y_test_encoded = le.transform(y_test)
         print(f"  ✓ Encoded {len(le.classes_)} classes")
 
         # ✅ FIX: Safe oversampling for minority classes
@@ -826,20 +829,20 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
         print("\n  📊 Training Optimized SVM Model...")
         try:
             dataset_size = len(patterns)
-            num_intents  = unique_tags
+            num_intents = unique_tags
 
             # ✅ FIX: Scale features properly for large intent counts.
             # Too few features = the model can't distinguish 100 intents.
             # Rule: at least 20 features per intent, minimum 500.
             if dataset_size < 100:
                 max_features = max(500, num_intents * 20)
-                ngram_range  = (1, 2)
+                ngram_range = (1, 2)
             elif dataset_size < 500:
                 max_features = max(1000, num_intents * 25)
-                ngram_range  = (1, 3)
+                ngram_range = (1, 3)
             else:
                 max_features = max(2000, num_intents * 30)
-                ngram_range  = (1, 3)
+                ngram_range = (1, 3)
 
             print(f"    📊 Features: {max_features}, N-grams: {ngram_range}, Intents: {num_intents}")
 
@@ -847,7 +850,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
                 max_features=max_features,
                 ngram_range=ngram_range,
                 min_df=1,
-                max_df=0.95,         # ✅ More permissive — 100 intents need less filtering
+                max_df=0.95,  # ✅ More permissive — 100 intents need less filtering
                 sublinear_tf=True,
                 lowercase=True,
                 strip_accents='unicode',
@@ -859,7 +862,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
             )
 
             x_train_svm = svm_vectorizer.fit_transform(x_train)
-            x_test_svm  = svm_vectorizer.transform(x_test)
+            x_test_svm = svm_vectorizer.transform(x_test)
 
             if unique_tags <= 5:
                 C_value = 10.0
@@ -879,7 +882,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
             svm_model.fit(x_train_svm, y_train_encoded)
 
             svm_predictions = svm_model.predict(x_test_svm)
-            svm_accuracy    = accuracy_score(y_test_encoded, svm_predictions)
+            svm_accuracy = accuracy_score(y_test_encoded, svm_predictions)
 
             from sklearn.calibration import CalibratedClassifierCV
             from collections import Counter
@@ -902,10 +905,10 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
                 calibrated_model.fit(x_train_svm, y_train_encoded)
 
                 calibrated_predictions = calibrated_model.predict(x_test_svm)
-                calibrated_accuracy    = accuracy_score(y_test_encoded, calibrated_predictions)
+                calibrated_accuracy = accuracy_score(y_test_encoded, calibrated_predictions)
 
                 if calibrated_accuracy >= svm_accuracy * 0.98:
-                    svm_model    = calibrated_model
+                    svm_model = calibrated_model
                     svm_accuracy = calibrated_accuracy
                     print(f"    ✅ Using calibrated model (accuracy: {svm_accuracy:.1%})")
 
@@ -925,7 +928,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
                 }
             }
 
-            model_path      = os.path.join(models_dir, 'svm_model.pkl')
+            model_path = os.path.join(models_dir, 'svm_model.pkl')
             vectorizer_path = os.path.join(models_dir, 'svm_vectorizer.pkl')
 
             with open(model_path, 'wb') as f:
@@ -949,10 +952,10 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
             results['models']['svm'] = {'accuracy': 0.0, 'status': 'failed', 'error': str(e)}
 
         # Final results
-        accuracies   = [m.get('accuracy', 0) for m in results['models'].values() if m.get('status') == 'success']
+        accuracies = [m.get('accuracy', 0) for m in results['models'].values() if m.get('status') == 'success']
         best_accuracy = max(accuracies) if accuracies else 0.0
 
-        results['accuracy']   = best_accuracy
+        results['accuracy'] = best_accuracy
         results['best_model'] = 'svm' if accuracies else None
 
         metadata = {
@@ -1030,7 +1033,7 @@ def train_chatbot_model(user_id: int, chatbot_id: int) -> Dict[str, Any]:
         # Try to create KB even on failure
         try:
             chatbot_folder = get_chatbot_folder(user_id, chatbot_id)
-            intents_path   = os.path.join(chatbot_folder, 'intents.json')
+            intents_path = os.path.join(chatbot_folder, 'intents.json')
 
             if os.path.exists(intents_path):
                 with open(intents_path, 'r', encoding='utf-8') as f:

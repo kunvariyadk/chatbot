@@ -94,7 +94,6 @@ body {
     color: var(--text-dark);
     text-decoration: none;
 }
-
 .nav-menu {
     flex: 1;
     padding: 14px 10px;

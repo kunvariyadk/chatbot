@@ -3,7 +3,7 @@
     {
       "tag": "qa_1",
       "patterns": [
-        "Hello..."
+        "Hello"
       ],
       "responses": [
         "Hello there! I'm glad you are here. How can I help you today?"
@@ -12,7 +12,7 @@
     {
       "tag": "qa_2",
       "patterns": [
-        "Hi, how are you"
+        "Hii, how are you?"
       ],
       "responses": [
         "I'm doing great, thank you for asking! How can I assist you today?"

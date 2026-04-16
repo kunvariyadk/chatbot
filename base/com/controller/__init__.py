@@ -6,3 +6,5 @@ from base.com.controller import embed_controller
 from base.com.controller import training_controller
 from base.com.controller import qa_controller
 from base.com.controller import analytics_controller
+from base.com.controller import live_chat_controller
+from base.com.controller import staging_controller
