@@ -1,0 +1,105 @@
+# ============================================
+# ENVIRONMENT & SECRETS
+# ============================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+*.pyc
+*.pyo
+
+# ============================================
+# VIRTUAL ENVIRONMENT
+# ============================================
+venv/
+env/
+ENV/
+.venv/
+.env/
+virtualenv/
+
+# ============================================
+# FLASK / APP SPECIFIC
+# ============================================
+instance/
+.webassets-cache
+flask_session/
+
+# ============================================
+# DATABASE
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# UPLOADS & USER DATA
+# ============================================
+data/
+/var/www/chatbot/data/
+uploads/
+*.pdf
+*.docx
+*.xlsx
+
+# ============================================
+# LOGS
+# ============================================
+*.log
+logs/
+/var/log/chatbot/
+
+# ============================================
+# MIGRATIONS (keep structure, ignore pyc)
+# ============================================
+migrations/__pycache__/
+
+# ============================================
+# IDE & EDITOR
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================
+# TESTING & COVERAGE
+# ============================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+
+# ============================================
+# GUNICORN
+# ============================================
+gunicorn.pid
+gunicorn-error.log
+gunicorn-access.log

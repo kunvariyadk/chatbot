@@ -14,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 from flask_socketio import SocketIO
+from sympy import false
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -99,13 +100,16 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 # ============================================
 # SESSION CONFIGURATION
 # ============================================
-session_lifetime = int(os.getenv('PERMANENT_SESSION_LIFETIME', '2592000'))  # 30 days default
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=session_lifetime)
-app.permanent_session_lifetime = timedelta(seconds=session_lifetime)
+# ============================================
+# SESSION & SECURITY CONFIGURATION
+# ============================================
+# ★ FIX: Only set to True if you actually have an SSL (HTTPS) certificate installed!
+# For now, we will set it to False so HTTP connections don't drop the session.
+app.config['SESSION_COOKIE_SECURE'] = False
 
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 # ============================================
 # FILE STORAGE CONFIGURATION
@@ -195,10 +199,13 @@ def add_security_headers(response):
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
 
-    # Security headers for all responses
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "SAMEORIGIN"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
+        # Security headers for all responses
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+
+        # ✅ Allow iFrame embedding from any website
+        response.headers["Content-Security-Policy"] = "frame-ancestors *"
+        # Remove X-Frame-Options — it overrides CSP and blocks iFrames
 
     return response
 
@@ -331,3 +338,21 @@ from base.com.controller import *
 # EXPORT FOR EXTERNAL USE
 # ============================================
 __all__ = ['app', 'db', 'mail', 'migrate', 'executor', 'serializer']
+
+
+@app.after_request
+def add_security_headers(response):
+    from flask import request as flask_request
+
+    # Allow iFrame for embed routes
+    if '/embed/' in flask_request.path:
+        response.headers["Content-Security-Policy"] = "frame-ancestors *"
+        response.headers.pop("X-Frame-Options", None)
+    else:
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+
+    # Rest of your headers...
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+
+    return response

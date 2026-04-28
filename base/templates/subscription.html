@@ -19,8 +19,8 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #f8fafc;
-            color: #475569;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
             padding: 8px 16px;
             border-radius: 8px;
             text-decoration: none;
@@ -70,13 +70,16 @@
                 <span>ChatBot Builder</span>
             </div>
 
+            {% if current_plan %}
             <a href="{{ url_for('dashboard') }}" class="btn-back-dashboard">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
                 Back to Dashboard
             </a>
+            {% endif %}
         </div>
 
         <div class="title-section">
@@ -94,8 +97,10 @@
         </div>
 
         <div class="plans-grid">
+
+            <!-- FREE TRIAL -->
             <div class="plan-card trial">
-                <div class="popular-badge">Start Here</div>
+                <div class="plan-badge badge-trial">Start Here</div>
                 <div class="plan-header">
                     <h3>Free Trial</h3>
                     <div class="price-container">
@@ -149,7 +154,9 @@
                 </div>
             </div>
 
-            <div class="plan-card">
+            <!-- BASIC -->
+            <div class="plan-card badge-basic">
+                <div class="plan-badge badge-basic-pill">Best for you</div>
                 <div class="plan-header">
                     <h3>Basic</h3>
                     <div class="price-container">
@@ -160,7 +167,7 @@
                     <p class="plan-description">Great for small businesses</p>
                 </div>
 
-                <button class="plan-button" onclick="selectPlan('basic')">
+                <button class="plan-button basic-btn" onclick="selectPlan('basic')">
                     Choose Basic
                 </button>
 
@@ -201,7 +208,7 @@
                         </svg>
                         <span>Email Support</span>
                     </div>
-                     <div class="feature-item">
+                    <div class="feature-item">
                         <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                         </svg>
@@ -210,8 +217,9 @@
                 </div>
             </div>
 
+            <!-- MODERATE -->
             <div class="plan-card popular">
-                <div class="popular-badge">Most Popular</div>
+                <div class="plan-badge badge-popular">Most Popular</div>
                 <div class="plan-header">
                     <h3>Moderate</h3>
                     <div class="price-container">
@@ -269,7 +277,7 @@
                         </svg>
                         <span>API Access</span>
                     </div>
-                     <div class="feature-item">
+                    <div class="feature-item">
                         <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                         </svg>
@@ -278,8 +286,9 @@
                 </div>
             </div>
 
+            <!-- ADVANCED -->
             <div class="plan-card enterprise">
-                <div class="popular-badge enterprise-badge">Enterprise</div>
+                <div class="plan-badge badge-enterprise">Enterprise</div>
                 <div class="plan-header">
                     <h3>Advanced</h3>
                     <div class="price-container">
@@ -343,7 +352,7 @@
                         </svg>
                         <span>SLA Guarantee</span>
                     </div>
-                     <div class="feature-item">
+                    <div class="feature-item">
                         <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                         </svg>
@@ -358,6 +367,7 @@
                     Contact Sales
                 </button>
             </div>
+
         </div>
 
         <div class="features-comparison">
@@ -488,5 +498,28 @@
         </div>
     </div>
    <script src="{{ url_for('static', filename='js/subscription.js') }}"></script>
+<script>
+    // Wait for the document to load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find all alert elements
+        const alerts = document.querySelectorAll('.alert');
+
+        alerts.forEach(function(alert) {
+            // Set a timeout to remove the alert after 5 seconds (5000ms)
+            setTimeout(function() {
+                // Add a smooth fade-out transition
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+
+                // Remove the element from the DOM after the fade finishes
+                setTimeout(function() {
+                    if (alert.parentNode) {
+                        alert.style.display = 'none';
+                    }
+                }, 500);
+            }, 3000);
+        });
+    });
+</script>
 </body>
 </html>

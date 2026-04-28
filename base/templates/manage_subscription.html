@@ -63,7 +63,7 @@
             <div class="subscription-details">
                 <div class="subscription-header-info">
                     <div class="plan-info">
-                        <span class="plan-badge {{ subscription.plan.name }}">{{ subscription.plan.display_name }}</span>
+                        <span class="plan-badge {{ subscription.name }}">{{ subscription.display_name }}</span>
                         <h2>{{ subscription.plan.display_name }} Plan</h2>
                         <p class="plan-price">
                             {% if subscription.plan.price == 0 %}
@@ -91,43 +91,48 @@
 
                 <!-- Usage Statistics -->
                 <h3 style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 16px;">Current Usage</h3>
-                <div class="usage-stats">
-                    <div class="usage-card">
-                        <h4>Chatbots</h4>
-                        <div class="usage-value">{{ subscription.chatbots_created }}</div>
-                        <div class="usage-limit">
-                            of {{ subscription.plan.max_chatbots if subscription.plan.max_chatbots != -1 else 'Unlimited' }}
-                        </div>
-                        {% if subscription.plan.max_chatbots != -1 %}
-                        <div class="progress-bar">
-                            {% set usage_percent = (subscription.chatbots_created / subscription.plan.max_chatbots * 100) %}
-                            <div class="progress-fill {{ 'warning' if usage_percent > 70 else '' }} {{ 'danger' if usage_percent > 90 else '' }}"
-                                 style="width: {{ usage_percent }}%"></div>
-                        </div>
-                        {% endif %}
-                    </div>
+                `<div class="usage-stats">
+    <div class="usage-card">
+        <h4>Chatbots</h4>
+        <div class="usage-display">
+            <span class="usage-value">{{ subscription.chatbots_created }}</span>
+            <span class="usage-separator">/</span>
+            <span class="usage-limit">{{ subscription.plan.max_chatbots if subscription.plan.max_chatbots != -1 else 'Unlimited' }}</span>
+        </div>
+        {% if subscription.plan.max_chatbots != -1 %}
+        <div class="progress-bar">
+            {% set usage_percent = (subscription.chatbots_created / subscription.plan.max_chatbots * 100) %}
+            <div class="progress-fill {{ 'warning' if usage_percent > 70 else '' }} {{ 'danger' if usage_percent > 90 else '' }}"
+                 style="width: {{ usage_percent }}%"></div>
+        </div>
+        {% endif %}
+    </div>
 
-                    <div class="usage-card">
-                        <h4>Messages This Month</h4>
-                        <div class="usage-value">{{ subscription.messages_this_month }}</div>
-                        <div class="usage-limit">
-                            of {{ subscription.plan.max_messages_per_month if subscription.plan.max_messages_per_month != -1 else 'Unlimited' }}
-                        </div>
-                        {% if subscription.plan.max_messages_per_month != -1 %}
-                        <div class="progress-bar">
-                            {% set msg_percent = (subscription.messages_this_month / subscription.plan.max_messages_per_month * 100) %}
-                            <div class="progress-fill {{ 'warning' if msg_percent > 70 else '' }} {{ 'danger' if msg_percent > 90 else '' }}"
-                                 style="width: {{ msg_percent }}%"></div>
-                        </div>
-                        {% endif %}
-                    </div>
+    <div class="usage-card">
+        <h4>Messages This Month</h4>
+        <div class="usage-display">
+            <span class="usage-value">{{ subscription.messages_this_month }}</span>
+            <span class="usage-separator">/</span>
+            <span class="usage-limit">{{ subscription.plan.max_messages_per_month if subscription.plan.max_messages_per_month != -1 else 'Unlimited' }}</span>
+        </div>
+        {% if subscription.plan.max_messages_per_month != -1 %}
+        <div class="progress-bar">
+            {% set msg_percent = (subscription.messages_this_month / subscription.plan.max_messages_per_month * 100) %}
+            <div class="progress-fill {{ 'warning' if msg_percent > 70 else '' }} {{ 'danger' if msg_percent > 90 else '' }}"
+                 style="width: {{ msg_percent }}%"></div>
+        </div>
+        {% endif %}
+    </div>
 
-                    <div class="usage-card">
-                        <h4>Subscription Period</h4>
-                        <div class="usage-value" style="font-size: 24px;">{{ subscription.days_remaining() }}</div>
-                        <div class="usage-limit">days remaining</div>
-                    </div>
-                </div>
+    <div class="usage-card">
+        <h4>Subscription Period</h4>
+        <div class="usage-display">
+            <span class="usage-value">{{ subscription.days_remaining() }}</span>
+            <span class="usage-separator">/</span>
+            <span class="usage-limit">Days Remaining</span>
+        </div>
+    </div>
+</div>`
 
                 <!-- Features -->
                 <h3 style="font-size: 18px; font-weight: 700; color: #1a202c; margin: 24px 0 16px 0;">Plan Features</h3>

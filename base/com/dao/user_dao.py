@@ -5,12 +5,15 @@ Database operations for User model
 from werkzeug.security import generate_password_hash
 from base import db
 from base.com.vo.user_vo import User
+from base.com.vo.subscription_vo import Subscription
 
+
+from sqlalchemy.orm import joinedload
 
 def get_user_by_id(user_id):
-    """Get user by ID"""
-    return db.session.get(User, user_id)
-
+    return User.query.options(
+        joinedload(User.subscription).joinedload(Subscription.plan)
+    ).filter(User.id == user_id).first()
 
 def get_user_by_email(email):
     """Get user by email"""

@@ -191,7 +191,7 @@ def create_chatbot_route():
         max_limit = user.subscription.plan.max_chatbots
         limit_text = "unlimited" if max_limit == -1 else str(max_limit)
         flash(f'You have reached your chatbot limit ({limit_text}). Please upgrade your plan.', 'error')
-        return redirect(url_for('subscription_plans'))
+        return redirect(url_for('dashboard'))
 
     if request.method == 'GET':
         return render_template('create_chatbot.html',
@@ -336,6 +336,9 @@ def edit_chatbot_route(chatbot_id):
 # ================================================================
 # ROUTE — Delete chatbot
 # ================================================================
+# ================================================================
+# ROUTE — Delete chatbot
+# ================================================================
 @app.route('/chatbot/delete/<int:chatbot_id>')
 @login_required
 @subscription_required
@@ -350,27 +353,59 @@ def delete_chatbot_route(chatbot_id):
         flash('Unauthorized access', 'error')
         return redirect(url_for('dashboard'))
 
-    if chatbot.training_file:
-        fp = os.path.join(app.config['UPLOAD_FOLDER'], chatbot.training_file)
-        if os.path.exists(fp):
-            os.remove(fp)
+    try:
+        # 1. Delete legacy training files if they exist
+        if chatbot.training_file:
+            fp = os.path.join(app.config.get('UPLOAD_FOLDER', ''), chatbot.training_file)
+            if os.path.exists(fp):
+                os.remove(fp)
 
-    # ★ THE FIX: Manually delete LiveChatMessages attached to this bot's sessions before deleting the bot
-    from base.com.vo.session_vo import ChatSession
-    from base.com.vo.live_chat_vo import LiveChatMessage
+        # 2. Delete ALL related Database Records (Sessions, Live Chats, QA Pairs)
+        from base.com.vo.session_vo import ChatSession
+        from base.com.vo.live_chat_vo import LiveChatMessage
+        from base.com.vo.qa_pair_vo import QAPair
 
-    sessions = ChatSession.query.filter_by(chatbot_id=chatbot.id).all()
-    for s in sessions:
-        LiveChatMessage.query.filter_by(session_id=s.id).delete()
+        # Delete all Q&A pairs related to this bot
+        QAPair.query.filter_by(chatbot_id=chatbot.id).delete()
 
-    # Now it is safe to delete the chatbot
-    db.session.delete(chatbot)
+        # Delete all live chat messages and the sessions themselves
+        sessions = ChatSession.query.filter_by(chatbot_id=chatbot.id).all()
+        for s in sessions:
+            LiveChatMessage.query.filter_by(session_id=s.id).delete()
+            db.session.delete(s)
 
-    if user.subscription:
-        user.subscription.decrement_chatbot_count()
+        # 3. Delete the physical folder from the server (Avatars, JSON files, etc.)
+        chatbot_folder = os.path.normpath(os.path.join(
+            os.getcwd(), 'data', 'users', f'user_{user.id}', 'chatbots', f'chatbot_{chatbot.id}'
+        ))
+        if os.path.exists(chatbot_folder):
+            import shutil
+            shutil.rmtree(chatbot_folder)
 
-    db.session.commit()
-    flash('Chatbot deleted successfully!', 'success')
+        # 4. Clear the bot from the server's RAM/Cache
+        try:
+            from utils import clear_model_cache
+            clear_model_cache(user.id, chatbot.id)
+        except Exception:
+            pass
+
+        # 5. Delete the actual Chatbot record
+        db.session.delete(chatbot)
+
+        # 6. Update user subscription limits
+        if user.subscription:
+            user.subscription.decrement_chatbot_count()
+
+        # Commit all deletions to the database
+        db.session.commit()
+        flash('Chatbot and all associated data deleted successfully!', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
+        flash(f'Error deleting chatbot: {str(e)}', 'error')
+
     return redirect(url_for('dashboard'))
 
 

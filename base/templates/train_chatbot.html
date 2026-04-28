@@ -656,7 +656,7 @@
 let flowData = [];
 
 // ★ BULLETPROOF SUBSCRIPTION CHECK
-const isPaidUser = {% if user and user.subscription and user.subscription.plan and 'free' not in user.subscription.plan.name|lower %} true {% else %} false {% endif %};
+const isPaidUser = {% if user and user.subscription and user.subscription and 'free' not in user.subscription.name|lower %} true {% else %} false {% endif %};
 
 function generateId() { return Math.random().toString(36).substr(2, 9); }
 function escapeHtml(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1161,6 +1161,9 @@ function checkStagingCount() {
     };
 })();
 
+document.addEventListener('DOMContentLoaded', function() {
+    checkStagingCount();
+});
 
 </script>
 <script>
@@ -1202,57 +1205,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Custom renderer that ignores the 10-item limit
-   // Custom renderer that ignores the 10-item limit AND uses the correct CSS classes
     function renderAllCardsBypass(data) {
         const container = document.getElementById('qaCardsContainer');
         if (!container) return;
 
         if (data.length === 0) {
-            container.innerHTML = '<div class="qa-cards-empty" style="grid-column: 1/-1;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><h3>No matches found</h3><p>Try adjusting your search terms.</p></div>';
+            container.innerHTML = '<div style="text-align:center; padding: 40px; color: #a0aec0;">No matching Q&A pairs found.</div>';
             return;
         }
 
         let html = '';
-        data.forEach((pair, index) => {
+        data.forEach(pair => {
             html += `
-            <div class="qa-card" id="qa-item-${pair.id}">
-                <div class="qa-card-meta" style="border-top: none; padding-top: 0; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border-soft);">
-                    <div class="qa-card-timestamp" style="font-weight: 600; color: var(--text-mid);">
-                        Item #${index + 1}
-                    </div>
-                    <div class="qa-card-actions">
-                        <button class="btn-edit-card" title="Edit" onclick="editQa(${pair.id})">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        </button>
-                        <button class="btn-delete-card" title="Delete" onclick="deleteQa(${pair.id})">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                    </div>
+            <div class="qa-item" id="qa-item-${pair.id}">
+                <div class="qa-actions">
+                    <button class="qa-btn btn-edit" title="Edit" onclick="editQa(${pair.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="qa-btn btn-delete" title="Delete" onclick="deleteQa(${pair.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
                 </div>
-
                 <div id="qa-view-${pair.id}">
-                    <div class="qa-card-question">
-                        <div class="qa-card-label">Question</div>
-                        <div class="qa-card-text" style="font-weight: 600;">${escapeHtmlBypass(pair.question)}</div>
-                    </div>
-                    <div class="qa-card-answer">
-                        <div class="qa-card-label">Answer</div>
-                        <div class="qa-card-text">${escapeHtmlBypass(pair.answer)}</div>
-                    </div>
+                    <div class="qa-label">Q: <span class="qa-q">${escapeHtmlBypass(pair.question)}</span></div>
+                    <div class="qa-label">A: <span class="qa-a">${escapeHtmlBypass(pair.answer)}</span></div>
                 </div>
-
                 <div id="qa-edit-${pair.id}" class="d-none" style="display:none;">
-                    <div style="margin-bottom: 8px;">
-                        <div class="qa-card-label">Edit Question</div>
-                        <input type="text" class="qa-edit-input" id="edit-q-${pair.id}" value="${escapeHtmlBypass(pair.question)}" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; margin-top: 4px;">
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <div class="qa-card-label">Edit Answer</div>
-                        <textarea class="qa-edit-textarea" id="edit-a-${pair.id}" rows="3" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; margin-top: 4px; resize: vertical;">${escapeHtmlBypass(pair.answer)}</textarea>
-                    </div>
+                    <input type="text" class="qa-edit-input" id="edit-q-${pair.id}" value="${escapeHtmlBypass(pair.question)}">
+                    <textarea class="qa-edit-textarea" id="edit-a-${pair.id}" rows="3">${escapeHtmlBypass(pair.answer)}</textarea>
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <button class="btn-primary" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="saveQa(${pair.id})">Save</button>
-                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="cancelEdit(${pair.id})">Cancel</button>
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="saveQa(${pair.id})">Save</button>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 6px; background: transparent; cursor: pointer;" onclick="cancelEdit(${pair.id})">Cancel</button>
                     </div>
                 </div>
             </div>`;

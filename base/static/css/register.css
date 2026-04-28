@@ -274,3 +274,78 @@
                 font-size: 12px;
             }
         }
+
+/* State when an input has an error */
+input.input-error {
+    border-color: #f56565 !important;
+    background-color: #fffaf0;
+}
+
+/* The error message text style */
+.error-text {
+    color: #f56565;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    text-align: left;
+}
+.phone-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.flag-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+/* Push text to the right to make room for flag + +91 */
+/*#phone {*/
+/*    padding-left: 37px !important;*/
+/*}*/
+
+/* Ensure error messages appear below the container */
+.phone-container + .error-message {
+    margin-top: 4px;
+}
+.phone-input-wrapper {
+    display: flex;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures the background doesn't leak past the corners */
+    transition: all 0.2s ease;
+}
+
+.prefix-box {
+    background: #f7fafc; /* Light gray background for the separate box */
+    border-right: 2px solid #e2e8f0; /* The divider line */
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
+    pointer-events: none;
+    user-select: none;
+}
+
+.phone-input-wrapper input {
+    border: none !important; /* Remove the individual input border */
+    border-radius: 0 !important;
+    padding: 9px 12px !important;
+    width: 100%;
+}
+
+/* Change border color for the whole wrapper when the input is focused */
+.phone-input-wrapper:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.12);
+}
+
+/* Error state for the separate box style */
+.phone-input-wrapper.input-error {
+    border-color: #f56565 !important;
+}

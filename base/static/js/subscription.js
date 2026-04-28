@@ -37,4 +37,20 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.style.display = 'none';
         }
     }
-});
+});document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('billingToggle');
+            // Select only the period spans inside the paid plan cards (ignores the trial card)
+            const periodLabels = document.querySelectorAll('.plan-card:not(.trial) .period');
+
+            if(toggle) {
+                toggle.addEventListener('change', function() {
+                    if(this.checked) {
+                        // Toggle is ON (Yearly)
+                        periodLabels.forEach(label => label.textContent = '/year');
+                    } else {
+                        // Toggle is OFF (Monthly)
+                        periodLabels.forEach(label => label.textContent = '/month');
+                    }
+                });
+            }
+        });

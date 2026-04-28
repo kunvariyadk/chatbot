@@ -279,7 +279,7 @@ def dashboard():
 
     if user.subscription:
         # ★ NEW: Check if the user is on a paid plan
-        if user.subscription.plan and 'free' not in user.subscription.plan.name.lower():
+        if user.subscription and 'free' not in user.subscription.plan.name.lower():
             is_premium = True
 
         if user.subscription.is_trial and user.subscription.days_remaining() <= 3:
@@ -337,114 +337,109 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route( '/forgot-password', methods=['GET', 'POST'])
+def send_reset_password_email(user, reset_url):
+    try:
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        sender_user = "kunvariya.dk@gmail.com"
+        sender_pass = "cwpctdztwwohcjhe"  # Your Gmail App Password here
+        sender_from = "kunvariya.dk@gmail.com"
+
+        if not sender_user or not sender_pass:
+            print("CRITICAL: Missing MAIL_USERNAME or MAIL_PASSWORD")
+            return False
+
+        display_name = user.username or user.email
+
+        html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {{ font-family: Inter, Arial, sans-serif; background: #f7fafc; margin: 0; padding: 0; }}
+    .wrap {{ max-width: 580px; margin: 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }}
+    .header {{ background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 32px 36px; text-align: center; }}
+    .header h1 {{ margin: 0; font-size: 22px; font-weight: 700; }}
+    .body {{ padding: 32px 36px; line-height: 1.6; color: #4a5568; }}
+    .cta {{ display: block; margin: 28px 0; text-align: center; }}
+    .btn {{ background: #667eea; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; }}
+    .footer {{ padding: 20px 36px; background: #f7fafc; font-size: 12px; color: #a0aec0; text-align: center; }}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header"><h1>Password Reset Request</h1></div>
+    <div class="body">
+      <p>Hello <strong>{display_name}</strong>,</p>
+      <p>We received a request to reset your account password. Click the button below to set a new one:</p>
+      <div class="cta">
+        <a href="{reset_url}" class="btn">Reset My Password</a>
+      </div>
+      <p>This link will expire in <strong>1 hour</strong>.</p>
+      <p>If you did not request this, you can safely ignore this email.</p>
+    </div>
+    <div class="footer">ChatBot Builder - Secure Account Management</div>
+  </div>
+</body>
+</html>"""
+
+        plain_body = f"Hello {display_name},\n\nReset your password here: {reset_url}\n\nThis link expires in 1 hour."
+
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = "Reset your ChatBot Builder Password"
+        msg['From'] = sender_from
+        msg['To'] = user.email
+
+        msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
+        msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(sender_user, sender_pass)
+            server.sendmail(sender_from, user.email, msg.as_bytes())
+
+        print(f"Email sent successfully to {user.email}")
+        return True
+
+    except smtplib.SMTPAuthenticationError:
+        print("SMTP Auth failed - use a Gmail App Password, not your account password")
+        print("Generate one at: https://myaccount.google.com/apppasswords")
+        return False
+    except smtplib.SMTPException as e:
+        print(f"SMTP error: {e}")
+        return False
+    except Exception as e:
+        print(f"Password reset email failed: {e}")
+        return False
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    """Handle forgot password request"""
+    """Handle forgot password request using smtplib"""
     if 'user_id' in session:
-        return redirect(url_for('user.dashboard'))
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip()
         user = get_user_by_email(email)
 
         if user:
-            # Generate password reset token
+            # Generate reset token
             token = serializer.dumps(email, salt='password-reset-salt')
-
-            # Create reset link
             reset_url = url_for('reset_password', token=token, _external=True)
 
-            # Send email
-            try:
-                msg = Message(
-                    'Password Reset Request',
-                    recipients=[email]
-                )
-                msg.body = f'''Hello {user.username},
-
-You have requested to reset your password. Click the link below to reset your password:
-
-{reset_url}
-
-This link will expire in 1 hour.
-
-If you did not request this, please ignore this email.
-
-Best regards,
-ChatBot Builder Team
-'''
-                msg.html = f'''
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body {{
-                            font-family: Arial, sans-serif;
-                            line-height: 1.6;
-                            color: #333;
-                        }}
-                        .container {{
-                            max-width: 600px;
-                            margin: 0 auto;
-                            padding: 20px;
-                        }}
-                        .header {{
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            padding: 30px;
-                            text-align: center;
-                            border-radius: 10px 10px 0 0;
-                        }}
-                        .content {{
-                            background: #f7fafc;
-                            padding: 30px;
-                            border-radius: 0 0 10px 10px;
-                        }}
-                        .footer {{
-                            text-align: center;
-                            margin-top: 20px;
-                            color: #718096;
-                            font-size: 12px;
-                        }}
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>Password Reset Request</h1>
-                        </div>
-                        <div class="content">
-                            <p>Hello <strong>{user.username}</strong>,</p>
-                            <p>You have requested to reset your password. Click the link below to reset your password:</p>
-
-                            <p style="margin: 20px 0; text-align: center;">
-                                <a href="{reset_url}" style="color: #667eea; text-decoration: underline; font-size: 16px; font-weight: 600;">Reset Password</a>
-                            </p>
-
-                            <p>Or copy and paste this link in your browser:</p>
-                            <p style="word-break: break-all; color: #667eea;">
-                                <a href="{reset_url}" style="color: #667eea;">{reset_url}</a>
-                            </p>
-
-                            <p><strong>This link will expire in 1 hour.</strong></p>
-                            <p>If you did not request this, please ignore this email.</p>
-                            <div class="footer">
-                                <p>Best regards,<br>ChatBot Builder Team</p>
-                            </div>
-                        </div>
-                    </div>
-                </body>
-                </html>
-                '''
-                mail.send(msg)
-                flash('Password reset link has been sent to your email', 'success')
-            except Exception as e:
-                print(f"Error sending email: {e}")
-                flash('Error sending email. Please try again later.', 'error')
+            # Attempt to send email
+            if send_reset_password_email(user, reset_url):
+                flash('A password reset link has been sent to your email.', 'success')
+            else:
+                flash('Technical error sending email. Please check server logs.', 'error')
         else:
-            # Don't reveal if email exists or not for security
-            flash('If that email exists, a password reset link has been sent', 'info')
+            # Security: do not reveal if the email exists
+            flash('If that email exists, a reset link has been sent.', 'info')
 
         return redirect(url_for('login'))
 
@@ -455,7 +450,7 @@ ChatBot Builder Team
 def reset_password(token):
     """Reset password with token"""
     if 'user_id' in session:
-        return redirect(url_for('user.dashboard'))
+        return redirect(url_for('dashboard'))
 
     try:
         # Verify token (expires in 1 hour)
@@ -473,11 +468,11 @@ def reset_password(token):
 
         if password != confirm_password:
             flash('Passwords do not match', 'error')
-            return redirect(url_for('auth.reset_password', token=token))
+            return redirect(url_for('reset_password', token=token))
 
         if len(password) < 6:
             flash('Password must be at least 6 characters long', 'error')
-            return redirect(url_for('auth.reset_password', token=token))
+            return redirect(url_for('reset_password', token=token))
 
         # Update password
         user = get_user_by_email(email)
@@ -485,9 +480,9 @@ def reset_password(token):
             user.password = generate_password_hash(password)
             db.session.commit()
             flash('Password has been reset successfully! You can now login.', 'success')
-            return redirect(url_for('auth.login'))
+            return render_template("login.html")
         else:
             flash('User not found', 'error')
-            return redirect(url_for('auth.forgot_password'))
+            return redirect(url_for('forgot_password'))
 
     return render_template('reset_password.html', token=token)

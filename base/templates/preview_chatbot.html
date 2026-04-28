@@ -551,12 +551,38 @@ document.addEventListener("DOMContentLoaded", function() {
         if (inputEl) inputEl.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
 
-        document.getElementById('pcSubmit').onclick = function() {
+      document.getElementById('pcSubmit').onclick = function() {
             const name = document.getElementById('pcName').value.trim();
-            const contact = document.getElementById('pcContact').value.trim();
-            if (!name || !contact) { alert('Please fill in both fields to continue.'); return; }
+            let contact = document.getElementById('pcContact').value.trim();
+
+            if (!name || !contact) {
+                alert('Please fill in both fields to continue.');
+                return;
+            }
+
+            // ★ NEW: Strict Email Validation ★
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            // Phone validation: Exactly 10 digits
+            const phoneRegex = /^\d{10}$/;
+
+            const isEmail = emailRegex.test(contact);
+            const isPhone = phoneRegex.test(contact);
+
+            // If it is neither a valid email nor exactly 10 digits, block it
+            if (!isEmail && !isPhone) {
+                alert('⚠️ Please enter a valid Email Address or exactly a 10-digit Phone Number (without +91).');
+                return;
+            }
+
+            // If it is a 10-digit phone number, automatically add +91
+            if (isPhone) {
+                contact = '+91 ' + contact;
+            }
+
             this.disabled = true;
             this.textContent = 'Connecting...';
+
             const infoMessage = `[Visitor Details] Name: ${name} | Contact: ${contact}`;
             sendChatRequest(infoMessage, btnObj, true);
         };

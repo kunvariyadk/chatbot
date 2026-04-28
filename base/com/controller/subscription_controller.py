@@ -159,7 +159,7 @@ def select_subscription():
         try:
             if user.subscription:
                 # Update existing subscription
-                old_plan = user.subscription.plan.display_name
+                old_plan = user.subscription.display_name
                 user.subscription.plan_id = plan.id
                 user.subscription.status = 'trial' if plan_name == 'free_trial' else 'active'
                 user.subscription.is_trial = (plan_name == 'free_trial')

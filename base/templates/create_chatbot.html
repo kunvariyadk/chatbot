@@ -459,13 +459,20 @@ function renderEditorCanvas() {
     var canvas = document.getElementById('previewCanvas');
     var ctx = canvas.getContext('2d');
     var img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = function() {
         canvas.width = CIRCLE_SIZE; canvas.height = CIRCLE_SIZE;
         ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE);
+        ctx.save();
         ctx.beginPath(); ctx.arc(CIRCLE_SIZE/2, CIRCLE_SIZE/2, CIRCLE_SIZE/2, 0, Math.PI*2); ctx.clip();
-        var scale = currentZoom / 100;
-        var sw = img.width * scale, sh = img.height * scale;
+
+        // ★ NEW: Calculate base scale so it covers the entire circle by default
+        var baseScale = Math.max(CIRCLE_SIZE / img.width, CIRCLE_SIZE / img.height);
+        var finalScale = baseScale * (currentZoom / 100);
+
+        var sw = img.width * finalScale, sh = img.height * finalScale;
         ctx.drawImage(img, (CIRCLE_SIZE - sw)/2 + currentX, (CIRCLE_SIZE - sh)/2 + currentY, sw, sh);
+        ctx.restore();
     };
     img.src = originalAvatarUrl || uploadedAvatarUrl;
 }
@@ -475,23 +482,31 @@ function saveAvatarImage() {
     outCanvas.width = OUTPUT_SIZE; outCanvas.height = OUTPUT_SIZE;
     var ctx = outCanvas.getContext('2d');
     var img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = function() {
         ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+        ctx.save();
         ctx.beginPath(); ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2); ctx.clip();
         ctx.fillStyle = "#FFFFFF"; ctx.fill();
-        var scale = currentZoom / 100;
-        var sw = img.width * scale, sh = img.height * scale;
+
+        // ★ NEW: Calculate output scale
+        var baseScale = Math.max(OUTPUT_SIZE / img.width, OUTPUT_SIZE / img.height);
+        var finalScale = baseScale * (currentZoom / 100);
+
+        var sw = img.width * finalScale, sh = img.height * finalScale;
         var ratio = OUTPUT_SIZE / CIRCLE_SIZE;
         ctx.drawImage(img, (OUTPUT_SIZE - sw)/2 + (currentX * ratio), (OUTPUT_SIZE - sh)/2 + (currentY * ratio), sw, sh);
+        ctx.restore();
+
         uploadedAvatarUrl = outCanvas.toDataURL('image/jpeg', 0.8);
         document.getElementById('bot_avatar_data').value = uploadedAvatarUrl;
+        document.getElementById('remove_avatar_flag').value = 'false';
         setAllPreviews(uploadedAvatarUrl);
         closeAvatarEditor();
     };
     img.onerror = function(){ alert('Error processing image. Please try again.'); };
     img.src = originalAvatarUrl || uploadedAvatarUrl;
 }
-
 /* ══ WELCOME BUTTONS ══ */
 var wbBtns = [];
 
