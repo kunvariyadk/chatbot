@@ -127,9 +127,19 @@
                                                 {% if chatbot.bot_avatar %}
                                                 <img src="{{ chatbot.bot_avatar }}?v={{ chatbot.updated_at.timestamp()|int if chatbot.updated_at else 0 }}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
                                                 {% else %}
-                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                                </svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <rect width="64" height="64" rx="32" fill="{{ (chatbot.theme_color or '#4F46E5') }}22"/>
+  <rect x="16" y="24" width="32" height="26" rx="6" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+  <line x1="32" y1="16" x2="32" y2="24" stroke="{{ chatbot.theme_color or '#4F46E5' }}" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="32" cy="14" r="3" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+  <circle cx="24" cy="33" r="3.5" fill="white"/>
+  <circle cx="40" cy="33" r="3.5" fill="white"/>
+  <circle cx="24" cy="33" r="1.5" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+  <circle cx="40" cy="33" r="1.5" fill="{{ chatbot.theme_color or '#4F46E5' }}"/>
+  <path d="M24 43 Q32 47 40 43" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect x="10" y="29" width="6" height="12" rx="3" fill="{{ chatbot.theme_color or '#4F46E5' }}" opacity="0.7"/>
+  <rect x="48" y="29" width="6" height="12" rx="3" fill="{{ chatbot.theme_color or '#4F46E5' }}" opacity="0.7"/>
+</svg>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -244,7 +254,38 @@ var yValueText = document.getElementById('yValue');
 var previewCanvas = document.getElementById('previewCanvas');
 
 function robotSVG(color) {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><rect x="16" y="24" width="32" height="28" rx="6" fill="' + color + '"/><circle cx="24" cy="34" r="3.5" fill="white"/><circle cx="40" cy="34" r="3.5" fill="white"/><path d="M24 44 Q32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">'
+        + '<rect width="64" height="64" rx="32" fill="' + color + '22"/>'
+        + '<rect x="16" y="24" width="32" height="26" rx="6" fill="' + color + '"/>'
+        + '<line x1="32" y1="16" x2="32" y2="24" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round"/>'
+        + '<circle cx="32" cy="14" r="3" fill="' + color + '"/>'
+        + '<circle cx="24" cy="33" r="3.5" fill="white"/>'
+        + '<circle cx="40" cy="33" r="3.5" fill="white"/>'
+        + '<circle cx="24" cy="33" r="1.5" fill="' + color + '"/>'
+        + '<circle cx="40" cy="33" r="1.5" fill="' + color + '"/>'
+        + '<path d="M24 43 Q32 47 40 43" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+        + '<rect x="10" y="29" width="6" height="12" rx="3" fill="' + color + '" opacity="0.7"/>'
+        + '<rect x="48" y="29" width="6" height="12" rx="3" fill="' + color + '" opacity="0.7"/>'
+        + '</svg>';
+}
+
+// Convert robotSVG to a base64 data URL for form submission
+function robotSVGDataURL(color) {
+    var svg = robotSVG(color);
+    var canvas = document.createElement('canvas');
+    canvas.width = 100; canvas.height = 100;
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    var svgBlob = new Blob([svg], {type: 'image/svg+xml'});
+    var url = URL.createObjectURL(svgBlob);
+    return new Promise(function(resolve) {
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, 100, 100);
+            URL.revokeObjectURL(url);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.src = url;
+    });
 }
 
 function imgTag(src) {
@@ -259,7 +300,8 @@ function setAllAvatarPreviews(src) {
 
 function clearAllAvatarPreviews() {
     var color = themeColorInput ? themeColorInput.value : '#4F46E5';
-    avatarPreviewEl.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+    // Show robot SVG in the avatar thumbnail panel too
+    avatarPreviewEl.innerHTML = robotSVG(color);
     if(previewIcon) previewIcon.innerHTML = robotSVG(color);
 }
 
@@ -272,7 +314,7 @@ function clearAllAvatarPreviews() {
     }
 })();
 
-avatarInput.addEventListener('change', function (e) {
+function onAvatarFileChange(e) {
     var file = e.target.files[0];
     if (!file) return;
     var reader = new FileReader();
@@ -286,18 +328,45 @@ avatarInput.addEventListener('change', function (e) {
         removeAvatarBtn.style.display = 'inline-flex';
     };
     reader.readAsDataURL(file);
-});
+}
+avatarInput.addEventListener('change', onAvatarFileChange);
 
 removeAvatarBtn.addEventListener('click', function () {
     uploadedAvatarUrl = null;
     originalAvatarUrl = null;
-    avatarInput.value = '';
+    // Clone file input to fully reset it
+    var newInput = avatarInput.cloneNode(false);
+    avatarInput.parentNode.replaceChild(newInput, avatarInput);
+    avatarInput = newInput;
+    avatarInput.addEventListener('change', onAvatarFileChange);
+    // Set remove flag — backend will set bot_avatar = None (use default robot in templates)
     botAvatarDataInput.value = '';
-    removeAvatarFlag.value = 'true';
+    removeAvatarFlag.value = '1';
     clearAllAvatarPreviews();
     adjustAvatarBtn.style.display = 'none';
     removeAvatarBtn.style.display = 'none';
+    // Optionally save robot SVG as the new avatar PNG
+    var color = themeColorInput ? themeColorInput.value : '#4F46E5';
+    robotSVGDataURL(color).then(function(dataUrl) {
+        // Store as new avatar data so backend saves the robot as default
+        botAvatarDataInput.value = dataUrl;
+        removeAvatarFlag.value = 'false';  // treat as new upload, not removal
+        uploadedAvatarUrl = dataUrl;
+    });
 });
+
+// Submit interceptor: when removing, ensure NO file or base64 data goes through
+document.getElementById('editChatbotForm').addEventListener('submit', function (e) {
+    if (removeAvatarFlag.value === 'true') {
+        botAvatarDataInput.value = '';
+        // Replace file input so browser sends empty file field
+        var newInput = avatarInput.cloneNode(false);
+        avatarInput.parentNode.replaceChild(newInput, avatarInput);
+        avatarInput = newInput;
+    }
+});
+
+
 
 window.openAvatarEditor = function () {
     if (!uploadedAvatarUrl) return;
@@ -364,3 +433,387 @@ window.resetEditorSliders = function () {
 </script>
 </body>
 </html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Edit Chatbot — {{ chatbot.name }}</title>-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit1.css') }}">-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">-->
+<!--    <style>-->
+<!--    /* ── Avatar Editor Modal ── */-->
+<!--    .av-modal-overlay {-->
+<!--        position: fixed; inset: 0; background: rgba(0,0,0,0.55);-->
+<!--        z-index: 9999; display: flex; align-items: center; justify-content: center;-->
+<!--        opacity: 0; visibility: hidden;-->
+<!--        transition: opacity 0.25s ease, visibility 0.25s ease;-->
+<!--    }-->
+<!--    .av-modal-overlay.open { opacity: 1; visibility: visible; }-->
+
+<!--    .av-modal {-->
+<!--        background: #fff; border-radius: 16px; width: 100%; max-width: 480px;-->
+<!--        box-shadow: 0 20px 60px rgba(0,0,0,0.2);-->
+<!--        transform: translateY(12px) scale(0.98);-->
+<!--        transition: transform 0.25s ease;-->
+<!--        overflow: hidden;-->
+<!--    }-->
+<!--    .av-modal-overlay.open .av-modal { transform: translateY(0) scale(1); }-->
+
+<!--    .av-modal-head {-->
+<!--        display: flex; align-items: center; justify-content: space-between;-->
+<!--        padding: 16px 20px; border-bottom: 1px solid #e8ecf4;-->
+<!--    }-->
+<!--    .av-modal-head h3 { font-size: 15px; font-weight: 600; color: #1a202c; margin: 0; }-->
+<!--    .av-modal-close {-->
+<!--        background: none; border: none; cursor: pointer; color: #718096;-->
+<!--        width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;-->
+<!--        transition: background 0.15s, color 0.15s;-->
+<!--    }-->
+<!--    .av-modal-close:hover { background: #f0f3f9; color: #1a202c; }-->
+
+<!--    .av-modal-body { padding: 20px; }-->
+
+<!--    .av-preview-circle {-->
+<!--        width: 180px; height: 180px; border-radius: 50%;-->
+<!--        overflow: hidden; margin: 0 auto 20px; border: 3px solid #667eea;-->
+<!--        box-shadow: 0 4px 16px rgba(102,126,234,0.2);-->
+<!--    }-->
+<!--    .av-preview-circle canvas { width: 100%; height: 100%; display: block; }-->
+
+<!--    .av-controls { display: flex; flex-direction: column; gap: 14px; }-->
+<!--    .av-control-row { display: flex; align-items: center; gap: 12px; }-->
+<!--    .av-control-row label { font-size: 12px; font-weight: 500; color: #718096; width: 70px; flex-shrink: 0; }-->
+<!--    .av-control-row input[type=range] { flex: 1; }-->
+<!--    .av-control-val { font-size: 12px; color: #1a202c; font-weight: 600; width: 42px; text-align: right; flex-shrink: 0; }-->
+
+<!--    .av-reset-btn {-->
+<!--        margin-top: 4px; width: 100%; padding: 8px; border-radius: 8px;-->
+<!--        border: 1.5px solid #e2e8f0; background: #f7fafc;-->
+<!--        color: #4a5568; font-size: 12px; font-weight: 500;-->
+<!--        cursor: pointer; transition: all 0.15s;-->
+<!--    }-->
+<!--    .av-reset-btn:hover { border-color: #667eea; color: #667eea; background: #f0f3ff; }-->
+
+<!--    .av-modal-foot {-->
+<!--        display: flex; gap: 10px; padding: 14px 20px;-->
+<!--        border-top: 1px solid #e8ecf4;-->
+<!--    }-->
+<!--    .av-btn-cancel {-->
+<!--        flex: 1; padding: 9px; border-radius: 8px;-->
+<!--        border: 1.5px solid #e2e8f0; background: #fff;-->
+<!--        color: #4a5568; font-size: 13px; font-weight: 500;-->
+<!--        cursor: pointer; transition: all 0.15s;-->
+<!--    }-->
+<!--    .av-btn-cancel:hover { border-color: #cbd5e0; background: #f7fafc; }-->
+<!--    .av-btn-apply {-->
+<!--        flex: 2; padding: 9px; border-radius: 8px;-->
+<!--        border: none; background: linear-gradient(135deg,#667eea,#764ba2);-->
+<!--        color: #fff; font-size: 13px; font-weight: 600;-->
+<!--        cursor: pointer; transition: opacity 0.15s;-->
+<!--    }-->
+<!--    .av-btn-apply:hover { opacity: 0.9; }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div class="toast-container" id="toastContainer"></div>-->
+
+<!--<div class="dashboard-container">-->
+<!--    {% include 'sidebar.html' %}-->
+<!--    <main class="main-content">-->
+<!--        <div class="page-header">-->
+<!--            <div>-->
+<!--                <h1>Edit: {{ chatbot.name }}</h1>-->
+<!--                <p>Update your chatbot settings</p>-->
+<!--            </div>-->
+<!--            <a href="{{ url_for('bots') }}" class="btn-secondary">Back to Bots</a>-->
+<!--        </div>-->
+
+<!--        <div class="form-container">-->
+<!--            <form method="POST" id="editChatbotForm" class="chatbot-form" enctype="multipart/form-data">-->
+<!--                <div class="two-column-layout">-->
+<!--                    <div class="form-column">-->
+<!--                        <div class="row-basic-avatar">-->
+<!--                            <div class="form-section compact">-->
+<!--                                <h2>Basic Information</h2>-->
+<!--                                <div class="form-row">-->
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="name">Chatbot Name <span class="required">*</span></label>-->
+<!--                                        <input type="text" id="name" name="name" value="{{ chatbot.name }}" required>-->
+<!--                                    </div>-->
+<!--                                    <div class="form-group">-->
+<!--                                        <label for="bot_name">Bot Display Name <span class="required">*</span></label>-->
+<!--                                        <input type="text" id="bot_name" name="bot_name" value="{{ chatbot.bot_name }}" required>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="description">Description</label>-->
+<!--                                    <textarea id="description" name="description" rows="2">{{ chatbot.description or '' }}</textarea>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="avatar-panel">-->
+<!--                                <h2>Bot Avatar</h2>-->
+<!--                                <div class="avatar-section">-->
+<!--                                    <div class="avatar-upload-wrapper">-->
+<!--                                        <div class="avatar-preview-container">-->
+<!--                                            <div class="avatar-preview small" id="avatarPreview" data-existing-url="{{ chatbot.bot_avatar or '' }}">-->
+<!--                                                {% if chatbot.bot_avatar %}-->
+<!--                                                <img src="{{ chatbot.bot_avatar }}?v={{ chatbot.updated_at.timestamp()|int if chatbot.updated_at else 0 }}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">-->
+<!--                                                {% else %}-->
+<!--                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">-->
+<!--                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>-->
+<!--                                                </svg>-->
+<!--                                                {% endif %}-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+
+<!--                                        <div class="avatar-controls-group">-->
+<!--                                            <input type="file" id="bot_avatar" name="bot_avatar" accept="image/*" style="display:none;">-->
+<!--                                            <button type="button" class="btn-upload small" onclick="document.getElementById('bot_avatar').click()">Choose Image</button>-->
+<!--                                            <button type="button" class="btn-adjust small" id="adjustAvatarBtn" onclick="openAvatarEditor()" style="display:{% if chatbot.bot_avatar %}inline-flex{% else %}none{% endif %};">Adjust</button>-->
+<!--                                            <button type="button" class="btn-remove small" id="removeAvatar" style="display:{% if chatbot.bot_avatar %}inline-flex{% else %}none{% endif %};">Remove</button>-->
+<!--                                            <input type="hidden" id="remove_avatar_flag" name="remove_avatar" value="false">-->
+<!--                                            <input type="hidden" id="bot_avatar_data" name="bot_avatar_data" value="">-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="preview-column">-->
+<!--                        <div class="preview-sticky">-->
+<!--                            <h2>Live Preview</h2>-->
+<!--                            <div class="chatbot-preview">-->
+<!--                                <div class="preview-header" id="previewHeader" style="background:{{ chatbot.theme_color or '#4F46E5' }};">-->
+<!--                                    <div class="preview-bot-icon" id="previewIcon">-->
+<!--                                        {% if chatbot.bot_avatar %}-->
+<!--                                        <img src="{{ chatbot.bot_avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">-->
+<!--                                        {% else %}-->
+<!--                                        {% endif %}-->
+<!--                                    </div>-->
+<!--                                    <span id="previewBotName">{{ chatbot.bot_name }}</span>-->
+<!--                                </div>-->
+<!--                                <div class="preview-body" id="previewBody" style="background:{{ chatbot.chat_background_color or '#F7FAFC' }};">-->
+<!--                                    </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="form-actions">-->
+<!--                    <a href="{{ url_for('bots') }}" class="btn-cancel">Cancel</a>-->
+<!--                    <button type="submit" class="btn-submit">Update Chatbot</button>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </main>-->
+<!--</div>-->
+
+<!--<div class="av-modal-overlay" id="avatarEditorModal">-->
+<!--    <div class="av-modal">-->
+<!--        <div class="av-modal-head">-->
+<!--            <h3>Adjust Your Avatar</h3>-->
+<!--            <button class="av-modal-close" type="button" onclick="closeAvatarEditor()">✕</button>-->
+<!--        </div>-->
+<!--        <div class="av-modal-body">-->
+<!--            <div class="av-preview-circle">-->
+<!--                <canvas id="previewCanvas" width="180" height="180"></canvas>-->
+<!--            </div>-->
+<!--            <div class="av-controls">-->
+<!--                <div class="av-control-row">-->
+<!--                    <label>Zoom</label>-->
+<!--                    <input type="range" id="zoomSlider" min="10" max="300" value="100">-->
+<!--                    <span class="av-control-val"><span id="zoomValue">100</span>%</span>-->
+<!--                </div>-->
+<!--                <div class="av-control-row">-->
+<!--                    <label>Horizontal</label>-->
+<!--                    <input type="range" id="xSlider" min="-150" max="150" value="0">-->
+<!--                    <span class="av-control-val"><span id="xValue">0</span>px</span>-->
+<!--                </div>-->
+<!--                <div class="av-control-row">-->
+<!--                    <label>Vertical</label>-->
+<!--                    <input type="range" id="ySlider" min="-150" max="150" value="0">-->
+<!--                    <span class="av-control-val"><span id="yValue">0</span>px</span>-->
+<!--                </div>-->
+<!--                <button class="av-reset-btn" type="button" onclick="resetEditorSliders()">↺ Reset Position</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="av-modal-foot">-->
+<!--            <button class="av-btn-cancel" type="button" onclick="closeAvatarEditor()">Cancel</button>-->
+<!--            <button class="av-btn-apply" type="button" onclick="saveAvatarImage()">Apply Changes</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--(function () {-->
+<!--'use strict';-->
+
+<!--var CIRCLE_SIZE = 180;-->
+<!--var OUTPUT_SIZE = 100;-->
+
+<!--var uploadedAvatarUrl = null;-->
+<!--var originalAvatarUrl = null;-->
+<!--var currentZoom = 100, currentX = 0, currentY = 0;-->
+<!--var isDragging = false, dragStartX = 0, dragStartY = 0;-->
+
+<!--var themeColorInput = document.getElementById('theme_color');-->
+<!--var previewIcon = document.getElementById('previewIcon');-->
+<!--var previewAvatar = document.getElementById('previewAvatar');-->
+<!--var avatarPreviewEl = document.getElementById('avatarPreview');-->
+<!--var avatarInput = document.getElementById('bot_avatar');-->
+<!--var adjustAvatarBtn = document.getElementById('adjustAvatarBtn');-->
+<!--var removeAvatarBtn = document.getElementById('removeAvatar');-->
+<!--var removeAvatarFlag = document.getElementById('remove_avatar_flag');-->
+<!--var botAvatarDataInput = document.getElementById('bot_avatar_data');-->
+
+<!--var avatarModal = document.getElementById('avatarEditorModal');-->
+<!--var zoomSlider = document.getElementById('zoomSlider');-->
+<!--var xSlider = document.getElementById('xSlider');-->
+<!--var ySlider = document.getElementById('ySlider');-->
+<!--var zoomValueText = document.getElementById('zoomValue');-->
+<!--var xValueText = document.getElementById('xValue');-->
+<!--var yValueText = document.getElementById('yValue');-->
+<!--var previewCanvas = document.getElementById('previewCanvas');-->
+
+<!--function robotSVG(color) {-->
+<!--    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><rect x="16" y="24" width="32" height="28" rx="6" fill="' + color + '"/><circle cx="24" cy="34" r="3.5" fill="white"/><circle cx="40" cy="34" r="3.5" fill="white"/><path d="M24 44 Q32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';-->
+<!--}-->
+
+<!--function imgTag(src) {-->
+<!--    return '<img src="' + src + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';-->
+<!--}-->
+
+<!--function setAllAvatarPreviews(src) {-->
+<!--    avatarPreviewEl.innerHTML = imgTag(src);-->
+<!--    if(previewIcon) previewIcon.innerHTML = imgTag(src);-->
+<!--    if(previewAvatar) previewAvatar.innerHTML = imgTag(src);-->
+<!--}-->
+
+<!--function clearAllAvatarPreviews() {-->
+<!--    var color = themeColorInput ? themeColorInput.value : '#4F46E5';-->
+<!--    avatarPreviewEl.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';-->
+<!--    if(previewIcon) previewIcon.innerHTML = robotSVG(color);-->
+<!--}-->
+
+<!--// Initial state-->
+<!--(function init() {-->
+<!--    var existingUrl = avatarPreviewEl.getAttribute('data-existing-url');-->
+<!--    if (existingUrl) {-->
+<!--        uploadedAvatarUrl = existingUrl;-->
+<!--        originalAvatarUrl = existingUrl;-->
+<!--    }-->
+<!--})();-->
+
+<!--function onAvatarFileChange(e) {-->
+<!--    var file = e.target.files[0];-->
+<!--    if (!file) return;-->
+<!--    var reader = new FileReader();-->
+<!--    reader.onload = function (ev) {-->
+<!--        originalAvatarUrl = ev.target.result;-->
+<!--        uploadedAvatarUrl = ev.target.result;-->
+<!--        botAvatarDataInput.value = ev.target.result;-->
+<!--        removeAvatarFlag.value = 'false';-->
+<!--        setAllAvatarPreviews(ev.target.result);-->
+<!--        adjustAvatarBtn.style.display = 'inline-flex';-->
+<!--        removeAvatarBtn.style.display = 'inline-flex';-->
+<!--    };-->
+<!--    reader.readAsDataURL(file);-->
+<!--}-->
+<!--avatarInput.addEventListener('change', onAvatarFileChange);-->
+
+<!--removeAvatarBtn.addEventListener('click', function () {-->
+<!--    uploadedAvatarUrl = null;-->
+<!--    originalAvatarUrl = null;-->
+<!--    // Clone input node to fully reset file selection (most reliable cross-browser method)-->
+<!--    var newInput = avatarInput.cloneNode(false);-->
+<!--    avatarInput.parentNode.replaceChild(newInput, avatarInput);-->
+<!--    avatarInput = newInput;-->
+<!--    avatarInput.addEventListener('change', onAvatarFileChange);-->
+<!--    botAvatarDataInput.value = '';-->
+<!--    removeAvatarFlag.value = 'true';-->
+<!--    clearAllAvatarPreviews();-->
+<!--    adjustAvatarBtn.style.display = 'none';-->
+<!--    removeAvatarBtn.style.display = 'none';-->
+<!--});-->
+
+<!--// Submit interceptor: when removing, ensure NO file or base64 data goes through-->
+<!--document.getElementById('editChatbotForm').addEventListener('submit', function (e) {-->
+<!--    if (removeAvatarFlag.value === 'true') {-->
+<!--        botAvatarDataInput.value = '';-->
+<!--        // Replace file input so browser sends empty file field-->
+<!--        var newInput = avatarInput.cloneNode(false);-->
+<!--        avatarInput.parentNode.replaceChild(newInput, avatarInput);-->
+<!--        avatarInput = newInput;-->
+<!--    }-->
+<!--});-->
+
+
+
+<!--window.openAvatarEditor = function () {-->
+<!--    if (!uploadedAvatarUrl) return;-->
+<!--    avatarModal.classList.add('open');-->
+<!--    renderEditorCanvas();-->
+<!--};-->
+
+<!--window.closeAvatarEditor = function () {-->
+<!--    avatarModal.classList.remove('open');-->
+<!--};-->
+
+<!--window.saveAvatarImage = function() {-->
+<!--    var outCanvas = document.createElement('canvas');-->
+<!--    outCanvas.width = OUTPUT_SIZE; outCanvas.height = OUTPUT_SIZE;-->
+<!--    var ctx = outCanvas.getContext('2d');-->
+<!--    var img = new Image();-->
+<!--    img.crossOrigin = 'anonymous';-->
+<!--    img.onload = function() {-->
+<!--        ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);-->
+<!--        ctx.save();-->
+<!--        ctx.beginPath(); ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2); ctx.clip();-->
+<!--        var baseScale = Math.max(OUTPUT_SIZE / img.width, OUTPUT_SIZE / img.height);-->
+<!--        var finalScale = baseScale * (currentZoom / 100);-->
+<!--        var sw = img.width * finalScale, sh = img.height * finalScale;-->
+<!--        ctx.drawImage(img, (OUTPUT_SIZE - sw)/2 + (currentX * (OUTPUT_SIZE/CIRCLE_SIZE)), (OUTPUT_SIZE - sh)/2 + (currentY * (OUTPUT_SIZE/CIRCLE_SIZE)), sw, sh);-->
+<!--        ctx.restore();-->
+<!--        uploadedAvatarUrl = outCanvas.toDataURL('image/jpeg', 0.8);-->
+<!--        botAvatarDataInput.value = uploadedAvatarUrl;-->
+<!--        removeAvatarFlag.value = 'false';-->
+<!--        setAllAvatarPreviews(uploadedAvatarUrl);-->
+<!--        closeAvatarEditor();-->
+<!--    };-->
+<!--    img.src = originalAvatarUrl || uploadedAvatarUrl;-->
+<!--};-->
+
+<!--function renderEditorCanvas() {-->
+<!--    var ctx = previewCanvas.getContext('2d');-->
+<!--    var img = new Image();-->
+<!--    img.onload = function() {-->
+<!--        ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE);-->
+<!--        ctx.save();-->
+<!--        ctx.beginPath(); ctx.arc(CIRCLE_SIZE/2, CIRCLE_SIZE/2, CIRCLE_SIZE/2, 0, Math.PI*2); ctx.clip();-->
+<!--        var baseScale = Math.max(CIRCLE_SIZE / img.width, CIRCLE_SIZE / img.height);-->
+<!--        var finalScale = baseScale * (currentZoom / 100);-->
+<!--        var sw = img.width * finalScale, sh = img.height * finalScale;-->
+<!--        ctx.drawImage(img, (CIRCLE_SIZE - sw)/2 + currentX, (CIRCLE_SIZE - sh)/2 + currentY, sw, sh);-->
+<!--        ctx.restore();-->
+<!--    };-->
+<!--    img.src = originalAvatarUrl || uploadedAvatarUrl;-->
+<!--}-->
+
+<!--zoomSlider.addEventListener('input', function() { currentZoom = this.value; zoomValueText.innerText = this.value; renderEditorCanvas(); });-->
+<!--xSlider.addEventListener('input', function() { currentX = parseInt(this.value); xValueText.innerText = this.value; renderEditorCanvas(); });-->
+<!--ySlider.addEventListener('input', function() { currentY = parseInt(this.value); yValueText.innerText = this.value; renderEditorCanvas(); });-->
+
+<!--window.resetEditorSliders = function () {-->
+<!--    currentZoom = 100; currentX = 0; currentY = 0;-->
+<!--    zoomSlider.value = 100; xSlider.value = 0; ySlider.value = 0;-->
+<!--    zoomValueText.innerText = 100; xValueText.innerText = 0; yValueText.innerText = 0;-->
+<!--    renderEditorCanvas();-->
+<!--};-->
+
+<!--})();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

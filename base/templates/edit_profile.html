@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile — ChatBot Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 </head>
 <body>
 <div class="dashboard-container">
 
-    <!-- ════════════ SIDEBAR ════════════ -->
     {% include 'sidebar.html' %}
 
-    <!-- ════════════ MAIN CONTENT ════════════ -->
     <main class="main-content">
 
         <header class="page-header">
@@ -49,112 +49,135 @@
             <!-- ── Profile form card ── -->
             <div class="profile-card">
 
-                <div class="profile-header">
-                    <div class="profile-avatar-large">{{ user.username[0].upper() }}</div>
-                    <div class="profile-header-info">
-                        <h2>{{ user.username }}</h2>
-                        <p>Member since {{ user.created_at.strftime('%B %Y') }}</p>
+                <!-- Header — matches change_password style -->
+                <div style="padding: 14px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e8ecf4;">
+                    <div style="width: 40px; height: 40px; border-radius: 7px; background: rgba(102,126,234,0.1); display: flex; align-items: center; justify-content: center; color: #667eea; flex-shrink: 0;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 14px; font-weight: 700; color: #1a202c; margin-bottom: 2px;">Profile Information</h2>
+                        <p style="font-size: 11px; color: #718096;">Update your personal details and contact info</p>
                     </div>
                 </div>
 
+                <!-- Form -->
                 <form method="POST" class="profile-form">
 
                     <div class="form-group">
-                        <label for="first_name">First Name</label>
+                        <label>First Name</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                 <circle cx="12" cy="7" r="4"/>
                             </svg>
                             <input type="text" id="first_name" name="first_name"
+                                   placeholder="Enter first name"
                                    value="{{ user.first_name if user.first_name else '' }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="last_name">Last Name</label>
+                        <label>Last Name</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                 <circle cx="12" cy="7" r="4"/>
                             </svg>
                             <input type="text" id="last_name" name="last_name"
+                                   placeholder="Enter last name"
                                    value="{{ user.last_name if user.last_name else '' }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label>Username</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                <circle cx="12" cy="7" r="4"/>
+                                <circle cx="12" cy="8" r="4"/>
+                                <path d="M6 20v-1a6 6 0 0 1 12 0v1"/>
                             </svg>
-                            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                            <input type="text" id="username" name="username"
+                                   placeholder="Enter username"
+                                   value="{{ user.username }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
+                        <label>Phone Number</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 16.92V21a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h4.09a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L9 10a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
                             <input type="tel" id="phone" name="phone"
+                                   placeholder="10-digit number"
                                    value="{{ user.phone if user.phone else '' }}"
                                    pattern="[0-9]{10}" maxlength="10" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label>Email Address</label>
                         <div class="input-with-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                            <input type="email" id="email" name="email"
+                                   placeholder="Enter email address"
+                                   value="{{ user.email }}" required>
                         </div>
                     </div>
 
                     <div class="form-actions">
                         <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancel</a>
-                        <button type="submit" class="btn-primary">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                                <polyline points="17 21 17 13 7 13 7 21"/>
-                                <polyline points="7 3 7 8 15 8"/>
-                            </svg>
-                            Save Changes
-                        </button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
                     </div>
 
                 </form>
             </div>
 
-            <!-- ── Right: Stats card ── -->
+            <!-- ── Right: Account Stats (matches security-tips panel style) ── -->
             <div class="profile-stats">
-                <h3>Account Statistics</h3>
-
-                <div class="stat-item">
-                    <span class="stat-label">Total Chatbots</span>
-                    <span class="stat-value">{{ user.chatbots|length }}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Active Chatbots</span>
-                    <span class="stat-value">{{ user.chatbots|selectattr('is_active')|list|length }}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Account Created</span>
-                    <span class="stat-value">{{ user.created_at.strftime('%b %d, %Y') }}</span>
-                </div>
+                <h3 style="font-size: 10px; font-weight: 800; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #f0f3f9;">Account Statistics</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 12px; color: #4a5568; border-bottom: 1px solid #f0f3f9;">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2.5" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            Total Chatbots
+                        </span>
+                        <strong style="color:#1a202c;">{{ user.chatbots|length }}</strong>
+                    </li>
+                    <li style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 12px; color: #4a5568; border-bottom: 1px solid #f0f3f9;">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#48bb78" stroke-width="2.5" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                            Active Chatbots
+                        </span>
+                        <strong style="color:#1a202c;">{{ user.chatbots|selectattr('is_active')|list|length }}</strong>
+                    </li>
+                    <li style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 12px; color: #4a5568; border-bottom: 1px solid #f0f3f9;">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2.5" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Member Since
+                        </span>
+                        <strong style="color:#1a202c;">{{ user.created_at.strftime('%b %d, %Y') }}</strong>
+                    </li>
+                    <li style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 12px; color: #4a5568;">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ed8936" stroke-width="2.5" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Username
+                        </span>
+                        <strong style="color:#1a202c;">{{ user.username }}</strong>
+                    </li>
+                </ul>
             </div>
 
         </div>
     </main>
 </div>
 
-<!-- Mobile toggle -->
 <button class="mobile-menu-toggle" id="mobileMenuToggle">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="12" x2="21" y2="12"/>
@@ -167,30 +190,25 @@
     document.getElementById('mobileMenuToggle').addEventListener('click', function () {
         document.getElementById('sidebar').classList.toggle('open');
     });
-
-    /* Account submenu — starts open since we're on an account page */
     document.getElementById('accountMenu').addEventListener('click', function (e) {
         e.preventDefault();
         this.classList.toggle('expanded');
         document.getElementById('accountSubmenu').classList.toggle('open');
     });
-    /* Mark expanded on load since submenu is open */
     document.getElementById('accountMenu').classList.add('expanded');
 </script>
-<script src="{{ url_for('static', filename='js/password.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
-/* ── Flash message dismiss ── */
 function dismissAlert(btn) {
     var a = btn.closest ? btn.closest(".alert-dismissible") : btn.parentElement;
     if (!a) return;
-    a.style.transition     = "opacity 0.35s ease, transform 0.35s ease, max-height 0.4s ease, margin-bottom 0.4s ease, padding 0.4s ease";
-    a.style.opacity        = "0";
-    a.style.transform      = "translateY(-6px)";
-    a.style.maxHeight      = "0";
-    a.style.marginBottom   = "0";
-    a.style.padding        = "0";
-    a.style.overflow       = "hidden";
+    a.style.transition   = "opacity 0.35s ease, transform 0.35s ease, max-height 0.4s ease, margin-bottom 0.4s ease, padding 0.4s ease";
+    a.style.opacity      = "0";
+    a.style.transform    = "translateY(-6px)";
+    a.style.maxHeight    = "0";
+    a.style.marginBottom = "0";
+    a.style.padding      = "0";
+    a.style.overflow     = "hidden";
     setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 420);
 }
 document.addEventListener("DOMContentLoaded", function () {

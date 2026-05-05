@@ -11,8 +11,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
-        .bubble-bot, .bubble-user, .bubble-owner {
+        .bubble-user, .bubble-owner {
             white-space: normal !important;
+        }
+
+        .bubble-bot div {
+            line-height: 1.4;
+        }
+
+        .bubble-bot strong {
+            color: inherit;
         }
     </style>
 </head>
@@ -20,7 +28,8 @@
 
 <button class="launcher {% if bot_avatar_url %}has-avatar{% endif %}" id="launcher" title="Chat with {{ chatbot.bot_name }}">
     {% if bot_avatar_url %}
-        <img src="../static/img/Live%20chatbot.gif" alt="{{ chatbot.bot_name }}" class="launcher-avatar">
+<!--             <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}" class="launcher-avatar">-->
+        <img src="../static/img/Ai%20Robot%20Vector%20Art%20(1).gif" alt="{{ chatbot.bot_name }}" style="width:120%" >
     {% else %}
         <svg class="launcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     {% endif %}
@@ -84,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
     root.style.setProperty('--user-text', config.userTextColor || '#fff');
 
     document.getElementById('widgetHeader').style.background = config.themeColor || '#4F46E5';
-    document.getElementById('launcher').style.background     = config.themeColor || '#4F46E5';
+    // document.getElementById('launcher').style.background     = config.themeColor || '#4F46E5';
     document.getElementById('messages').style.background     = config.chatBackgroundColor || '#F7FAFC';
     const sendBtn = document.getElementById('sendBtn');
     if (sendBtn) { sendBtn.style.background = config.themeColor || '#4F46E5'; sendBtn.style.border = 'none'; }
@@ -153,41 +162,30 @@ document.addEventListener("DOMContentLoaded", function() {
         return new Date().toLocaleTimeString('en-IN', options);
     }
 
-    // ★ NEW: RICH TEXT FORMATTER
-    function formatRichText(text) {
-        if (!text) return '';
+   function formatRichText(text) {
+    if (!text) return '';
 
-        // 1. Escape HTML
-        let html = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // 1. Escape HTML to prevent XSS
+    let html = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        // 2. Smart Emoji Line Breaks (Fixes AI clumping text together)
-        // If an emoji like 📞 or 📎 comes after a word, force it to a new line to create clean paragraphs.
-        html = html.replace(/([a-zA-Z0-9.!?])\s+(📞|📎|📧|📍|🌐|👉|👇|✅|✨|🚀|🔗)\s+([A-Z])/g, '$1<br><br>$2 $3');
+    // 2. Bold Text (**text**)
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>');
 
-        // 3. Bold Text (**text**)
-        html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>');
+    // 3. Bullet Points (- or *)
+    html = html.replace(/^ ?[-*]\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><span style="color: var(--theme-color, #4F46E5); font-weight: bold;">&bull;</span><span style="flex:1;">$1</span></div>');
 
-        // 4. Bullet Points (- or *)
-        html = html.replace(/^ ?[-*]\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><span style="color: var(--theme-color); font-weight: bold;">&bull;</span><span style="flex:1;">$1</span></div>');
+    // 4. Numbered Lists (1. 2.)
+    html = html.replace(/^ ?(\d+)\.\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><strong>$1.</strong><span style="flex:1;">$2</span></div>');
 
-        // 5. Numbered Lists (1. 2.)
-        html = html.replace(/^ ?(\d+)\.\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><strong>$1.</strong><span style="flex:1;">$2</span></div>');
+    // 5. Links & Emails
+    html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-weight: 700; word-break: break-word;">$1</a>');
+    html = html.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi, '<a href="mailto:$1" style="color: inherit; text-decoration: underline; font-weight: 700;">$1</a>');
 
-        // 6. Links (Make URLs clickable & bold)
-        html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-weight: 700; word-break: break-word;">$1</a>');
+    // 6. Native Line Breaks
+    html = html.replace(/\n/g, '<br>');
 
-        // 7. Emails
-        html = html.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi, '<a href="mailto:$1" style="color: inherit; text-decoration: underline; font-weight: 700;">$1</a>');
-
-        // 8. Native Line Breaks (Convert AI \n to <br>)
-        html = html.replace(/\n/g, '<br>');
-
-        // 9. Clean up excess <br> after injected list divs
-        html = html.replace(/<\/div><br>/g, '</div>');
-
-        return html;
-    }
-
+    return html;
+}
     function toggleWidget() {
         if (widget.classList.contains('force-hide-widget')) {
             widget.classList.remove('force-hide-widget');
@@ -207,16 +205,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 
-    function appendBotMessage(text, timeStr) {
-        const ts = timeStr || formatTime();
-        const row = document.createElement('div');
-        row.className = 'msg-row msg-bot';
-        // 👇 Now using formatRichText() 👇
-        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot">${formatRichText(text)}<div class="bubble-time">${ts}</div></div>`;
-        messagesEl.appendChild(row);
-        scrollToBottom();
-        return row.querySelector('.bubble-bot');
-    }
+   function appendBotMessage(text, timeStr) {
+    const ts = timeStr || formatTime();
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-bot';
+    row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div>
+                     <div class="bubble-bot">${formatRichText(text)}<div class="bubble-time">${ts}</div></div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+    return row.querySelector('.bubble-bot');
+}
 
     function appendUserMessage(text, timeStr) {
         const ts = timeStr || formatTime();

@@ -61,78 +61,105 @@
 
             <!-- Subscription Details -->
             <div class="subscription-details">
+
+                <!-- PATCHED: header row — plan info left, button top-right, status below plan name -->
                 <div class="subscription-header-info">
                     <div class="plan-info">
                         <span class="plan-badge {{ subscription.name }}">{{ subscription.display_name }}</span>
                         <h2>{{ subscription.plan.display_name }} Plan</h2>
-                        <p class="plan-price">
-                            {% if subscription.plan.price == 0 %}
+                        <!-- Status moved here, inline under the plan name -->
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+                            <p class="plan-price" style="margin:0;">
+                                {% if subscription.plan.price == 0 %}
                                 Free Trial
-                            {% else %}
+                                {% else %}
                                 ${{ "%.2f"|format(subscription.plan.price) }}/month
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div>
-                        <div class="status-indicator {{ 'pending' if subscription.payment_pending else 'trial' if subscription.is_trial else 'active' if not subscription.is_expired() else 'expired' }}">
-                            <span class="status-dot"></span>
-                            {% if subscription.payment_pending %}
-                                Payment Pending
-                            {% elif subscription.is_trial %}
-                                Trial Active
-                            {% elif subscription.is_expired() %}
-                                Expired
-                            {% else %}
-                                Active
-                            {% endif %}
+                                {% endif %}
+                            </p>
+                            <div class="status-indicator {{ 'pending' if subscription.payment_pending else 'trial' if subscription.is_trial else 'active' if not subscription.is_expired() else 'expired' }}">
+                                <span class="status-dot"></span>
+                                {% if subscription.payment_pending %}
+                                    Payment Pending
+                                {% elif subscription.is_trial %}
+                                    Trial Active
+                                {% elif subscription.is_expired() %}
+                                    Expired
+                                {% else %}
+                                    Active
+                                {% endif %}
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Upgrade/Renew button moved to top-right -->
+                    <div>
+                        {% if subscription.plan.name != 'advanced' %}
+                        <a href="{{ url_for('subscription_plans') }}" class="btn-upgrade">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:8px;vertical-align:middle;">
+                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                <polyline points="5 12 12 5 19 12"></polyline>
+                            </svg>
+                            Upgrade Plan
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('subscription_plans') }}" class="btn-upgrade">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:8px;vertical-align:middle;">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Renew Subscription
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Usage Statistics -->
                 <h3 style="font-size: 18px; font-weight: 700; color: #1a202c; margin-bottom: 16px;">Current Usage</h3>
-                `<div class="usage-stats">
-    <div class="usage-card">
-        <h4>Chatbots</h4>
-        <div class="usage-display">
-            <span class="usage-value">{{ subscription.chatbots_created }}</span>
-            <span class="usage-separator">/</span>
-            <span class="usage-limit">{{ subscription.plan.max_chatbots if subscription.plan.max_chatbots != -1 else 'Unlimited' }}</span>
-        </div>
-        {% if subscription.plan.max_chatbots != -1 %}
-        <div class="progress-bar">
-            {% set usage_percent = (subscription.chatbots_created / subscription.plan.max_chatbots * 100) %}
-            <div class="progress-fill {{ 'warning' if usage_percent > 70 else '' }} {{ 'danger' if usage_percent > 90 else '' }}"
-                 style="width: {{ usage_percent }}%"></div>
-        </div>
-        {% endif %}
-    </div>
+                <div class="usage-stats">
+                    <div class="usage-card">
+                        <h4>Chatbots</h4>
+                        <div class="usage-display">
+                            <span class="usage-value">{{ subscription.chatbots_created }}</span>
+                            <span class="usage-separator">/</span>
+                            <span class="usage-limit">{{ subscription.plan.max_chatbots if subscription.plan.max_chatbots != -1 else 'Unlimited' }}</span>
+                        </div>
+                        {% if subscription.plan.max_chatbots != -1 %}
+                        <div class="progress-bar">
+                            {% set usage_percent = (subscription.chatbots_created / subscription.plan.max_chatbots * 100) %}
+                            <div class="progress-fill {{ 'warning' if usage_percent > 70 else '' }} {{ 'danger' if usage_percent > 90 else '' }}"
+                                 style="width: {{ usage_percent }}%"></div>
+                        </div>
+                        {% endif %}
+                    </div>
 
-    <div class="usage-card">
-        <h4>Messages This Month</h4>
-        <div class="usage-display">
-            <span class="usage-value">{{ subscription.messages_this_month }}</span>
-            <span class="usage-separator">/</span>
-            <span class="usage-limit">{{ subscription.plan.max_messages_per_month if subscription.plan.max_messages_per_month != -1 else 'Unlimited' }}</span>
-        </div>
-        {% if subscription.plan.max_messages_per_month != -1 %}
-        <div class="progress-bar">
-            {% set msg_percent = (subscription.messages_this_month / subscription.plan.max_messages_per_month * 100) %}
-            <div class="progress-fill {{ 'warning' if msg_percent > 70 else '' }} {{ 'danger' if msg_percent > 90 else '' }}"
-                 style="width: {{ msg_percent }}%"></div>
-        </div>
-        {% endif %}
-    </div>
+                    <div class="usage-card">
+                        <h4>Messages This Month</h4>
+                        <div class="usage-display">
+                            <span class="usage-value">{{ subscription.messages_this_month }}</span>
+                            <span class="usage-separator">/</span>
+                            <span class="usage-limit">{{ subscription.plan.max_messages_per_month if subscription.plan.max_messages_per_month != -1 else 'Unlimited' }}</span>
+                        </div>
+                        {% if subscription.plan.max_messages_per_month != -1 %}
+                        <div class="progress-bar">
+                            {% set msg_percent = (subscription.messages_this_month / subscription.plan.max_messages_per_month * 100) %}
+                            <div class="progress-fill {{ 'warning' if msg_percent > 70 else '' }} {{ 'danger' if msg_percent > 90 else '' }}"
+                                 style="width: {{ msg_percent }}%"></div>
+                        </div>
+                        {% endif %}
+                    </div>
 
-    <div class="usage-card">
-        <h4>Subscription Period</h4>
-        <div class="usage-display">
-            <span class="usage-value">{{ subscription.days_remaining() }}</span>
-            <span class="usage-separator">/</span>
-            <span class="usage-limit">Days Remaining</span>
-        </div>
-    </div>
-</div>`
+                    <div class="usage-card">
+                        <h4>Subscription Period</h4>
+                        <div class="usage-display">
+                            <span class="usage-value">{{ subscription.days_remaining() }}</span>
+                            <span class="usage-separator">/</span>
+                            <span class="usage-limit">Days Remaining</span>
+                        </div>
+                        <p class="expiry-date" style="font-size: 14px;">
+                            <strong>Expires on:</strong> {{ subscription.end_date.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                </div>
 
                 <!-- Features -->
                 <h3 style="font-size: 18px; font-weight: 700; color: #1a202c; margin: 24px 0 16px 0;">Plan Features</h3>
@@ -210,26 +237,8 @@
                     {% endif %}
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    {% if subscription.plan.name != 'advanced' %}
-                    <a href="{{ url_for('subscription_plans') }}" class="btn-upgrade">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 8px; vertical-align: middle;">
-                            <line x1="12" y1="19" x2="12" y2="5"></line>
-                            <polyline points="5 12 12 5 19 12"></polyline>
-                        </svg>
-                        Upgrade Plan
-                    </a>
-                    {% else %}
-                    <a href="{{ url_for('subscription_plans') }}" class="btn-upgrade">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 8px; vertical-align: middle;">
-                            <polyline points="23 4 23 10 17 10"></polyline>
-                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                        </svg>
-                        Renew Subscription
-                    </a>
-                    {% endif %}
-                </div>
+                <!-- Action Buttons section REMOVED from bottom (moved to top-right) -->
+
             </div>
         </main>
     </div>

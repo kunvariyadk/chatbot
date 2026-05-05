@@ -381,7 +381,7 @@ def send_reset_password_email(user, reset_url):
       <p>If you did not request this, you can safely ignore this email.</p>
     </div>
     <div class="footer">ChatBot Builder - Secure Account Management</div>
-  </div>
+  </div>=
 </body>
 </html>"""
 

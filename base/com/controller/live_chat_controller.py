@@ -109,7 +109,6 @@ def send_live_chat_email(owner, chatbot, session_id):
     </body>
     </html>
     """
-
     try:
         import os
         import smtplib

@@ -1084,3 +1084,192 @@ body {
         width: 100%;
     }
 }
+
+
+/* ── Card size & layout improvements ── */
+.chatbots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 20px !important;
+}
+.chatbot-card {
+    padding: 20px 20px 18px !important;
+    min-height: 200px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;
+}
+.card-top {
+    padding-right: 36px; /* space for delete icon */
+    margin-bottom: 10px;
+}
+.card-top .chatbot-icon {
+    width: 48px !important;
+    height: 48px !important;
+    flex-shrink: 0;
+}
+.card-top .chatbot-icon img,
+.card-top .chatbot-icon svg {
+    width: 48px !important;
+    height: 48px !important;
+}
+.card-title-block h3 {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+.chatbot-description {
+    font-size: 13px !important;
+    color: #718096 !important;
+    margin-bottom: 14px !important;
+    flex: 1 !important;
+    line-height: 1.5 !important;
+}
+.card-meta {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: auto !important;
+}
+.meta-date {
+    margin-left: auto !important;
+    font-size: 11px !important;
+    color: #a0aec0 !important;
+}
+
+/* ── Delete icon button on card ── */
+.chatbot-card { position: relative; }
+
+/* ── Delete icon button — top-right corner of card ── */
+.btn-delete-bot {
+    position: absolute;
+    top: 12px;
+    right: 30px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: 7px;
+    color: #cbd5e0;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+    flex-shrink: 0;
+    z-index: 2;
+}
+.btn-delete-bot:hover {
+    background: #fff5f5;
+    border-color: #fed7d7;
+    color: #e53e3e;
+}
+.btn-delete-bot:active { transform: scale(0.96); }
+
+/* ── Modal backdrop ── */
+.delete-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 900;
+    animation: fadeIn 0.18s ease;
+}
+.delete-modal-backdrop.open { display: block; }
+
+/* ── Modal box ── */
+.delete-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%) scale(0.96);
+    z-index: 901;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+    padding: 28px 28px 24px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    border: 1px solid #e8ecf4;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+}
+.delete-modal.open {
+    display: block;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.delete-modal-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #fff5f5;
+    border: 1.5px solid #fed7d7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: #e53e3e;
+}
+.delete-modal h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+.delete-modal p {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+.delete-modal strong { color: #1a202c; }
+.delete-modal-warn {
+    font-size: 12px !important;
+    color: #e53e3e !important;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+}
+.delete-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.btn-modal-cancel {
+    flex: 1;
+    padding: 9px 16px;
+    border: 1.5px solid #e8ecf4;
+    border-radius: 8px;
+    background: #fff;
+    color: #4a5568;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.btn-modal-cancel:hover { background: #f7f8fc; border-color: #cbd5e0; }
+#deleteForm { flex: 1; }
+.btn-modal-confirm {
+    width: 100%;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #e53e3e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s, transform 0.12s;
+}
+.btn-modal-confirm:hover { background: #c53030; }
+.btn-modal-confirm:active { transform: scale(0.98); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

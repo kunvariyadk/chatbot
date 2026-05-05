@@ -107,6 +107,21 @@
                     </span>
                     <span class="meta-date">{{ chatbot.created_at.strftime('%b %d, %Y') }}</span>
                 </div>
+
+                <!-- Delete icon button — top-right corner -->
+                <button class="btn-delete-bot"
+                        data-id="{{ chatbot.id }}"
+                        data-name="{{ chatbot.name }}"
+                        onclick="openDeleteModal(event, this)"
+                        title="Delete bot"
+                        aria-label="Delete bot">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    </svg>
+                </button>
             </a>
             {% endfor %}
         </div>
@@ -213,7 +228,7 @@ function applyFilters() {
     });
 
     cards.forEach(function(c){ c.style.display = 'none'; });
-    visible.forEach(function(c){ c.style.display = 'block'; grid.appendChild(c); });
+    visible.forEach(function(c){ c.style.display = 'flex'; grid.appendChild(c); });
     if (countLabel) countLabel.textContent = visible.length + ' bot' + (visible.length !== 1 ? 's' : '');
     if (noResults)  noResults.style.display = visible.length === 0 ? 'block' : 'none';
     if (clearBtn)   clearBtn.style.display  = query ? 'flex' : 'none';
@@ -248,6 +263,63 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
     {% endwith %}
 });
+
+/* ══ DELETE MODAL ══ */
+function openDeleteModal(e, btn) {
+    e.preventDefault();
+    e.stopPropagation();
+    var id   = btn.getAttribute('data-id');
+    var name = btn.getAttribute('data-name');
+    document.getElementById('deleteModalBotName').textContent = '"' + name + '"';
+    document.getElementById('deleteForm').action = '/chatbot/delete/' + id;
+    document.getElementById('deleteModalBackdrop').classList.add('open');
+    // Small delay so display:block kicks in before transition
+    setTimeout(function() {
+        document.getElementById('deleteModal').classList.add('open');
+    }, 10);
+    document.addEventListener('keydown', handleDeleteEsc);
+}
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+    document.getElementById('deleteModalBackdrop').classList.remove('open');
+    document.removeEventListener('keydown', handleDeleteEsc);
+}
+function handleDeleteEsc(e) {
+    if (e.key === 'Escape') closeDeleteModal();
+}
+/* ══ END DELETE MODAL ══ */
+
 </script>
+
+<!-- ══ DELETE CONFIRMATION MODAL ══ -->
+<div class="delete-modal-backdrop" id="deleteModalBackdrop" onclick="closeDeleteModal()"></div>
+<div class="delete-modal" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="delete-modal-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+    </div>
+    <h3 id="deleteModalTitle">Delete Bot?</h3>
+    <p>You are about to permanently delete <strong id="deleteModalBotName"></strong>. This will remove all its training data, sessions and settings.</p>
+    <p class="delete-modal-warn">This action cannot be undone.</p>
+    <div class="delete-modal-actions">
+        <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <form id="deleteForm" method="GET" action="">
+            <input type="hidden" name="next" value="bots">
+            <button type="submit" class="btn-modal-confirm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                </svg>
+                 Delete
+            </button>
+        </form>
+    </div>
+</div>
+<!-- ══ END DELETE MODAL ══ -->
+
 </body>
 </html>

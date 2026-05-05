@@ -180,11 +180,11 @@
                 <span>Deploy</span>
             </button>
 
-            <div class="tab-spacer"></div>
-            <button class="tab-btn tab-delete" data-tab="delete" onclick="switchTab(this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                <span>Delete</span>
-            </button>
+<!--            <div class="tab-spacer"></div>-->
+            <!--            <button class="tab-btn tab-delete" data-tab="delete" onclick="switchTab(this)">-->
+            <!--                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>-->
+            <!--                <span>Delete</span>-->
+            <!--            </button>-->
         </div>
 
         <div class="tab-panel active" id="panel-overview">
@@ -253,40 +253,74 @@
                                         <div class="avatar-preview-wrap">
                                             <div class="avatar-preview" id="avatarPreview">
                                                 {% if chatbot.bot_avatar %}
-                                                <img src="{{ chatbot.bot_avatar }}" alt="Bot Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                                                <img src="{{ chatbot.bot_avatar }}" alt="Bot Avatar"
+                                                     style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
                                                 {% else %}
                                                 <span>{{ chatbot.bot_name[0].upper() if chatbot.bot_name else 'B' }}</span>
                                                 {% endif %}
                                             </div>
                                             <div class="avatar-camera-badge">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2.5">
+                                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                                    <circle cx="12" cy="13" r="4"/>
+                                                </svg>
                                             </div>
                                         </div>
 
                                         <div class="avatar-upload-info">
-                                            <div class="avatar-upload-title" id="avatarUploadTitle">{% if chatbot.bot_avatar %}Change Avatar{% else %}Upload Avatar{% endif %}</div>
-                                            <div class="avatar-upload-hint">PNG, JPG, GIF or WebP · Max 2 MB<br>Click or drag &amp; drop an image here</div>
+                                            <div class="avatar-upload-title" id="avatarUploadTitle">{% if
+                                                chatbot.bot_avatar %}Change Avatar{% else %}Upload Avatar{% endif %}
+                                            </div>
+                                            <div class="avatar-upload-hint">PNG, JPG, GIF or WebP · Max 2 MB<br>Click or
+                                                drag &amp; drop an image here
+                                            </div>
                                             <div class="avatar-file-tag" id="avatarFileTag">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2">
+                                                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                                    <polyline points="13 2 13 9 20 9"/>
+                                                </svg>
                                                 <span id="avatarFileName"></span>
-                                                <button type="button" onclick="clearAvatarSelection(event)" title="Remove"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                                                <button type="button" onclick="clearAvatarSelection(event)"
+                                                        title="Remove">
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                                         stroke="currentColor" stroke-width="2.5">
+                                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
 
                                         <div class="avatar-upload-actions" onclick="event.stopPropagation()">
-                                            <button type="button" class="btn-avatar-choose" onclick="document.getElementById('avatarFileInput').click()">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                            <button type="button" class="btn-avatar-choose"
+                                                    onclick="document.getElementById('avatarFileInput').click()">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2.5">
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                                    <polyline points="17 8 12 3 7 8"/>
+                                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                                </svg>
                                                 Choose
                                             </button>
-                                            <button type="button" class="btn-avatar-adjust hidden" id="btnAdjustAvatar" onclick="openAvatarEditor()">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <button type="button" class="btn-avatar-adjust hidden" id="btnAdjustAvatar"
+                                                    onclick="openAvatarEditor()">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2.5">
                                                     <circle cx="12" cy="12" r="3"/>
                                                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
                                                 </svg>
                                                 Adjust
                                             </button>
-                                            <button type="button" class="btn-avatar-remove {% if not chatbot.bot_avatar %}hidden{% endif %}" id="btnRemoveAvatar" onclick="removeAvatar(event)">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                                            <button type="button"
+                                                    class="btn-avatar-remove {% if not chatbot.bot_avatar %}hidden{% endif %}"
+                                                    id="btnRemoveAvatar" onclick="removeAvatar(event)">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2">
+                                                    <polyline points="3 6 5 6 21 6"/>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                                                </svg>
                                                 Remove
                                             </button>
                                         </div>
