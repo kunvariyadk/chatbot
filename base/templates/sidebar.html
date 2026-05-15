@@ -1,9 +1,27 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" width="45" height="35">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" width="45" height="32">
             <span>ChatBot Builder</span>
         </div>
+        <!-- ADDED: Slide toggle button -->
+        <button id="sidebarToggleBtn" style="
+            margin-left:auto;
+            width:28px; height:28px;
+            background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.15);
+            border-radius:6px;
+            cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            color:inherit;
+            flex-shrink:0;
+            transition:background 0.15s, transform 0.3s ease;
+        " aria-label="Collapse sidebar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+                <polyline points="9 18 3 12 9 6"/>
+            </svg>
+        </button>
     </div>
     <nav class="nav-menu">
         <div class="nav-section">
@@ -15,23 +33,23 @@
                     <rect x="14" y="14" width="7" height="7"/>
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
-                <span>Dashboard</span>
+                <span class="nav-label">Dashboard</span>
             </a>
         </div>
         <div class="nav-section">
-            <div class="nav-section-title">Workspace</div>
+            <div class="nav-section-title nav-label">Workspace</div>
             <a href="{{ url_for('bots') }}"
                class="nav-item {% if request.endpoint in ['bots', 'bot_detail', 'create_chatbot_route', 'edit_chatbot_route', 'deploy_chatbot', 'train_chatbot'] %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                <span>Bots</span>
+                <span class="nav-label">Bots</span>
             </a>
         </div>
 
         {% if user and user.subscription and user.subscription.plan and 'free' not in user.subscription.plan.name|lower %}
         <div class="nav-section">
-            <div class="nav-section-title">Support</div>
+            <div class="nav-section-title nav-label">Support</div>
             <a href="{{ url_for('live_chat_dashboard') }}"
                class="nav-item {% if 'live_chat' in request.endpoint %}active{% endif %}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -40,7 +58,7 @@
                     <circle cx="12" cy="10" r="1" fill="currentColor"/>
                     <circle cx="15" cy="10" r="1" fill="currentColor"/>
                 </svg>
-                <span>Live Chat</span>
+                <span class="nav-label">Live Chat</span>
                 <span id="sidebarBadge"
                       style="display:none; background:#e53e3e; color:#fff; border-radius:20px; padding:1px 8px; font-size:11px; font-weight:700; margin-left:auto;"></span>
             </a>
@@ -48,7 +66,7 @@
         {% endif %}
 
         <div class="nav-section">
-            <div class="nav-section-title">Account</div>
+            <div class="nav-section-title nav-label">Account</div>
             <a href="#"
                class="nav-item {% if request.endpoint in ['edit_profile', 'change_password'] %}expanded{% endif %}"
                id="accountMenu">
@@ -56,7 +74,7 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>
                 </svg>
-                <span>My Account</span>
+                <span class="nav-label">My Account</span>
                 <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                      style="margin-left:auto; transition:transform 0.2s; {% if request.endpoint in ['edit_profile', 'change_password'] %}transform:rotate(90deg);{% endif %}">
                     <polyline points="9 18 15 12 9 6"/>
@@ -102,7 +120,7 @@
                        <polyline points="16 17 21 12 16 7"/>
                        <line x1="21" y1="12" x2="9" y2="12"/>
                    </svg>
-                <span>Log Out</span>
+                <span class="nav-label">Log Out</span>
             </a>
         </div>
     </nav>
@@ -119,6 +137,77 @@
         </div>
     </div>
 </aside>
+
+<!-- ADDED: Sidebar slider CSS only -->
+<style>
+    /* Make header a flex row so toggle button sits inside it */
+    .sidebar-header {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        overflow: hidden !important;
+    }
+
+    /* Logo stays flex and doesn't overflow */
+    .sidebar-header .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .sidebar-header .logo span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: opacity 0.2s ease, width 0.3s ease;
+    }
+
+    /* Sidebar slide transition */
+    .sidebar {
+        transition: width 0.3s ease, min-width 0.3s ease;
+        overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+        width: 65px !important;
+        min-width: 65px !important;
+    }
+
+    /* Hide all text labels when collapsed */
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .user-details,
+    .sidebar.collapsed .logo span,
+    .sidebar.collapsed .chevron {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: opacity 0.2s ease;
+    }
+
+    /* Hide badge text when collapsed */
+    .sidebar.collapsed #sidebarBadge {
+        display: none !important;
+    }
+
+    /* Force close submenu when collapsed */
+    .sidebar.collapsed #accountSubmenu {
+        max-height: 0 !important;
+    }
+
+    /* Flip the toggle arrow when collapsed */
+    .sidebar.collapsed #sidebarToggleBtn {
+        transform: rotate(180deg);
+    }
+
+    /* Keep toggle button always visible and not shrinking */
+    #sidebarToggleBtn {
+        flex-shrink: 0;
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -141,6 +230,21 @@
                     if (chevron) chevron.style.transform = 'rotate(90deg)';
                 } else {
                     accSubMenu.style.maxHeight = '0';
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+
+        // ADDED: Sidebar slide toggle
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        if (toggleBtn && sidebarEl) {
+            toggleBtn.addEventListener('click', function () {
+                const collapsed = sidebarEl.classList.toggle('collapsed');
+                this.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+                if (collapsed && accSubMenu) {
+                    accSubMenu.style.maxHeight = '0';
+                    if (accMenuBtn) accMenuBtn.classList.remove('expanded');
+                    const chevron = accMenuBtn && accMenuBtn.querySelector('.chevron');
                     if (chevron) chevron.style.transform = 'rotate(0deg)';
                 }
             });

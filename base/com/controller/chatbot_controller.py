@@ -8,6 +8,8 @@ Fixes:
   5. _validate_buttons is now RECURSIVE to support infinite Nested Flow Builder
   6. Added 'live_chat' to valid_types to allow Live Agent transfers!
 """
+from werkzeug.utils import secure_filename
+
 from base import app, db
 from flask import (render_template, request, redirect, url_for,
                    session, flash, jsonify, send_from_directory, abort)
@@ -16,7 +18,6 @@ import secrets, json, os, time, base64, io, shutil
 from PIL import Image
 from base.com.controller.decorators import login_required
 from base.com.vo.chatbot_vo import Chatbot
-from base.com.vo.user_vo import User
 from base.com.dao.user_dao import get_user_by_id
 from base.com.dao.chat_dao import (
     get_chatbot_by_id, get_chatbots_by_user, create_chatbot,
@@ -292,11 +293,12 @@ def edit_chatbot_route(chatbot_id):
 
             remove_avatar_flag = request.form.get('remove_avatar', 'false').strip().lower()
             bot_avatar_data = request.form.get('bot_avatar_data', '').strip()
+            avatar_file = request.files.get('bot_avatar')
 
-            print(f"[AVATAR DEBUG] remove_flag='{remove_avatar_flag}' | has_b64={bool(bot_avatar_data)} | current_avatar={chatbot.bot_avatar}")
+            print(f"[AVATAR DEBUG] remove_flag='{remove_avatar_flag}' | has_b64={bool(bot_avatar_data)} | has_file={bool(avatar_file)} | current_avatar={chatbot.bot_avatar}")
 
             if remove_avatar_flag in ('true', '1', 'yes'):
-                # Delete the physical file if it exists
+                # Delete old file
                 if chatbot.bot_avatar and chatbot.bot_avatar.startswith('/data/users/'):
                     rel = chatbot.bot_avatar.lstrip('/')
                     old_path = os.path.normpath(os.path.join(os.getcwd(), rel))
@@ -306,47 +308,140 @@ def edit_chatbot_route(chatbot_id):
                             print(f"[AVATAR DEBUG] Deleted file: {old_path}")
                         except Exception as ex:
                             print(f"[AVATAR DEBUG] Could not delete file: {ex}")
+                chatbot.bot_avatar = None
                 # Force SQLAlchemy to detect the change
                 from sqlalchemy.orm.attributes import flag_modified
-                chatbot.bot_avatar = None
                 flag_modified(chatbot, 'bot_avatar')
                 print("[AVATAR DEBUG] Avatar set to None and flagged modified")
 
             elif bot_avatar_data and bot_avatar_data.startswith('data:image'):
+                # Delete old avatar file if exists
                 if chatbot.bot_avatar and chatbot.bot_avatar.startswith('/data/users/'):
                     rel = chatbot.bot_avatar.lstrip('/')
-                    old_path = os.path.normpath(os.path.join(os.getcwd(), rel))
-                    if os.path.exists(old_path):
+                    old = os.path.normpath(os.path.join(os.getcwd(), rel))
+                    if os.path.exists(old):
                         try:
-                            os.remove(old_path)
+                            os.remove(old)
                         except Exception:
                             pass
-
+                # Save new base64 image
                 db_path = _save_avatar_from_b64(bot_avatar_data, chatbot.user_id, chatbot_id)
                 if db_path:
                     chatbot.bot_avatar = db_path
+                    print("[AVATAR DEBUG] Base64 avatar saved successfully")
+                else:
+                    print("[AVATAR DEBUG] ERROR: _save_avatar_from_b64 returned None")
 
+            elif avatar_file and avatar_file.filename:
+                # Handle direct file upload (fallback)
+                # Delete old file
+                if chatbot.bot_avatar and chatbot.bot_avatar.startswith('/data/users/'):
+                    rel = chatbot.bot_avatar.lstrip('/')
+                    old = os.path.normpath(os.path.join(os.getcwd(), rel))
+                    if os.path.exists(old):
+                        os.remove(old)
+                # Save new file
+                filename = secure_filename(avatar_file.filename)
+                chatbot_folder = os.path.normpath(os.path.join(
+                    'data', 'users', f'user_{chatbot.user_id}',
+                    'chatbots', f'chatbot_{chatbot_id}'
+                ))
+                os.makedirs(chatbot_folder, exist_ok=True)
+                file_path = os.path.join(chatbot_folder, 'avatar.png')  # always save as avatar.png
+                avatar_file.save(file_path)
+
+                # Thumbnail (optional)
+                try:
+                    from PIL import Image
+                    img = Image.open(file_path)
+                    img.thumbnail((500, 500))
+                    img.save(file_path)
+                except Exception:
+                    pass
+
+                chatbot.bot_avatar = f"/data/users/user_{chatbot.user_id}/chatbots/chatbot_{chatbot_id}/avatar.png"
+                print("[AVATAR DEBUG] File upload avatar saved")
+
+            # Rest of your existing update logic…
             chatbot.use_ml_model = request.form.get('use_ml_model') == 'on'
             chatbot.updated_at = datetime.now(timezone.utc)
             db.session.commit()
-            db.session.expire(chatbot)   # force fresh DB read on next access
-
+            db.session.expire(chatbot)
             flash('Chatbot updated successfully!', 'success')
             return redirect(url_for('bot_detail', chatbot_id=chatbot_id))
 
         except Exception as e:
             db.session.rollback()
-            import traceback;
+            import traceback
             traceback.print_exc()
             flash(f'Error updating chatbot: {str(e)}', 'error')
             return redirect(request.url)
+    #     try:
+    #         chatbot.name = request.form.get('name', '').strip()
+    #         chatbot.bot_name = request.form.get('bot_name', '').strip()
+    #         chatbot.description = request.form.get('description', '').strip()
+    #         chatbot.welcome_message = request.form.get('welcome_message', '').strip()
+    #         chatbot.theme_color = request.form.get('theme_color', '#4F46E5')
+    #         chatbot.chat_background_color = request.form.get('chat_background_color', '#F7FAFC')
+    #         chatbot.bot_message_color = request.form.get('bot_message_color', '#FFFFFF')
+    #         chatbot.bot_text_color = request.form.get('bot_text_color', '#1A202C')
+    #         chatbot.user_text_color = request.form.get('user_text_color', '#FFFFFF')
+    #
+    #         remove_avatar_flag = request.form.get('remove_avatar', 'false').strip().lower()
+    #         bot_avatar_data = request.form.get('bot_avatar_data', '').strip()
+    #
+    #         print(f"[AVATAR DEBUG] remove_flag='{remove_avatar_flag}' | has_b64={bool(bot_avatar_data)} | current_avatar={chatbot.bot_avatar}")
+    #
+    #         if remove_avatar_flag in ('true', '1', 'yes'):
+    #             # Delete the physical file if it exists
+    #             if chatbot.bot_avatar and chatbot.bot_avatar.startswith('/data/users/'):
+    #                 rel = chatbot.bot_avatar.lstrip('/')
+    #                 old_path = os.path.normpath(os.path.join(os.getcwd(), rel))
+    #                 if os.path.exists(old_path):
+    #                     try:
+    #                         os.remove(old_path)
+    #                         print(f"[AVATAR DEBUG] Deleted file: {old_path}")
+    #                     except Exception as ex:
+    #                         print(f"[AVATAR DEBUG] Could not delete file: {ex}")
+    #             # Force SQLAlchemy to detect the change
+    #             from sqlalchemy.orm.attributes import flag_modified
+    #             chatbot.bot_avatar = None
+    #             flag_modified(chatbot, 'bot_avatar')
+    #             print("[AVATAR DEBUG] Avatar set to None and flagged modified")
+    #
+    #         elif bot_avatar_data and bot_avatar_data.startswith('data:image'):
+    #             if chatbot.bot_avatar and chatbot.bot_avatar.startswith('/data/users/'):
+    #                 rel = chatbot.bot_avatar.lstrip('/')
+    #                 old_path = os.path.normpath(os.path.join(os.getcwd(), rel))
+    #                 if os.path.exists(old_path):
+    #                     try:
+    #                         os.remove(old_path)
+    #                     except Exception:
+    #                         pass
+    #
+    #             db_path = _save_avatar_from_b64(bot_avatar_data, chatbot.user_id, chatbot_id)
+    #             if db_path:
+    #                 chatbot.bot_avatar = db_path
+    #
+    #         chatbot.use_ml_model = request.form.get('use_ml_model') == 'on'
+    #         chatbot.updated_at = datetime.now(timezone.utc)
+    #         db.session.commit()
+    #         db.session.expire(chatbot)   # force fresh DB read on next access
+    #
+    #         flash('Chatbot updated successfully!', 'success')
+    #         return redirect(url_for('bot_detail', chatbot_id=chatbot_id))
+    #
+        # except Exception as e:
+        #     db.session.rollback()
+        #     import traceback;
+        #     traceback.print_exc()
+        #     flash(f'Error updating chatbot: {str(e)}', 'error')
+        #     return redirect(request.url)
 
     return render_template('bot_details.html', chatbot=chatbot, chatbots=chatbots, user=user)
 
 
-# ================================================================
-# ROUTE — Delete chatbot
-# ================================================================
+
 # ================================================================
 # ROUTE — Delete chatbot
 # ================================================================

@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+}
+
 /* ============================================================
    CREATE CHATBOT — perfect layout
    ============================================================ */
@@ -1000,7 +1008,7 @@ body {
    LIVE PREVIEW — right column (sticky dark panel)
 ══════════════════════════════════════════════ */
 .preview-column {
-    background: linear-gradient(155deg, #131929 0%, #1a1645 50%, #1c1030 100%);
+    /*background: linear-gradient(155deg, #131929 0%, #1a1645 50%, #1c1030 100%);*/
     padding: 20px 16px 24px;
     display: flex;
     flex-direction: column;
@@ -1008,17 +1016,17 @@ body {
     overflow: hidden;
 }
 
-.preview-column::before {
-    content: '';
-    position: absolute;
-    top: -70px;
-    right: -70px;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(102, 126, 234, .2) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
+/*.preview-column::before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: -70px;*/
+/*    right: -70px;*/
+/*    width: 200px;*/
+/*    height: 200px;*/
+/*    background: radial-gradient(circle, rgba(102, 126, 234, .2) 0%, transparent 70%);*/
+/*    border-radius: 50%;*/
+/*    pointer-events: none;*/
+/*}*/
 
 .preview-column::after {
     content: '';
@@ -1042,9 +1050,9 @@ body {
 }
 
 .preview-column h2 {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
-    color: rgba(255, 255, 255, .4);
+    color: rgba(21, 21, 21, 0.4);
     text-transform: uppercase;
     letter-spacing: 1.4px;
     display: flex;
@@ -1084,14 +1092,7 @@ body {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, .06), 0 8px 28px rgba(0, 0, 0, .55);
 }
 
-.chatbot-preview::before {
-    content: '';
-    display: block;
-    height: 3px;
-    background: linear-gradient(90deg, #667eea, #a78bfa, #764ba2, #667eea);
-    background-size: 300%;
-    animation: barSlide 4s linear infinite;
-}
+
 
 @keyframes barSlide {
     0% {
@@ -1161,8 +1162,8 @@ body {
 
 .preview-body {
     padding: 14px 12px;
-    min-height: 190px;
-    max-height: 280px;
+    /*min-height: 190px;*/
+    height: 280px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;

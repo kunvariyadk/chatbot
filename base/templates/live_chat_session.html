@@ -6,8 +6,9 @@
     <title>{{ chat_session.visitor_name or 'Live Chat' }} — {{ chatbot.bot_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat_session.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/static/js/socket.io.min.js"></script>
+
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>-->
 </head>
 <body>
 <div class="dashboard-container">
@@ -177,7 +178,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 if (IS_LIVE) {
-    const socket = io({ transports: ['websocket', 'polling'] });
+    // const socket = io({ transports: ['websocket', 'polling'] })
+    const socket = io(window.location.origin, { transports: ['websocket', 'polling'] });
+
     socket.on('connect', () => { socket.emit('join_live_room', { session_id: SESSION_ID }); });
     socket.on('new_live_message', (data) => { appendMessage(data.sender_role, data.message, data.timestamp); });
     socket.on('user_is_typing', () => { if (userTypingRow) userTypingRow.style.display = 'block'; scrollBottom(); });

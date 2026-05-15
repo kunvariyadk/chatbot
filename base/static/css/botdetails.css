@@ -6,6 +6,13 @@
     padding: 0;
     box-sizing: border-box;
 }
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+}
 
 :root {
     --brand-1: #667eea;
@@ -1575,9 +1582,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(19, 19, 19, 0.5);
     text-transform: uppercase;
     letter-spacing: 1.4px;
     margin-bottom: 10px;
@@ -1608,25 +1615,25 @@ body {
 
 /* Wrapper — dark themed like edit page preview */
 .edit-live-preview {
-    background: linear-gradient(155deg, #131929 0%, #1a1645 50%, #1c1030 100%);
+    /*background: linear-gradient(155deg, #131929 0%, #1a1645 50%, #1c1030 100%);*/
     border-radius: var(--radius-lg);
     padding: 16px 14px 20px;
     position: sticky;
     top: 20px;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
-.edit-live-preview::before {
-    content: '';
-    position: absolute;
-    top: -60px;
-    right: -60px;
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle, rgba(102, 126, 234, .18) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
+/*.edit-live-preview::before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: -60px;*/
+/*    right: -60px;*/
+/*    width: 180px;*/
+/*    height: 180px;*/
+/*    background: radial-gradient(circle, rgba(102, 126, 234, .18) 0%, transparent 70%);*/
+/*    border-radius: 50%;*/
+/*    pointer-events: none;*/
+/*}*/
 
 .edit-live-preview::after {
     content: '';
@@ -1926,8 +1933,8 @@ body {
 
 .elp-messages {
     padding: 12px 10px;
-    min-height: 160px;
-    max-height: 200px;
+    /*min-height: 160px;*/
+    height: 250px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;

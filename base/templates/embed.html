@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ chatbot.bot_name }} - Chat Widget</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/embed.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/static/js/socket.io.min.js"></script>
 
     <style>
+        /* Additional UI overrides to ensure shadow-free and clean embedding */
         .bubble-user, .bubble-owner {
             white-space: normal !important;
         }
@@ -22,18 +20,42 @@
         .bubble-bot strong {
             color: inherit;
         }
+
+        /* Guarantee no shadows anywhere for seamless integration */
+        .widget,
+        .launcher,
+        .launcher:hover,
+        .help-message,
+        .bubble-bot,
+        .bubble-user,
+        .header,
+        .live-banner,
+        .flow-btn,
+        .close-btn,
+        .msg-avatar,
+        #sendBtn {
+            box-shadow: none !important;
+        }
+
+        /* Slight border for widget definition (no shadow) */
+        .widget {
+            border: 1px solid #eef2f6;
+        }
+
+        /* Keep interactive elements clean */
+        .launcher {
+            background: transparent;
+        }
+
+        .launcher.has-avatar {
+            background: white;
+        }
     </style>
 </head>
 <body>
 
-<button class="launcher {% if bot_avatar_url %}has-avatar{% endif %}" id="launcher" title="Chat with {{ chatbot.bot_name }}">
-    {% if bot_avatar_url %}
-<!--             <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}" class="launcher-avatar">-->
-        <img src="../static/img/Ai%20Robot%20Vector%20Art%20(1).gif" alt="{{ chatbot.bot_name }}" style="width:120%" >
-    {% else %}
-        <svg class="launcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-    {% endif %}
-    <svg class="launcher-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+<button class="launcher has-avatar" id="launcher" title="Chat with {{ chatbot.bot_name }}" style="background-color: rgba(0,0,0,0)">
+      <img src="../static/img/Ai%20Robot%20Vector%20Art%20(1).gif" alt="{{ chatbot.bot_name }}" style="width:120%" >
     <div class="help-message" id="helpMessage">👋 How may I help you?</div>
 </button>
 
@@ -44,12 +66,31 @@
                 {% if bot_avatar_url %}
                     <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}">
                 {% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                        <rect x="16" y="24" width="32" height="28" rx="6" fill="{{ settings.themeColor or '#4F46E5' }}"/>
-                        <circle cx="24" cy="34" r="3.5" fill="white"/>
-                        <circle cx="40" cy="34" r="3.5" fill="white"/>
-                        <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                    <!-- Antenna -->
+                    <line x1="32" y1="5" x2="32" y2="15" stroke="{{ settings.themeColor or '#F97316' }}"
+                          stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="32" cy="4" r="3" fill="{{ settings.themeColor or '#F97316' }}"/>
+
+                    <!-- Head background (solid theme color) -->
+                    <rect x="8" y="15" width="48" height="40" rx="10" fill="{{ settings.themeColor or '#F97316' }}"/>
+
+                    <!-- Head inner face (white panel) -->
+                    <rect x="11" y="18" width="42" height="34" rx="7" fill="white" opacity="0.2"/>
+
+                    <!-- Eyes -->
+                    <circle cx="22" cy="31" r="5" fill="white" opacity="0.3"/>
+                    <circle cx="22" cy="31" r="3.5" fill="white"/>
+                    <circle cx="23.2" cy="29.8" r="1.2" fill="{{ settings.themeColor or '#F97316' }}"/>
+
+                    <circle cx="42" cy="31" r="5" fill="white" opacity="0.3"/>
+                    <circle cx="42" cy="31" r="3.5" fill="white"/>
+                    <circle cx="43.2" cy="29.8" r="1.2" fill="{{ settings.themeColor or '#F97316' }}"/>
+
+                    <!-- Mouth -->
+                    <rect x="22" y="43" width="20" height="4" rx="2" fill="white" opacity="0.5"/>
+                    <rect x="22" y="43" width="10" height="4" rx="2" fill="white" opacity="0.9"/>
+                </svg>
                 {% endif %}
             </div>
             <div class="header-text">
@@ -98,13 +139,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const sendBtn = document.getElementById('sendBtn');
     if (sendBtn) { sendBtn.style.background = config.themeColor || '#4F46E5'; sendBtn.style.border = 'none'; }
 
-    const launcher       = document.getElementById('launcher');
-    const widget         = document.getElementById('widget');
-    const closeBtn       = document.getElementById('closeBtn');
-    const messagesEl     = document.getElementById('messages');
-    const inputEl        = document.getElementById('input');
-    const liveBanner     = document.getElementById('liveBanner');
-    const headerStatus   = document.getElementById('headerStatus');
+    const launcher = document.getElementById('launcher');
+    const widget = document.getElementById('widget');
+    const closeBtn = document.getElementById('closeBtn');
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+    const liveBanner = document.getElementById('liveBanner');
+    const headerStatus = document.getElementById('headerStatus');
     const userEndLiveBtn = document.getElementById('userEndLiveBtn');
 
     const EXPIRY_TIME_MS = 60 * 60 * 1000;
@@ -135,8 +176,29 @@ document.addEventListener("DOMContentLoaded", function() {
     let socket = null;
 
     const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18"><rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor||'#4F46E5'}"/><circle cx="24" cy="34" r="3.5" fill="white"/><circle cx="40" cy="34" r="3.5" fill="white"/><path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
-    const botAvatarHtml = config.botAvatar ? `<img src="${config.botAvatar}" alt="Bot">` : fallbackSvg;
+    const botAvatarHtml = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
+  <!-- Antenna -->
+  <line x1="32" y1="5" x2="32" y2="15" stroke="${config.themeColor||'#F97316'}" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="4" r="3" fill="${config.themeColor||'#F97316'}"/>
 
+  <!-- Head -->
+  <rect x="8" y="15" width="48" height="40" rx="10" fill="${config.themeColor||'#F97316'}"/>
+  <rect x="11" y="18" width="42" height="34" rx="7" fill="white" opacity="0.2"/>
+
+  <!-- Eyes -->
+  <circle cx="22" cy="31" r="5" fill="white" opacity="0.3"/>
+  <circle cx="22" cy="31" r="3.5" fill="white"/>
+  <circle cx="23.2" cy="29.8" r="1.2" fill="${config.themeColor||'#F97316'}"/>
+
+  <circle cx="42" cy="31" r="5" fill="white" opacity="0.3"/>
+  <circle cx="42" cy="31" r="3.5" fill="white"/>
+  <circle cx="43.2" cy="29.8" r="1.2" fill="${config.themeColor||'#F97316'}"/>
+
+  <!-- Mouth -->
+  <rect x="22" y="43" width="20" height="4" rx="2" fill="white" opacity="0.5"/>
+  <rect x="22" y="43" width="10" height="4" rx="2" fill="white" opacity="0.9"/>
+</svg>`;
     function formatTime(ts) {
         const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true };
         if (!ts) return new Date().toLocaleTimeString('en-IN', options);
@@ -193,10 +255,14 @@ document.addEventListener("DOMContentLoaded", function() {
             launcher.classList.add('open');
             if (!isChatInitialized) { initChat(); isChatInitialized = true; }
             if (inputEl) inputEl.focus();
+            window.parent.postMessage({ type: 'launcher:clicked' }, '*');
+
         } else {
             widget.classList.remove('force-show-widget');
             widget.classList.add('force-hide-widget');
             launcher.classList.remove('open');
+            window.parent.postMessage({ type: 'close:clicked' }, '*');
+
         }
     }
 
@@ -280,7 +346,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function connectSocket() {
         if (socket && socket.connected) return;
-        socket = io({ transports: ['websocket', 'polling'] });
+        // socket = io({ transports: ['websocket', 'polling'] });
+        socket = io(config.serverUrl || window.location.origin, {
+            transports: ['websocket', 'polling']
+        });
         socket.on('connect', () => { if (currentSessionId) socket.emit('join_live_room', { session_id: currentSessionId }); });
         socket.on('live_chat_ended', (data) => {
             deactivateLiveMode(data.message);
@@ -536,3 +605,588 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 </body>
 </html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>{{ chatbot.bot_name }} - Chat Widget</title>-->
+<!--    <link rel="preconnect" href="https://fonts.googleapis.com">-->
+<!--    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/embed.css') }}">-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>-->
+
+<!--    <style>-->
+<!--        .bubble-user, .bubble-owner {-->
+<!--            white-space: normal !important;-->
+<!--        }-->
+
+<!--        .bubble-bot div {-->
+<!--            line-height: 1.4;-->
+<!--        }-->
+
+<!--        .bubble-bot strong {-->
+<!--            color: inherit;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<button class="launcher has-avatar" id="launcher" title="Chat with {{ chatbot.bot_name }}" style="background-color: rgba(0,0,0,0)">-->
+<!--&lt;!&ndash;    {% if bot_avatar_url %}&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;             <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}" class="launcher-avatar">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        <img src="../static/img/Ai%20Robot%20Vector%20Art%20(1).gif" alt="{{ chatbot.bot_name }}" style="width:120%" >&ndash;&gt;-->
+<!--&lt;!&ndash;    {% else %}&ndash;&gt;-->
+<!--&lt;!&ndash;        <svg class="launcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>&ndash;&gt;-->
+<!--&lt;!&ndash;    {% endif %}&ndash;&gt;-->
+<!--&lt;!&ndash;    <svg class="launcher-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>&ndash;&gt;-->
+<!--      <img src="../static/img/Ai%20Robot%20Vector%20Art%20(1).gif" alt="{{ chatbot.bot_name }}" style="width:120%" >-->
+<!--    <div class="help-message" id="helpMessage">👋 How may I help you?</div>-->
+<!--</button>-->
+
+<!--<div class="widget force-hide-widget" id="widget">-->
+<!--    <div class="header" id="widgetHeader">-->
+<!--        <div class="header-info">-->
+<!--            <div class="avatar">-->
+<!--                {% if bot_avatar_url %}-->
+<!--                    <img src="{{ bot_avatar_url }}" alt="{{ chatbot.bot_name }}">-->
+<!--                {% else %}-->
+<!--&lt;!&ndash;                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <rect x="16" y="24" width="32" height="28" rx="6" fill="{{ settings.themeColor or '#4F46E5' }}"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <circle cx="24" cy="34" r="3.5" fill="white"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <circle cx="40" cy="34" r="3.5" fill="white"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </svg>&ndash;&gt;-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">-->
+<!--                    &lt;!&ndash; Antenna &ndash;&gt;-->
+<!--                    <line x1="32" y1="5" x2="32" y2="15" stroke="{{ settings.themeColor or '#F97316' }}"-->
+<!--                          stroke-width="2" stroke-linecap="round"/>-->
+<!--                    <circle cx="32" cy="4" r="3" fill="{{ settings.themeColor or '#F97316' }}"/>-->
+
+<!--                    &lt;!&ndash; Head background (solid theme color) &ndash;&gt;-->
+<!--                    <rect x="8" y="15" width="48" height="40" rx="10" fill="{{ settings.themeColor or '#F97316' }}"/>-->
+
+<!--                    &lt;!&ndash; Head inner face (white panel) &ndash;&gt;-->
+<!--                    <rect x="11" y="18" width="42" height="34" rx="7" fill="white" opacity="0.2"/>-->
+
+<!--                    &lt;!&ndash; Eyes &ndash;&gt;-->
+<!--                    <circle cx="22" cy="31" r="5" fill="white" opacity="0.3"/>-->
+<!--                    <circle cx="22" cy="31" r="3.5" fill="white"/>-->
+<!--                    <circle cx="23.2" cy="29.8" r="1.2" fill="{{ settings.themeColor or '#F97316' }}"/>-->
+
+<!--                    <circle cx="42" cy="31" r="5" fill="white" opacity="0.3"/>-->
+<!--                    <circle cx="42" cy="31" r="3.5" fill="white"/>-->
+<!--                    <circle cx="43.2" cy="29.8" r="1.2" fill="{{ settings.themeColor or '#F97316' }}"/>-->
+
+<!--                    &lt;!&ndash; Mouth &ndash;&gt;-->
+<!--                    <rect x="22" y="43" width="20" height="4" rx="2" fill="white" opacity="0.5"/>-->
+<!--                    <rect x="22" y="43" width="10" height="4" rx="2" fill="white" opacity="0.9"/>-->
+<!--                </svg>-->
+<!--                {% endif %}-->
+<!--            </div>-->
+<!--            <div class="header-text">-->
+<!--                <h3>{{ chatbot.bot_name }}</h3>-->
+<!--                <p id="headerStatus">Online</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <button class="close-btn" id="closeBtn" title="Close">-->
+<!--            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>-->
+<!--        </button>-->
+<!--    </div>-->
+
+<!--    <div class="live-banner" id="liveBanner">-->
+<!--        <div class="live-banner-left">-->
+<!--            <span class="live-banner-dot"></span> Live Support-->
+<!--        </div>-->
+<!--        <button class="btn-end-live" id="userEndLiveBtn">End Chat</button>-->
+<!--    </div>-->
+
+<!--    <div class="messages" id="messages"></div>-->
+
+<!--    <div class="owner-typing-row msg-row msg-bot" id="ownerTypingRow" style="padding: 0 16px 8px; display:none;"></div>-->
+
+<!--    <div class="input-area">-->
+<!--        <label for="input" style="display:none;"></label>-->
+<!--        <input type="text" id="input" placeholder="Type your message…" autocomplete="off">-->
+<!--        <button id="sendBtn" title="Send">-->
+<!--            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>-->
+<!--        </button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--document.addEventListener("DOMContentLoaded", function() {-->
+<!--    const config = {{ settings | tojson | safe }};-->
+
+<!--    const root = document.documentElement;-->
+<!--    root.style.setProperty('&#45;&#45;theme-color', config.themeColor || '#4F46E5');-->
+<!--    root.style.setProperty('&#45;&#45;bot-bg', config.botMessageColor || '#fff');-->
+<!--    root.style.setProperty('&#45;&#45;bot-text', config.botTextColor || '#1a202c');-->
+<!--    root.style.setProperty('&#45;&#45;user-text', config.userTextColor || '#fff');-->
+
+<!--    document.getElementById('widgetHeader').style.background = config.themeColor || '#4F46E5';-->
+<!--    // document.getElementById('launcher').style.background     = config.themeColor || '#4F46E5';-->
+<!--    document.getElementById('messages').style.background     = config.chatBackgroundColor || '#F7FAFC';-->
+<!--    const sendBtn = document.getElementById('sendBtn');-->
+<!--    if (sendBtn) { sendBtn.style.background = config.themeColor || '#4F46E5'; sendBtn.style.border = 'none'; }-->
+
+<!--    const launcher       = document.getElementById('launcher');-->
+<!--    const widget         = document.getElementById('widget');-->
+<!--    const closeBtn       = document.getElementById('closeBtn');-->
+<!--    const messagesEl     = document.getElementById('messages');-->
+<!--    const inputEl        = document.getElementById('input');-->
+<!--    const liveBanner     = document.getElementById('liveBanner');-->
+<!--    const headerStatus   = document.getElementById('headerStatus');-->
+<!--    const userEndLiveBtn = document.getElementById('userEndLiveBtn');-->
+
+<!--    const EXPIRY_TIME_MS = 60 * 60 * 1000;-->
+
+<!--    function getValidSession() {-->
+<!--        const raw = localStorage.getItem('chat_session_' + config.embedCode);-->
+<!--        if (!raw) return null;-->
+<!--        try {-->
+<!--            const data = JSON.parse(raw);-->
+<!--            if (Date.now() - data.timestamp > EXPIRY_TIME_MS) {-->
+<!--                localStorage.removeItem('chat_session_' + config.embedCode);-->
+<!--                return null;-->
+<!--            }-->
+<!--            return data.id;-->
+<!--        } catch (e) {-->
+<!--            localStorage.removeItem('chat_session_' + config.embedCode);-->
+<!--            return null;-->
+<!--        }-->
+<!--    }-->
+
+<!--    function saveSession(id) {-->
+<!--        localStorage.setItem('chat_session_' + config.embedCode, JSON.stringify({ id: id, timestamp: Date.now() }));-->
+<!--    }-->
+
+<!--    let isChatInitialized = false;-->
+<!--    let currentSessionId = getValidSession();-->
+<!--    let isLiveMode = false;-->
+<!--    let socket = null;-->
+
+<!--    const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="18" height="18"><rect x="16" y="24" width="32" height="28" rx="6" fill="${config.themeColor||'#4F46E5'}"/><circle cx="24" cy="34" r="3.5" fill="white"/><circle cx="40" cy="34" r="3.5" fill="white"/><path d="M 24 44 Q 32 48 40 44" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;-->
+<!--    const botAvatarHtml = `-->
+<!--<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">-->
+<!--  &lt;!&ndash; Antenna &ndash;&gt;-->
+<!--  <line x1="32" y1="5" x2="32" y2="15" stroke="${config.themeColor||'#F97316'}" stroke-width="2" stroke-linecap="round"/>-->
+<!--  <circle cx="32" cy="4" r="3" fill="${config.themeColor||'#F97316'}"/>-->
+
+<!--  &lt;!&ndash; Head &ndash;&gt;-->
+<!--  <rect x="8" y="15" width="48" height="40" rx="10" fill="${config.themeColor||'#F97316'}"/>-->
+<!--  <rect x="11" y="18" width="42" height="34" rx="7" fill="white" opacity="0.2"/>-->
+
+<!--  &lt;!&ndash; Eyes &ndash;&gt;-->
+<!--  <circle cx="22" cy="31" r="5" fill="white" opacity="0.3"/>-->
+<!--  <circle cx="22" cy="31" r="3.5" fill="white"/>-->
+<!--  <circle cx="23.2" cy="29.8" r="1.2" fill="${config.themeColor||'#F97316'}"/>-->
+
+<!--  <circle cx="42" cy="31" r="5" fill="white" opacity="0.3"/>-->
+<!--  <circle cx="42" cy="31" r="3.5" fill="white"/>-->
+<!--  <circle cx="43.2" cy="29.8" r="1.2" fill="${config.themeColor||'#F97316'}"/>-->
+
+<!--  &lt;!&ndash; Mouth &ndash;&gt;-->
+<!--  <rect x="22" y="43" width="20" height="4" rx="2" fill="white" opacity="0.5"/>-->
+<!--  <rect x="22" y="43" width="10" height="4" rx="2" fill="white" opacity="0.9"/>-->
+<!--</svg>`;-->
+<!--    function formatTime(ts) {-->
+<!--        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true };-->
+<!--        if (!ts) return new Date().toLocaleTimeString('en-IN', options);-->
+
+<!--        if (typeof ts === 'number') {-->
+<!--            return new Date(ts > 10000000000 ? ts : ts * 1000).toLocaleTimeString('en-IN', options);-->
+<!--        }-->
+
+<!--        if (typeof ts === 'string') {-->
+<!--            if (/^\d{1,2}:\d{2}$/.test(ts) || /^\d{1,2}:\d{2}:\d{2}$/.test(ts)) {-->
+<!--                let [h, m] = ts.split(':');-->
+<!--                let d = new Date();-->
+<!--                d.setUTCHours(parseInt(h), parseInt(m), 0, 0);-->
+<!--                return d.toLocaleTimeString('en-IN', options);-->
+<!--            }-->
+<!--            let cleanTs = ts;-->
+<!--            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(cleanTs)) cleanTs = cleanTs.replace(' ', 'T') + 'Z';-->
+<!--            else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(cleanTs)) cleanTs += 'Z';-->
+
+<!--            let d = new Date(cleanTs);-->
+<!--            if (!isNaN(d)) return d.toLocaleTimeString('en-IN', options);-->
+<!--        }-->
+<!--        return new Date().toLocaleTimeString('en-IN', options);-->
+<!--    }-->
+
+<!--   function formatRichText(text) {-->
+<!--    if (!text) return '';-->
+
+<!--    // 1. Escape HTML to prevent XSS-->
+<!--    let html = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');-->
+
+<!--    // 2. Bold Text (**text**)-->
+<!--    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>');-->
+
+<!--    // 3. Bullet Points (- or *)-->
+<!--    html = html.replace(/^ ?[-*]\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><span style="color: var(&#45;&#45;theme-color, #4F46E5); font-weight: bold;">&bull;</span><span style="flex:1;">$1</span></div>');-->
+
+<!--    // 4. Numbered Lists (1. 2.)-->
+<!--    html = html.replace(/^ ?(\d+)\.\s+(.+)/gm, '<div style="display: flex; gap: 8px; margin: 8px 0;"><strong>$1.</strong><span style="flex:1;">$2</span></div>');-->
+
+<!--    // 5. Links & Emails-->
+<!--    html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline; font-weight: 700; word-break: break-word;">$1</a>');-->
+<!--    html = html.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi, '<a href="mailto:$1" style="color: inherit; text-decoration: underline; font-weight: 700;">$1</a>');-->
+
+<!--    // 6. Native Line Breaks-->
+<!--    html = html.replace(/\n/g, '<br>');-->
+
+<!--    return html;-->
+<!--}-->
+<!--    function toggleWidget() {-->
+<!--        if (widget.classList.contains('force-hide-widget')) {-->
+<!--            widget.classList.remove('force-hide-widget');-->
+<!--            widget.classList.add('force-show-widget');-->
+<!--            launcher.classList.add('open');-->
+<!--            if (!isChatInitialized) { initChat(); isChatInitialized = true; }-->
+<!--            if (inputEl) inputEl.focus();-->
+<!--        } else {-->
+<!--            widget.classList.remove('force-show-widget');-->
+<!--            widget.classList.add('force-hide-widget');-->
+<!--            launcher.classList.remove('open');-->
+<!--        }-->
+<!--    }-->
+
+<!--    launcher.addEventListener('click', toggleWidget);-->
+<!--    closeBtn.addEventListener('click', toggleWidget);-->
+
+<!--    function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }-->
+
+<!--   function appendBotMessage(text, timeStr) {-->
+<!--    const ts = timeStr || formatTime();-->
+<!--    const row = document.createElement('div');-->
+<!--    row.className = 'msg-row msg-bot';-->
+<!--    row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div>-->
+<!--                     <div class="bubble-bot">${formatRichText(text)}<div class="bubble-time">${ts}</div></div>`;-->
+<!--    messagesEl.appendChild(row);-->
+<!--    scrollToBottom();-->
+<!--    return row.querySelector('.bubble-bot');-->
+<!--}-->
+
+<!--    function appendUserMessage(text, timeStr) {-->
+<!--        const ts = timeStr || formatTime();-->
+<!--        const row = document.createElement('div');-->
+<!--        row.className = 'msg-row msg-user';-->
+<!--        let safeText = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');-->
+<!--        row.innerHTML = `<div class="bubble-user">${safeText}<div class="bubble-time">${ts}</div></div>`;-->
+<!--        messagesEl.appendChild(row);-->
+<!--        scrollToBottom();-->
+<!--    }-->
+
+<!--    function appendOwnerMessage(text, senderName, timeStr) {-->
+<!--        const ts = timeStr || formatTime();-->
+<!--        const row = document.createElement('div');-->
+<!--        row.className = 'msg-row msg-bot';-->
+<!--        row.innerHTML = `-->
+<!--            <div class="msg-avatar" style="background:#e6fffa; border-color:#81e6d9;">-->
+<!--                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>-->
+<!--            </div>-->
+<!--            <div class="bubble-owner">-->
+<!--                <span style="font-size:10px;opacity:0.6;margin-bottom:3px;display:block;">${senderName || 'Support'} (Live Support)</span>-->
+<!--                ${formatRichText(text)}-->
+<!--                <div class="bubble-time">${ts}</div>-->
+<!--            </div>`;-->
+<!--        messagesEl.appendChild(row);-->
+<!--        scrollToBottom();-->
+<!--    }-->
+
+<!--    function showTypingIndicator() {-->
+<!--        const row = document.createElement('div');-->
+<!--        row.id = 'typingIndicator';-->
+<!--        row.className = 'msg-row msg-bot';-->
+<!--        row.innerHTML = `<div class="msg-avatar">${botAvatarHtml}</div><div class="bubble-bot" style="padding:14px 18px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;-->
+<!--        messagesEl.appendChild(row);-->
+<!--        scrollToBottom();-->
+<!--    }-->
+
+<!--    function hideTypingIndicator() {-->
+<!--        const el = document.getElementById('typingIndicator');-->
+<!--        if (el) el.remove();-->
+<!--    }-->
+
+<!--    function activateLiveMode() {-->
+<!--        isLiveMode = true;-->
+<!--        liveBanner.classList.add('visible');-->
+<!--        if (headerStatus) headerStatus.textContent = ' Live Support';-->
+<!--        if (inputEl) inputEl.placeholder = 'Message the representative…';-->
+<!--        connectSocket();-->
+<!--    }-->
+
+<!--    function deactivateLiveMode(msg) {-->
+<!--        isLiveMode = false;-->
+<!--        liveBanner.classList.remove('visible');-->
+<!--        if (headerStatus) headerStatus.textContent = 'Online';-->
+<!--        if (inputEl) inputEl.placeholder = 'Type your message…';-->
+<!--        const d = document.createElement('div');-->
+<!--        d.className = 'sys-divider';-->
+<!--        d.textContent = msg || 'Live session ended. AI assistant resumed.';-->
+<!--        messagesEl.appendChild(d);-->
+<!--        if (socket) { socket.disconnect(); socket = null; }-->
+<!--        scrollToBottom();-->
+<!--    }-->
+
+<!--    function connectSocket() {-->
+<!--        if (socket && socket.connected) return;-->
+<!--        socket = io({ transports: ['websocket', 'polling'] });-->
+<!--        socket.on('connect', () => { if (currentSessionId) socket.emit('join_live_room', { session_id: currentSessionId }); });-->
+<!--        socket.on('live_chat_ended', (data) => {-->
+<!--            deactivateLiveMode(data.message);-->
+<!--            setTimeout(() => {-->
+<!--                const restartBubble = appendBotMessage("Live chat ended. The AI assistant has resumed. How else can I help you today?", formatTime());-->
+<!--                if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons, restartBubble);-->
+<!--            }, 600);-->
+<!--        });-->
+<!--        socket.on('new_live_message', (data) => { if (data.sender_role === 'owner') appendOwnerMessage(data.message, data.sender_name, formatTime(data.timestamp)); });-->
+<!--    }-->
+
+<!--    function renderButtons(buttons, targetBubble = null) {-->
+<!--        if (!buttons || buttons.length === 0) return;-->
+<!--        const container = document.createElement('div');-->
+<!--        container.className = 'flow-btn-container';-->
+
+<!--        buttons.forEach((btn, idx) => {-->
+<!--            const el = document.createElement('button');-->
+<!--            el.className = 'flow-btn' + (btn.type === 'live_chat' ? ' live-chat-btn' : '');-->
+<!--            el.textContent = btn.text;-->
+<!--            if (idx >= 3) { el.style.display = 'none'; el.classList.add('hidden-flow-btn'); }-->
+
+<!--            el.onclick = () => {-->
+<!--                if (btn.type === 'url' && btn.value) {-->
+<!--                    let url = btn.value.trim();-->
+<!--                    if (!url.match(/^https?:\/\//i)) url = 'https://' + url;-->
+<!--                    window.open(url, '_blank');-->
+<!--                }-->
+<!--                if (btn.type === 'live_chat' && !isLiveMode) {-->
+<!--                    renderPreChatForm(btn);-->
+<!--                } else {-->
+<!--                    sendChatRequest(btn.text, btn);-->
+<!--                }-->
+<!--            };-->
+<!--            container.appendChild(el);-->
+<!--        });-->
+
+<!--        if (buttons.length > 3) {-->
+<!--            const more = document.createElement('button');-->
+<!--            more.className = 'flow-btn';-->
+<!--            more.innerHTML = `View More (${buttons.length - 3}) &darr;`;-->
+<!--            more.onclick = () => {-->
+<!--                container.querySelectorAll('.hidden-flow-btn').forEach(b => b.style.display = 'block');-->
+<!--                more.remove(); scrollToBottom();-->
+<!--            };-->
+<!--            container.appendChild(more);-->
+<!--        }-->
+
+<!--        if (targetBubble) {-->
+<!--            targetBubble.appendChild(container);-->
+<!--        } else {-->
+<!--            const bubbles = messagesEl.querySelectorAll('.bubble-bot');-->
+<!--            if (bubbles.length > 0) bubbles[bubbles.length - 1].appendChild(container);-->
+<!--            else messagesEl.appendChild(container);-->
+<!--        }-->
+<!--        scrollToBottom();-->
+<!--    }-->
+
+<!--    function renderPreChatForm(btnObj) {-->
+<!--        appendUserMessage(btnObj.text);-->
+<!--        const row = document.createElement('div');-->
+<!--        row.className = 'msg-row msg-bot';-->
+<!--        row.innerHTML = `-->
+<!--            <div class="msg-avatar">${botAvatarHtml}</div>-->
+<!--            <div class="bubble-bot" style="width: 100%; max-width: 85%;">-->
+<!--                <h4 style="margin:0 0 8px; font-size:15px; color:${config.themeColor||'#4F46E5'};">Almost connected!</h4>-->
+<!--                <p style="margin:0 0 12px; font-size:13px;">Please provide your details so our team can assist you better.</p>-->
+<!--                <input type="text" id="pcName" placeholder="Your Name" style="width:100%; padding:10px 12px; margin-bottom:8px; border:1px solid #e2e8f0; border-radius:8px; box-sizing:border-box; font-family:'Inter',sans-serif; font-size:13px; outline:none;" required>-->
+<!--                <input type="text" id="pcContact" placeholder="Email or Phone Number" style="width:100%; padding:10px 12px; margin-bottom:12px; border:1px solid #e2e8f0; border-radius:8px; box-sizing:border-box; font-family:'Inter',sans-serif; font-size:13px; outline:none;" required>-->
+<!--                <button id="pcSubmit" class="flow-btn live-chat-btn" style="margin:0;">Connect to Agent</button>-->
+<!--            </div>`;-->
+<!--        messagesEl.appendChild(row);-->
+<!--        scrollToBottom();-->
+
+<!--        if (inputEl) inputEl.disabled = true;-->
+<!--        if (sendBtn) sendBtn.disabled = true;-->
+
+<!--         document.getElementById('pcSubmit').onclick = function() {-->
+<!--                const name = document.getElementById('pcName').value.trim();-->
+<!--                let contact = document.getElementById('pcContact').value.trim();-->
+
+<!--                if (!name || !contact) {-->
+<!--                    alert('Please fill in both fields to continue.');-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                // ★ NEW: Strict Email Validation ★-->
+<!--                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;-->
+
+<!--                // Phone validation: Exactly 10 digits-->
+<!--                const phoneRegex = /^\d{10}$/;-->
+
+<!--                const isEmail = emailRegex.test(contact);-->
+<!--                const isPhone = phoneRegex.test(contact);-->
+
+<!--                // If it is neither a valid email nor exactly 10 digits, block it-->
+<!--                if (!isEmail && !isPhone) {-->
+<!--                    alert('⚠️ Please enter a valid Email Address or exactly a 10-digit Phone Number (without +91).');-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                // If it is a 10-digit phone number, automatically add +91-->
+<!--                if (isPhone) {-->
+<!--                    contact = '+91 ' + contact;-->
+<!--                }-->
+
+<!--                this.disabled = true;-->
+<!--                this.textContent = 'Connecting...';-->
+
+<!--                const infoMessage = `[Visitor Details] Name: ${name} | Contact: ${contact}`;-->
+<!--                sendChatRequest(infoMessage, btnObj, true);-->
+<!--            };-->
+<!--    }-->
+
+<!--    async function sendChatRequest(messageText, buttonActionObj = null, isSilent = false) {-->
+<!--        if (messageText && !isSilent) appendUserMessage(messageText);-->
+<!--        if (inputEl) inputEl.disabled = true;-->
+<!--        if (sendBtn) sendBtn.disabled = true;-->
+<!--        showTypingIndicator();-->
+
+<!--        const payload = { message: messageText || '', is_voice: false };-->
+<!--        if (buttonActionObj)  payload.button_action = buttonActionObj;-->
+<!--        if (currentSessionId) payload.session_id    = currentSessionId;-->
+
+<!--        try {-->
+<!--            const response = await fetch(`/api/chat/${config.embedCode}`, {-->
+<!--                method: 'POST', headers: { 'Content-Type': 'application/json' },-->
+<!--                body: JSON.stringify(payload)-->
+<!--            });-->
+<!--            const data = await response.json();-->
+<!--            hideTypingIndicator();-->
+
+<!--            if (data.error) {-->
+<!--                appendBotMessage("⚠️ Error: " + data.error);-->
+<!--            } else {-->
+<!--                if (data.session_id) {-->
+<!--                    currentSessionId = data.session_id;-->
+<!--                    saveSession(currentSessionId);-->
+<!--                }-->
+<!--                if (data.is_live && !isLiveMode) {-->
+<!--                    activateLiveMode();-->
+<!--                    if (socket && currentSessionId) socket.emit('join_live_room', { session_id: currentSessionId });-->
+<!--                }-->
+<!--                if (data.response) appendBotMessage(data.response, formatTime());-->
+
+<!--                if (data.nested_buttons && data.nested_buttons.length > 0) {-->
+<!--                    renderButtons(data.nested_buttons, null);-->
+<!--                } else if (buttonActionObj && !isLiveMode) {-->
+<!--                    setTimeout(() => {-->
+<!--                        showTypingIndicator();-->
+<!--                        setTimeout(() => {-->
+<!--                            hideTypingIndicator();-->
+<!--                            const restartBubble = appendBotMessage("Is there anything else I can help you with?", formatTime());-->
+<!--                            if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons, restartBubble);-->
+<!--                        }, 600);-->
+<!--                    }, 1000);-->
+<!--                }-->
+<!--            }-->
+<!--        } catch(err) {-->
+<!--            hideTypingIndicator();-->
+<!--            appendBotMessage("⚠️ Sorry, couldn't connect to server.");-->
+<!--        } finally {-->
+<!--            if (inputEl) { inputEl.disabled = false; inputEl.focus(); }-->
+<!--            if (sendBtn) sendBtn.disabled = false;-->
+<!--        }-->
+<!--    }-->
+
+<!--    function handleFreeTextSubmit() {-->
+<!--        if (!inputEl) return;-->
+<!--        const text = inputEl.value.trim();-->
+<!--        if (!text) return;-->
+<!--        inputEl.value = '';-->
+
+<!--        if (isLiveMode && socket && currentSessionId) {-->
+<!--            appendUserMessage(text);-->
+<!--            saveSession(currentSessionId);-->
+<!--            socket.emit('user_message_live', { session_id: currentSessionId, message: text });-->
+<!--        } else {-->
+<!--            sendChatRequest(text, null);-->
+<!--        }-->
+<!--    }-->
+
+<!--    if (sendBtn) sendBtn.onclick = handleFreeTextSubmit;-->
+<!--    if (inputEl) inputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleFreeTextSubmit(); });-->
+
+<!--    if (userEndLiveBtn) {-->
+<!--        userEndLiveBtn.addEventListener('click', async () => {-->
+<!--            if (!confirm('Are you sure you want to end the live chat?')) return;-->
+<!--            if (socket && currentSessionId) socket.emit('user_message_live', { session_id: currentSessionId, message: '[User ended live chat]' });-->
+<!--            deactivateLiveMode('You ended the live chat. The AI assistant has resumed.');-->
+<!--            try {-->
+<!--                const response = await fetch(`/api/chat/${config.embedCode}`, {-->
+<!--                    method: 'POST', headers: { 'Content-Type': 'application/json' },-->
+<!--                    body: JSON.stringify({ session_id: currentSessionId, message: '[User ended live chat]', button_action: { type: 'end_live_chat', value: 'ended' } })-->
+<!--                });-->
+<!--                const data = await response.json();-->
+<!--                if (data.response) {-->
+<!--                    const bubble = appendBotMessage(data.response, formatTime());-->
+<!--                    if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons, bubble);-->
+<!--                }-->
+<!--            } catch(err) {}-->
+<!--        });-->
+<!--    }-->
+
+<!--    async function initChat() {-->
+<!--        if (inputEl) inputEl.disabled = false;-->
+<!--        if (sendBtn) sendBtn.disabled = false;-->
+<!--        messagesEl.innerHTML = '';-->
+
+<!--        if (currentSessionId) {-->
+<!--            try {-->
+<!--                const res = await fetch(`/api/chat/${config.embedCode}/history?session_id=${currentSessionId}`);-->
+<!--                const data = await res.json();-->
+
+<!--                if (data.messages && data.messages.length > 0) {-->
+<!--                    appendBotMessage(config.welcomeMessage, formatTime());-->
+<!--                    data.messages.forEach(msg => {-->
+<!--                        if (msg.message.includes('User requested live support') || msg.message.includes('User ended live chat') || msg.message.includes('Requested Live Chat') || msg.message.includes('[Visitor Details]')) return;-->
+<!--                        if (msg.message === config.welcomeMessage) return;-->
+
+<!--                        let displayText = msg.message;-->
+<!--                        if (displayText.startsWith('[Button: ')) displayText = displayText.replace('[Button: ', '').replace(/]$/, '');-->
+
+<!--                        const timeStr = formatTime(msg.timestamp);-->
+<!--                        if (msg.sender === 'user') appendUserMessage(displayText, timeStr);-->
+<!--                        else appendBotMessage(displayText, timeStr);-->
+<!--                    });-->
+
+<!--                    if (data.is_live) {-->
+<!--                        activateLiveMode();-->
+<!--                    } else {-->
+<!--                        setTimeout(() => {-->
+<!--                            showTypingIndicator();-->
+<!--                            setTimeout(() => {-->
+<!--                                hideTypingIndicator();-->
+<!--                                const restartBubble = appendBotMessage("Welcome back! Is there anything else I can help you with?", formatTime());-->
+<!--                                if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons, restartBubble);-->
+<!--                            }, 500);-->
+<!--                        }, 500);-->
+<!--                    }-->
+<!--                    scrollToBottom();-->
+<!--                    return;-->
+<!--                }-->
+<!--            } catch (err) { console.error("History error:", err); }-->
+<!--        }-->
+
+<!--        const welcomeBubble = appendBotMessage(config.welcomeMessage, formatTime());-->
+<!--        if (config.welcomeButtons && config.welcomeButtons.length > 0) renderButtons(config.welcomeButtons, welcomeBubble);-->
+<!--    }-->
+
+<!--    initChat();-->
+<!--});-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+}
 /* ============================================================
    PREVIEW PAGE — cohesive with dashboard / bots / edit brand
    ============================================================ */
@@ -1086,3 +1093,6 @@ body {
     opacity: 1;
     background: rgba(0, 0, 0, 0.08);
 }
+
+
+
