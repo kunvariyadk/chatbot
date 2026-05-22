@@ -255,11 +255,26 @@ def register():
 
 
 @app.route('/dashboard', methods=['GET'])
-@login_required
+@login_required          # ← only login required, NOT subscription_required
 def dashboard():
     """User dashboard - shows chatbots and subscription info"""
     import os
     user = get_user_by_id(session['user_id'])
+
+    # ── SUBSCRIPTION STATUS CHECK ──────────────────────────────────────────
+    # Always re-check from DB so a just-renewed sub clears the stale flag
+    if user.subscription and not user.subscription.is_expired() \
+            and user.subscription.status != 'cancelled':
+        session.pop('sub_status', None)   # ← clears overlay after renewal
+    else:
+        # Set/refresh the flag so the overlay shows the right state
+        if not user.subscription:
+            session['sub_status'] = 'none'
+        elif user.subscription.is_expired():
+            session['sub_status'] = 'expired'
+        elif user.subscription.status == 'cancelled':
+            session['sub_status'] = 'cancelled'
+    # ──────────────────────────────────────────────────────────────────────
 
     # Get all chatbots for this user
     chatbots = get_chatbots_by_user(user.id)
@@ -275,11 +290,10 @@ def dashboard():
 
     # Subscription warnings & Premium Check
     subscription_warning = None
-    is_premium = False  # ★ NEW: Default to False
+    is_premium = False
 
     if user.subscription:
-        # ★ NEW: Check if the user is on a paid plan
-        if user.subscription and 'free' not in user.subscription.plan.name.lower():
+        if 'free' not in user.subscription.plan.name.lower():
             is_premium = True
 
         if user.subscription.is_trial and user.subscription.days_remaining() <= 3:
@@ -287,7 +301,7 @@ def dashboard():
         elif user.subscription.status == 'cancelled':
             subscription_warning = f"Your subscription is cancelled and will end in {user.subscription.days_remaining()} days."
 
-    # ── ★ ONLY QUERY LEADS IF USER IS PREMIUM ★ ──
+    # Only query leads if user is premium
     total_leads = 0
     recent_sessions = []
 
@@ -316,9 +330,8 @@ def dashboard():
         subscription_warning=subscription_warning,
         total_leads=total_leads,
         recent_sessions=recent_sessions,
-        is_premium=is_premium  # 👈 Pass the flag to HTML!
+        is_premium=is_premium
     )
-
 
 @app.route('/bots')
 @login_required

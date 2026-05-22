@@ -521,7 +521,8 @@ def load_knowledge_base(user_id: int, chatbot_id: int = None) -> List[Dict]:
                 # Assign a tag if none exists
                 tag = p.tag or f"qa_{p.id}"
                 if tag not in tag_map:
-                    tag_map[tag] = {'patterns': [], 'responses': [p.answer]}
+                    # ✅ FIX: Always add the question to patterns on first creation!
+                    tag_map[tag] = {'patterns': [p.question], 'responses': [p.answer]}
                 else:
                     tag_map[tag]['patterns'].append(p.question)
 

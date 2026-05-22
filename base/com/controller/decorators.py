@@ -9,46 +9,55 @@ from base.com.dao.user_dao import get_user_by_id
 
 def subscription_required(f):
     """
-    Decorator to require active subscription
+    Decorator to require active subscription.
+
+    - If not logged in          -> redirect to login
+    - If no subscription        -> redirect to dashboard with overlay (status: none)
+    - If subscription expired   -> redirect to dashboard with overlay (status: expired)
+    - If subscription cancelled -> redirect to dashboard with overlay (status: cancelled)
+    - Otherwise                 -> allow access normally
+
+    The dashboard reads session['sub_status'] to show the correct
+    locked overlay and message to the user.
 
     Usage:
-        @bp.route('/some-route')
+        @app.route('/some-route')
         @subscription_required
         def some_view():
-            # Your code here
+            ...
     """
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Check if user is logged in
+        # 1. Must be logged in
         if 'user_id' not in session:
             flash('Please log in to access this page.', 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('login'))
 
-        # Get user from database
+        # 2. User must exist in DB
         user = get_user_by_id(session['user_id'])
-
         if not user:
             session.clear()
-            flash('Please log in again', 'error')
-            return redirect(url_for('auth.login'))
+            flash('Session expired. Please log in again.', 'error')
+            return redirect(url_for('login'))
 
-        # Check if user has a subscription
+        # 3. No subscription at all
         if not user.subscription:
-            flash('You need an active subscription to access this feature.', 'warning')
-            return redirect(url_for('subscription.plans'))
+            session['sub_status'] = 'none'
+            return redirect(url_for('dashboard'))
 
-        # Check if subscription is expired
+        # 4. Subscription expired
         if user.subscription.is_expired():
-            flash('Your subscription has expired. Please renew to continue.', 'error')
-            return redirect(url_for('subscription.plans'))
+            session['sub_status'] = 'expired'
+            return redirect(url_for('dashboard'))
 
-        # Check if subscription is cancelled
+        # 5. Subscription cancelled
         if user.subscription.status == 'cancelled':
-            flash('Your subscription has been cancelled. Please reactivate or choose a new plan.', 'warning')
-            return redirect(url_for('subscription.manage'))
+            session['sub_status'] = 'cancelled'
+            return redirect(url_for('dashboard'))
 
-        # All checks passed - allow access
+        # 6. All good — clear any stale flag and proceed
+        session.pop('sub_status', None)
         return f(*args, **kwargs)
 
     return decorated_function
@@ -59,10 +68,10 @@ def login_required(f):
     Decorator to require login (but not necessarily active subscription)
 
     Usage:
-        @bp.route('/some-route')
+        @app.route('/some-route')
         @login_required
         def some_view():
-            # Your code here
+            ...
     """
 
     @wraps(f)
@@ -93,17 +102,26 @@ def premium_required(f):
 
         # 1. Check if they have a subscription
         if not user.subscription:
-            flash('Live Chat requires a premium subscription. Please upgrade.', 'warning')
-            return redirect(url_for('subscription_plans'))
+            session['sub_status'] = 'none'
+            return redirect(url_for('dashboard'))
 
-        # 2. Correctly get the plan name from the connected SubscriptionPlan table
+        # 2. Check if expired or cancelled first
+        if user.subscription.is_expired():
+            session['sub_status'] = 'expired'
+            return redirect(url_for('dashboard'))
+
+        if user.subscription.status == 'cancelled':
+            session['sub_status'] = 'cancelled'
+            return redirect(url_for('dashboard'))
+
+        # 3. Get the plan name from the connected SubscriptionPlan table
         try:
             plan_name = user.subscription.plan.name.lower()
         except AttributeError:
             flash('Subscription verification error. Please contact support.', 'error')
             return redirect(url_for('dashboard'))
 
-        # 3. Block if it's the free plan
+        # 4. Block if it's the free plan
         if 'free' in plan_name:
             flash('Live Chat requires a premium subscription. Please upgrade to access this feature.', 'warning')
             return redirect(url_for('subscription_plans'))

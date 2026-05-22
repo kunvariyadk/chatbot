@@ -159,7 +159,9 @@ def select_subscription():
         try:
             if user.subscription:
                 # Update existing subscription
-                old_plan = user.subscription.display_name
+                old_plan = user.subscription.plan.display_name
+                was_expired = user.subscription.is_expired() or user.subscription.status in ['expired', 'cancelled']
+
                 user.subscription.plan_id = plan.id
                 user.subscription.status = 'trial' if plan_name == 'free_trial' else 'active'
                 user.subscription.is_trial = (plan_name == 'free_trial')
@@ -172,6 +174,12 @@ def select_subscription():
 
                 user.subscription.next_billing_date = user.subscription.end_date
                 db.session.commit()
+
+                if was_expired:
+                    session.clear()
+                    flash('Subscription renewed successfully! Please log in again to continue.', 'success')
+                    return redirect(url_for('login'))
+
                 flash(f'Successfully changed from {old_plan} to {plan.display_name}!', 'success')
             else:
                 # Create new subscription
@@ -241,6 +249,7 @@ def reactivate_subscription():
         return redirect(url_for('dashboard'))  # ✅ Fixed function name
 
     try:
+        was_expired = user.subscription.is_expired() or user.subscription.status in ['expired', 'cancelled']
         user.subscription.status = 'active'
 
         if user.subscription.end_date < datetime.now(timezone.utc):
@@ -248,6 +257,12 @@ def reactivate_subscription():
             user.subscription.next_billing_date = user.subscription.end_date
 
         db.session.commit()
+
+        if was_expired:
+            session.clear()
+            flash('Your subscription has been reactivated! Please log in again to continue.', 'success')
+            return redirect(url_for('login'))
+
         flash('Your subscription has been reactivated!', 'success')
     except Exception as e:
         db.session.rollback()

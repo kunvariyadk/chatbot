@@ -537,7 +537,6 @@ def toggle_chatbot_route(chatbot_id):
 # ================================================================
 @app.route('/chatbot/preview/<int:chatbot_id>')
 @login_required
-@subscription_required
 def preview_chatbot(chatbot_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
