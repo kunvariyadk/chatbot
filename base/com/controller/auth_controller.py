@@ -72,7 +72,7 @@ def login():
 
         if not email or not password:
             flash('Please enter both email and password.', 'error')
-            return render_template('login.html')
+            return redirect(url_for('login'))
 
         user = get_user_by_email(email)
 
@@ -111,7 +111,7 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password.', 'error')
-            return render_template('login.html')
+            return redirect(url_for('login'))
 
     # GET request
     return render_template('login.html')
@@ -255,19 +255,17 @@ def register():
 
 
 @app.route('/dashboard', methods=['GET'])
-@login_required          # ← only login required, NOT subscription_required
+@login_required
 def dashboard():
     """User dashboard - shows chatbots and subscription info"""
     import os
     user = get_user_by_id(session['user_id'])
 
     # ── SUBSCRIPTION STATUS CHECK ──────────────────────────────────────────
-    # Always re-check from DB so a just-renewed sub clears the stale flag
     if user.subscription and not user.subscription.is_expired() \
             and user.subscription.status != 'cancelled':
-        session.pop('sub_status', None)   # ← clears overlay after renewal
+        session.pop('sub_status', None)
     else:
-        # Set/refresh the flag so the overlay shows the right state
         if not user.subscription:
             session['sub_status'] = 'none'
         elif user.subscription.is_expired():
@@ -276,49 +274,134 @@ def dashboard():
             session['sub_status'] = 'cancelled'
     # ──────────────────────────────────────────────────────────────────────
 
-    # Get all chatbots for this user
     chatbots = get_chatbots_by_user(user.id)
-
-    # Calculate statistics
     total_chatbots = len(chatbots)
     active_chatbots = sum(1 for bot in chatbots if bot.is_active)
 
-    # Check if ML model is trained
     from flask import current_app
     user_folder = os.path.join(current_app.config['USER_DATA_FOLDER'], f'user_{user.id}')
     ml_model_trained = os.path.exists(os.path.join(user_folder, 'chatbot_model.h5'))
 
-    # Subscription warnings & Premium Check
     subscription_warning = None
     is_premium = False
 
     if user.subscription:
         if 'free' not in user.subscription.plan.name.lower():
             is_premium = True
-
         if user.subscription.is_trial and user.subscription.days_remaining() <= 3:
             subscription_warning = f"Your trial expires in {user.subscription.days_remaining()} days!"
         elif user.subscription.status == 'cancelled':
             subscription_warning = f"Your subscription is cancelled and will end in {user.subscription.days_remaining()} days."
 
-    # Only query leads if user is premium
     total_leads = 0
     recent_sessions = []
 
-    if is_premium:
-        from base.com.vo.session_vo import ChatSession
-        chatbot_ids = [bot.id for bot in chatbots]
+    # ── NEW: per-bot chat counts & sparkline history ───────────────────────
+    from base.com.vo.session_vo import ChatSession, ChatMessage
+    from sqlalchemy import func
+    from datetime import datetime, timezone, timedelta
 
-        if chatbot_ids:
-            total_leads = ChatSession.query.filter(
+    chatbot_ids = [bot.id for bot in chatbots]
+
+    if chatbot_ids:
+        # AI chat count — sessions handled purely by AI (status='bot')
+        ai_rows = (
+            ChatSession.query
+            .with_entities(
+                ChatSession.chatbot_id,
+                func.count(ChatSession.id).label('cnt')
+            )
+            .filter(
+                ChatSession.chatbot_id.in_(chatbot_ids),
+                ChatSession.status == 'bot'
+            )
+            .group_by(ChatSession.chatbot_id)
+            .all()
+        )
+        ai_map = {r.chatbot_id: r.cnt for r in ai_rows}
+
+        # Live session count — escalated to human owner
+        live_rows = (
+            ChatSession.query
+            .with_entities(
+                ChatSession.chatbot_id,
+                func.count(ChatSession.id).label('cnt')
+            )
+            .filter(
+                ChatSession.chatbot_id.in_(chatbot_ids),
+                db.or_(
+                    ChatSession.is_live == True,
+                    ChatSession.status == 'human'
+                )
+            )
+            .group_by(ChatSession.chatbot_id)
+            .all()
+        )
+        live_map = {r.chatbot_id: r.cnt for r in live_rows}
+
+        # 7-day daily message history per bot (for sparkline mini-chart)
+        # Single query for all bots at once
+        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        history_rows = (
+            db.session.query(
+                ChatSession.chatbot_id,
+                func.date(ChatSession.started_at).label('day'),
+                func.count(ChatMessage.id).label('msg_count')
+            )
+            .join(ChatMessage, ChatMessage.session_id == ChatSession.id)
+            .filter(
+                ChatSession.chatbot_id.in_(chatbot_ids),
+                ChatSession.started_at >= cutoff
+            )
+            .group_by(ChatSession.chatbot_id, func.date(ChatSession.started_at))
+            .all()
+        )
+
+        # { chatbot_id: { 'YYYY-MM-DD': count } }
+        hist_map = {}
+        for r in history_rows:
+            hist_map.setdefault(r.chatbot_id, {})[str(r.day)] = r.msg_count
+
+        # Date slots oldest → newest
+        date_slots = [
+            (datetime.now(timezone.utc) - timedelta(days=i)).strftime('%Y-%m-%d')
+            for i in range(6, -1, -1)
+        ]
+
+        for bot in chatbots:
+            bot.chat_count = ai_map.get(bot.id, 0)
+            bot.live_chat_count = live_map.get(bot.id, 0)
+            bot.daily_chat_history = [
+                hist_map.get(bot.id, {}).get(d, 0) for d in date_slots
+            ]
+
+    else:
+        for bot in chatbots:
+            bot.chat_count = 0
+            bot.live_chat_count = 0
+            bot.daily_chat_history = [0, 0, 0, 0, 0, 0, 0]
+    # ──────────────────────────────────────────────────────────────────────
+
+    # Leads — premium only (your existing logic, unchanged)
+    if is_premium and chatbot_ids:
+        total_leads = (
+            ChatSession.query
+            .filter(
                 ChatSession.chatbot_id.in_(chatbot_ids),
                 ChatSession.visitor_name.isnot(None)
-            ).count()
-
-            recent_sessions = ChatSession.query.filter(
+            )
+            .count()
+        )
+        recent_sessions = (
+            ChatSession.query
+            .filter(
                 ChatSession.chatbot_id.in_(chatbot_ids),
                 ChatSession.visitor_name.isnot(None)
-            ).order_by(ChatSession.started_at.desc()).limit(15).all()
+            )
+            .order_by(ChatSession.started_at.desc())
+            .limit(15)
+            .all()
+        )
 
     return render_template(
         'dashboard.html',
@@ -332,6 +415,7 @@ def dashboard():
         recent_sessions=recent_sessions,
         is_premium=is_premium
     )
+
 
 @app.route('/bots')
 @login_required
@@ -351,82 +435,159 @@ def logout():
 
 
 def send_reset_password_email(user, reset_url):
+    """
+    Send a professional password reset email with one-time link.
+    """
     try:
         import smtplib
         from email.mime.multipart import MIMEMultipart
         from email.mime.text import MIMEText
 
-        sender_user = "kunvariya.dk@gmail.com"
-        sender_pass = "cwpctdztwwohcjhe"  # Your Gmail App Password here
-        sender_from = "kunvariya.dk@gmail.com"
+        # Your Gmail credentials (consider moving to config)
+        SMTP_USER = "kunvariya.dk@gmail.com"
+        SMTP_PASS = "cwpctdztwwohcjhe"
+        FROM_EMAIL = "kunvariya.dk@gmail.com"
 
-        if not sender_user or not sender_pass:
-            print("CRITICAL: Missing MAIL_USERNAME or MAIL_PASSWORD")
+        if not SMTP_USER or not SMTP_PASS:
+            app.logger.error("SMTP credentials missing")
             return False
 
-        display_name = user.username or user.email
+        display_name = f"{user.first_name} {user.last_name}".strip() or user.username or user.email
 
+        # --- Professional HTML Email ---
         html_body = f"""<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password</title>
   <style>
-    body {{ font-family: Inter, Arial, sans-serif; background: #f7fafc; margin: 0; padding: 0; }}
-    .wrap {{ max-width: 580px; margin: 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }}
-    .header {{ background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 32px 36px; text-align: center; }}
-    .header h1 {{ margin: 0; font-size: 22px; font-weight: 700; }}
-    .body {{ padding: 32px 36px; line-height: 1.6; color: #4a5568; }}
-    .cta {{ display: block; margin: 28px 0; text-align: center; }}
-    .btn {{ background: #667eea; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; }}
-    .footer {{ padding: 20px 36px; background: #f7fafc; font-size: 12px; color: #a0aec0; text-align: center; }}
+    /* Reset styles */
+    body, table, td, p, a {{ margin: 0; padding: 0; border: 0; font-size: 100%; }}
+    body {{ font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7fb; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }}
+    table {{ border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }}
+    td {{ vertical-align: top; }}
+    .container {{ max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }}
+    .header {{ background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px 28px; text-align: center; }}
+    .header h1 {{ margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.3px; }}
+    .content {{ padding: 40px 32px; background: #ffffff; }}
+    .greeting {{ font-size: 18px; color: #1F2937; font-weight: 600; margin-bottom: 20px; }}
+    .message {{ color: #4B5563; line-height: 1.6; margin-bottom: 24px; font-size: 16px; }}
+    .button-container {{ text-align: center; margin: 32px 0; }}
+    .button {{ background-color: #4F46E5; border-radius: 12px; display: inline-block; padding: 14px 32px; color: #ffffff !important; text-decoration: none; font-weight: 600; font-size: 16px; transition: background 0.2s; box-shadow: 0 2px 6px rgba(79,70,229,0.3); }}
+    .button:hover {{ background-color: #4338CA; }}
+    .info-box {{ background: #F3F4F6; border-left: 4px solid #4F46E5; padding: 16px 20px; border-radius: 10px; margin: 24px 0; font-size: 14px; color: #374151; }}
+    .info-box strong {{ color: #1F2937; }}
+    .footer {{ background: #F9FAFB; padding: 24px 32px; text-align: center; font-size: 12px; color: #9CA3AF; border-top: 1px solid #E5E7EB; }}
+    .footer a {{ color: #4F46E5; text-decoration: none; }}
+    @media only screen and (max-width: 600px) {{
+      .content {{ padding: 28px 20px; }}
+      .button {{ display: block; width: auto; text-align: center; }}
+      .container {{ width: 100% !important; border-radius: 0; }}
+    }}
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="header"><h1>Password Reset Request</h1></div>
-    <div class="body">
-      <p>Hello <strong>{display_name}</strong>,</p>
-      <p>We received a request to reset your account password. Click the button below to set a new one:</p>
-      <div class="cta">
-        <a href="{reset_url}" class="btn">Reset My Password</a>
-      </div>
-      <p>This link will expire in <strong>1 hour</strong>.</p>
-      <p>If you did not request this, you can safely ignore this email.</p>
-    </div>
-    <div class="footer">ChatBot Builder - Secure Account Management</div>
-  </div>=
+<body style="background-color: #f4f7fb; padding: 24px 12px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+    <tr>
+      <td align="center">
+        <div class="container">
+          <!-- Header -->
+          <div class="header">
+            <h1>🔐 Reset Your Password</h1>
+          </div>
+
+          <!-- Main Content -->
+          <div class="content">
+            <div class="greeting">Hello, {display_name}</div>
+            <div class="message">
+              We received a request to reset the password for your ChatBot Builder account. Click the button below to create a new password.
+            </div>
+
+            <div class="button-container">
+              <a href="{reset_url}" class="button" style="color:#ffffff;">Reset My Password</a>
+            </div>
+
+            <div class="info-box">
+              <strong>⚠️ Security Information</strong><br>
+              • This link is <strong>valid for 1 hour</strong> and can be used <strong>only once</strong>.<br>
+              • If you didn't request this, please ignore this email. Your password will not change.<br>
+              • For security, never share this link with anyone.
+            </div>
+
+            <div class="message" style="font-size: 14px; margin-top: 24px;">
+              If the button above doesn't work, copy and paste this link into your browser:
+              <div style="background: #F3F4F6; padding: 10px; border-radius: 8px; margin-top: 8px; font-family: monospace; word-break: break-all; font-size: 13px;">
+                {reset_url}
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="footer">
+            <p>© 2025 ChatBot Builder. All rights reserved.</p>
+            <p>This is an automated message, please do not reply directly to this email.</p>
+            <p><a href="{{ url_for('login', _external=True) }}">Visit our website</a></p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>"""
 
-        plain_body = f"Hello {display_name},\n\nReset your password here: {reset_url}\n\nThis link expires in 1 hour."
+        # Plain text alternative (for old email clients)
+        plain_body = f"""Reset Your Password - ChatBot Builder
 
+Hello {display_name},
+
+We received a request to reset the password for your ChatBot Builder account.
+
+To reset your password, click the link below (valid for 1 hour, one-time use only):
+
+{reset_url}
+
+If the link above doesn't work, copy and paste it into your browser.
+
+Security Notes:
+- This link expires after 1 hour and can be used only once.
+- If you didn't request a password reset, please ignore this email. Your password will not change.
+- Never share this link with anyone.
+
+Best regards,
+ChatBot Builder Team
+"""
+
+        # Build email
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Reset your ChatBot Builder Password"
-        msg['From'] = sender_from
+        msg['Subject'] = "Reset your ChatBot Builder password"
+        msg['From'] = f"ChatBot Builder <{FROM_EMAIL}>"
         msg['To'] = user.email
+        msg['Reply-To'] = "support@chatbotbuilder.com"  # adjust to your domain
 
+        # Attach parts
         msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
         msg.attach(MIMEText(html_body, 'html', 'utf-8'))
 
+        # Send via SMTP
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
-            server.login(sender_user, sender_pass)
-            server.sendmail(sender_from, user.email, msg.as_bytes())
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(FROM_EMAIL, user.email, msg.as_bytes())
 
-        print(f"Email sent successfully to {user.email}")
+        app.logger.info(f"Password reset email sent to {user.email}")
         return True
 
     except smtplib.SMTPAuthenticationError:
-        print("SMTP Auth failed - use a Gmail App Password, not your account password")
-        print("Generate one at: https://myaccount.google.com/apppasswords")
+        app.logger.error("SMTP auth failed – use a Gmail App Password")
         return False
     except smtplib.SMTPException as e:
-        print(f"SMTP error: {e}")
+        app.logger.error(f"SMTP error: {e}")
         return False
     except Exception as e:
-        print(f"Password reset email failed: {e}")
+        app.logger.error(f"Password reset email failed: {e}")
         return False
 
 
@@ -441,8 +602,12 @@ def forgot_password():
         user = get_user_by_email(email)
 
         if user:
-            # Generate reset token
-            token = serializer.dumps(email, salt='password-reset-salt')
+            # Generate reset token containing email and current password hash for one-time use
+            token_data = {
+                'email': user.email,
+                'password_hash': user.password
+            }
+            token = serializer.dumps(token_data, salt='password-reset-salt')
             reset_url = url_for('reset_password', token=token, _external=True)
 
             # Attempt to send email
@@ -467,13 +632,29 @@ def reset_password(token):
 
     try:
         # Verify token (expires in 1 hour)
-        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+        data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+        if isinstance(data, dict):
+            email = data.get('email')
+            token_password_hash = data.get('password_hash')
+        else:
+            email = data
+            token_password_hash = None
     except SignatureExpired:
         flash('The password reset link has expired', 'error')
-        return redirect(url_for('auth.forgot_password'))
+        return redirect(url_for('forgot_password'))
     except BadSignature:
         flash('Invalid password reset link', 'error')
-        return redirect(url_for('auth.forgot_password'))
+        return redirect(url_for('forgot_password'))
+
+    user = get_user_by_email(email)
+    if not user:
+        flash('User not found', 'error')
+        return redirect(url_for('forgot_password'))
+
+    # Ensure the link is one-time use by checking it against the current password hash
+    if not token_password_hash or user.password != token_password_hash:
+        flash('This password reset link has already been used.', 'error')
+        return redirect(url_for('forgot_password'))
 
     if request.method == 'POST':
         password = request.form.get('password')
@@ -488,14 +669,9 @@ def reset_password(token):
             return redirect(url_for('reset_password', token=token))
 
         # Update password
-        user = get_user_by_email(email)
-        if user:
-            user.password = generate_password_hash(password)
-            db.session.commit()
-            flash('Password has been reset successfully! You can now login.', 'success')
-            return render_template("login.html")
-        else:
-            flash('User not found', 'error')
-            return redirect(url_for('forgot_password'))
+        user.password = generate_password_hash(password)
+        db.session.commit()
+        flash('Password has been reset successfully! You can now login.', 'success')
+        return redirect(url_for('login'))
 
     return render_template('reset_password.html', token=token)

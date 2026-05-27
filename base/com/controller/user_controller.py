@@ -117,7 +117,7 @@ def edit_profile():
 def change_password():
     """Change user password"""
     if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('login'))
 
     user = get_user_by_id(session['user_id'])
 
@@ -134,12 +134,12 @@ def change_password():
         # Check if new passwords match
         if new_password != confirm_password:
             flash('New passwords do not match', 'error')
-            return redirect(url_for('user.change_password'))
+            return redirect(url_for('change_password'))
 
         # Check password length
         if len(new_password) < 6:
             flash('Password must be at least 6 characters long', 'error')
-            return redirect(url_for('user.change_password'))
+            return redirect(url_for('change_password'))
 
         # Update password
         user.password = generate_password_hash(new_password)

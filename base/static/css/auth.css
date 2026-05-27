@@ -322,3 +322,68 @@ body {
         display: none;
     }
 }
+   .pw-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        /* lock icon on the left */
+        .pw-field .pw-left-icon {
+            position: absolute;
+            left: 14px;
+            color: #718096;
+            pointer-events: none;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+        }
+
+        /* the actual input */
+        .pw-field input {
+            width: 100%;
+            padding: 12px 46px 12px 44px;   /* left gap for lock, right gap for eye */
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: #f7fafc;
+            transition: all 0.2s;
+            color: #1a202c;
+        }
+
+        .pw-field input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* eye toggle button on the right */
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: #a0aec0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: color 0.2s, background 0.15s;
+        }
+
+        .pw-toggle:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+        }
+
+        .pw-toggle svg {
+            display: block;
+            pointer-events: none;   /* so click always lands on the button */
+        }
