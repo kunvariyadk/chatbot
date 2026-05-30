@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>All Bots — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bots.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
-
 </head>
 <body>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="dashboard-container">
-{% include 'sidebar.html' %}
-    <main class="main-content">
+    {% include 'sidebar.html' %}
 
+    <main class="main-content">
         <div class="page-header">
             <div>
                 <h1>Your Bots</h1>
@@ -37,7 +36,7 @@
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input type="text" id="searchInput" placeholder="Search bots…" autocomplete="off">
-                <button class="clear-search" id="clearSearch" onclick="clearSearchInput()">
+                <button class="clear-search" id="clearSearch" onclick="clearSearchInput()" aria-label="Clear">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
@@ -49,7 +48,7 @@
                 <button class="filter-btn" data-filter="inactive">Inactive</button>
             </div>
             <div class="sort-dropdown">
-                <label for="sortSelect"></label>
+                <label for="sortSelect" style="display:none;">Sort by</label>
                 <select id="sortSelect">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -107,7 +106,6 @@
                     <span class="meta-date">{{ chatbot.created_at.strftime('%b %d, %Y') }}</span>
                 </div>
 
-                <!-- Delete icon button — top-right corner -->
                 <button class="btn-delete-bot"
                         data-id="{{ chatbot.id }}"
                         data-name="{{ chatbot.name }}"
@@ -153,7 +151,7 @@
     </main>
 </div>
 
-<button class="mobile-menu-toggle" id="mobileMenuToggle">
+<button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="12" x2="21" y2="12"/>
         <line x1="3" y1="6"  x2="21" y2="6"/>
@@ -164,14 +162,15 @@
 <script>
 /* ══ TOAST SYSTEM ══ */
 var toastIcons = {
-    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
 };
 function showToast(type, title, msg, duration) {
     duration = duration || 4000;
     var c = document.getElementById('toastContainer');
+    if(!c) return;
     var t = document.createElement('div');
     t.className = 'toast ' + type;
     t.innerHTML = '<div class="toast-icon-wrap">' + (toastIcons[type]||toastIcons.info) + '</div>' +
@@ -189,10 +188,17 @@ function removeToast(t) {
     setTimeout(function(){ if(t.parentElement) t.remove(); }, 420);
 }
 
-/* ══ SIDEBAR ══ */
-document.getElementById('mobileMenuToggle').addEventListener('click', function(){ document.getElementById('sidebar').classList.toggle('open'); });
-// FIX: Commented out the missing accountMenu listener so it doesn't crash the rest of the script!
-// document.getElementById('accountMenu').addEventListener('click', function(e){ e.preventDefault(); this.classList.toggle('expanded'); document.getElementById('accountSubmenu').classList.toggle('open'); });
+/* ══ SIDEBAR MOBILE TOGGLE ══ */
+var toggleBtn = document.getElementById('mobileMenuToggle');
+var sidebar = document.getElementById('sidebar');
+if(toggleBtn && sidebar) {
+    toggleBtn.addEventListener('click', function(){ sidebar.classList.toggle('open'); });
+    document.addEventListener('click', function(e) {
+        if(window.innerWidth <= 968 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+}
 
 /* ══ SEARCH + FILTER + SORT ══ */
 var searchInput = document.getElementById('searchInput');
@@ -272,7 +278,6 @@ function openDeleteModal(e, btn) {
     document.getElementById('deleteModalBotName').textContent = '"' + name + '"';
     document.getElementById('deleteForm').action = '/chatbot/delete/' + id;
     document.getElementById('deleteModalBackdrop').classList.add('open');
-    // Small delay so display:block kicks in before transition
     setTimeout(function() {
         document.getElementById('deleteModal').classList.add('open');
     }, 10);
@@ -286,11 +291,9 @@ function closeDeleteModal() {
 function handleDeleteEsc(e) {
     if (e.key === 'Escape') closeDeleteModal();
 }
-/* ══ END DELETE MODAL ══ */
-
 </script>
 
-<!-- ══ DELETE CONFIRMATION MODAL ══ -->
+<!-- ══ DELETE CONFIRMATION MODAL (enhanced) ══ -->
 <div class="delete-modal-backdrop" id="deleteModalBackdrop" onclick="closeDeleteModal()"></div>
 <div class="delete-modal" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
     <div class="delete-modal-icon">
@@ -313,7 +316,7 @@ function handleDeleteEsc(e) {
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                 </svg>
-                 Delete
+                Delete
             </button>
         </form>
     </div>

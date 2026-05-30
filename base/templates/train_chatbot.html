@@ -64,18 +64,20 @@
 
         <div class="staging-banner" id="stagingBanner">
             <div class="staging-banner-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
             </div>
             <div class="staging-banner-text">
-                <strong>New data waiting in Staging</strong>
-                <span id="stagingBannerCount">— pairs pending review before going live.</span>
+                <strong>Staging data awaiting review</strong>
+                <span id="stagingBannerCount">— pairs pending before going live.</span>
             </div>
             <div class="staging-banner-actions">
-                <button class="btn-view-staging" onclick="goToStaging()">Review &amp; Deploy</button>
+                <button class="btn-view-staging" onclick="goToStaging()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    Review &amp; Deploy
+                </button>
                 <button class="btn-dismiss-staging" onclick="dismissStagingBanner()">Dismiss</button>
             </div>
         </div>
@@ -88,34 +90,33 @@
                 {% if chatbot.training_data %}
 
                 <div class="main-page-header">
-                    <div>
-                        <h2>Training Data Overview</h2>
-                        <p class="main-page-subtitle">Manage your chatbot's knowledge base</p>
+                    <div class="mph-left">
+                        <div class="mph-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Training Knowledge Base</h2>
+                            <p class="main-page-subtitle">Manage Q&amp;A pairs that power your chatbot's responses</p>
+                        </div>
                     </div>
                     <div class="main-page-actions">
-
                         <button class="btn-view-staging" id="stagingHeaderBtn" onclick="goToStaging()" style="display:none;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
                             Staging <span class="staging-badge" id="stagingHeaderBadge"></span>
                         </button>
                         <button class="btn-add-data" onclick="showUploadPage('append')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19"/>
-                                <line x1="5" y1="12" x2="19" y2="12"/>
-                            </svg>
-                            Add More Data
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Data
                         </button>
                         <button class="btn-replace-data" onclick="showUploadPage('replace')">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="23 4 23 10 17 10"/>
-                                <path d="M20.49 15a9 9 0 1 1-2-8.83"/>
-                            </svg>
-                            Replace All Data
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2-8.83"/></svg>
+                            Replace
                         </button>
                         <button class="btn-danger" onclick="deleteAllTrainingData()">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-                            </svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
                             Delete All
                         </button>
                     </div>
@@ -186,9 +187,17 @@
             <div class="training-container">
 
                 <div class="upload-page-header">
-                    <div>
-                        <h2 id="uploadPageTitle">Upload Training Data</h2>
-                        <p class="upload-page-subtitle" id="uploadPageSubtitle">Choose your preferred method</p>
+                    <div class="mph-left">
+                        <div class="mph-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 id="uploadPageTitle">Upload Training Data</h2>
+                            <p class="upload-page-subtitle" id="uploadPageSubtitle">Choose your preferred method to train the bot</p>
+                        </div>
                     </div>
                     {% if chatbot.training_data %}
                     <button class="btn-back" onclick="backToMainPage()">
@@ -196,53 +205,41 @@
                             <line x1="19" y1="12" x2="5" y2="12"/>
                             <polyline points="12 19 5 12 12 5"/>
                         </svg>
-                        Back
+                        Back to Data
                     </button>
                     {% endif %}
                 </div>
 
                 <div class="tab-navigation">
                     <button class="tab-btn active" data-tab="json">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                            <polyline points="13 2 13 9 20 9"/>
-                        </svg>
-                        JSON File
+                        <span class="tab-icon" style="background:rgba(102,126,234,.12);color:#667eea;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        </span>
+                        <span class="tab-label">JSON File</span>
                     </button>
-                     <button class="tab-btn" data-tab="manual">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                        Simple Q&amp;A
+                    <button class="tab-btn" data-tab="manual">
+                        <span class="tab-icon" style="background:rgba(72,187,120,.12);color:#38a169;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </span>
+                        <span class="tab-label">Simple Q&amp;A</span>
                     </button>
                     <button class="tab-btn" data-tab="text">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                        </svg>
-                        Text/HTML File
+                        <span class="tab-icon" style="background:rgba(246,173,85,.14);color:#c47f00;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </span>
+                        <span class="tab-label">Text / HTML</span>
                     </button>
                     <button class="tab-btn" data-tab="excel">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="9" y1="15" x2="15" y2="15"/>
-                        </svg>
-                        Excel File
+                        <span class="tab-icon" style="background:rgba(16,185,129,.12);color:#059669;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                        </span>
+                        <span class="tab-label">Excel File</span>
                     </button>
                     <button class="tab-btn" data-tab="flow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                        </svg>
-                        Interactive Flow
+                        <span class="tab-icon" style="background:rgba(237,100,166,.12);color:#b83280;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        </span>
+                        <span class="tab-label">Flow Builder</span>
                     </button>
                 </div>
 
@@ -388,10 +385,10 @@
                                     <span><strong>Best Practice:</strong> Include 10–20 Q&amp;A pairs minimum. Clear formatting improves extraction accuracy!</span>
                                 </div>
                                 <pre><code>Q: What are your business hours?
-                                A: We are open Monday to Friday, 9 AM to 6 PM.
-
-                                Question: Do you offer refunds?
-                                Answer: Yes, we offer a 30-day money-back guarantee.</code></pre>
+A: We are open Monday to Friday, 9 AM to 6 PM.
+Question: Do you offer refunds?
+Answer: Yes, we offer a 30-day money-back guarantee.
+                                </code></pre>
                             </div>
                             <form id="textUploadForm" enctype="multipart/form-data">
                                 <div class="upload-area" id="textUploadArea">

@@ -2,36 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Create Chatbot — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/create.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
 </head>
 <body>
 <div class="dashboard-container">
-
     {% include 'sidebar.html' %}
 
     <main class="main-content">
-
         {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
-            {% if category == 'success' %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            {% elif category in ['error','danger'] %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            {% else %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>{% endif %}
-            <span>{{ message }}</span>
-            <button class="alert-close" type="button" onclick="this.closest('.alert').remove()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-        </div>
-        {% endfor %}{% endif %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible">
+                {% if category == 'success' %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                {% elif category in ['error','danger'] %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {% else %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>
+                {% endif %}
+                <span>{{ message }}</span>
+                <button class="alert-close" type="button" onclick="this.closest('.alert').remove()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <div class="page-header">
             <div>
                 <h1>Create Chatbot</h1>
-                <p>Configure your new chatbot settings</p>
+                <p>Configure your new chatbot's personality, appearance, and conversation flow</p>
             </div>
             <a href="{{ url_for('bots') }}" class="btn-secondary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -42,82 +46,78 @@
         </div>
 
         <div class="form-container">
-        <form method="POST" action="{{ url_for('create_chatbot_route') }}"
-              id="createChatbotForm" class="chatbot-form" enctype="multipart/form-data">
+            <form method="POST" action="{{ url_for('create_chatbot_route') }}"
+                  id="createChatbotForm" class="chatbot-form" enctype="multipart/form-data">
 
-            <div class="two-column-layout">
+                <div class="two-column-layout">
+                    <!-- LEFT COLUMN: FORM FIELDS -->
+                    <div class="form-column">
+                        <div id="alerts" style="padding: 0 24px 0 24px;"></div>
 
-                <div class="form-column">
-                    <div id="alerts" style="padding:12px 22px 0;"></div>
-
-                    <div class="form-section">
-                        <h2>Basic Information</h2>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="name">Chatbot Name <span class="required">*</span></label>
-                                <input type="text" id="name" name="name" required placeholder="e.g., Customer Support Bot">
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <h2>Basic Information</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">Chatbot Name <span class="required">*</span></label>
+                                    <input type="text" id="name" name="name" required placeholder="e.g., Customer Support Bot">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bot_name">Display Name <span class="required">*</span></label>
+                                    <input type="text" id="bot_name" name="bot_name" value="AI Assistant" required
+                                           placeholder="e.g., Sarah" oninput="updatePreviewBotName(this.value)">
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="bot_name">Display Name <span class="required">*</span></label>
-                                <input type="text" id="bot_name" name="bot_name" value="AI Assistant" required
-                                       placeholder="e.g., Sarah" oninput="updatePreviewBotName(this.value)">
+                                <label for="description">Description</label>
+                                <textarea id="description" name="description" rows="2"
+                                          placeholder="Describe what your chatbot does…"></textarea>
+                                <span class="field-hint">Optional — helps you identify this bot later</span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" name="description" rows="2"
-                                      placeholder="Describe what your chatbot does…"></textarea>
-                            <span class="field-hint">Optional — helps you identify this bot later</span>
-                        </div>
-                    </div>
 
-                    <div class="form-section">
-                        <h2>Avatar &amp; Appearance</h2>
-                        <div class="avatar-colors-row">
-
-                            <div class="avatar-pane">
-                                <span class="avatar-pane-label">Bot Avatar</span>
-                                <div class="avatar-circle" id="avatarPreview">
-                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                                    </svg>
-                                </div>
-                                <input type="file" id="bot_avatar" name="bot_avatar" accept="image/*"
-                                       style="display:none" onchange="handleAvatarUpload(this)">
-                                <input type="hidden" id="bot_avatar_data" name="bot_avatar_data" value="">
-                                <input type="hidden" id="remove_avatar_flag" name="remove_avatar" value="false">
-                                <div class="avatar-btn-group">
-                                    <button type="button" class="btn-av choose"
-                                            onclick="document.getElementById('bot_avatar').click()">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                        <!-- Avatar & Theme -->
+                        <div class="form-section">
+                            <h2>Avatar &amp; Appearance</h2>
+                            <div class="avatar-colors-row">
+                                <!-- Avatar panel -->
+                                <div class="avatar-pane">
+                                    <span class="avatar-pane-label">Bot Avatar</span>
+                                    <div class="avatar-circle" id="avatarPreview">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                                         </svg>
-                                        Choose
-                                    </button>
-                                    <button type="button" class="btn-av adjust" id="adjustAvatarBtn"
-                                            onclick="openAvatarEditor()" style="display:none;">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="1"/>
-                                            <path d="M4.6 4.6l2.8 2.8M19.4 19.4l-2.8-2.8M4.6 19.4l2.8-2.8M19.4 4.6l-2.8 2.8M12 2v3m0 12v3M2 12h3m12 0h3"/>
-                                        </svg>
-                                        Adjust
-                                    </button>
-                                    <button type="button" class="btn-av remove" id="removeAvatar"
-                                            style="display:none" onclick="removeAvatarImage()">
-                                        Remove
-                                    </button>
+                                    </div>
+                                    <input type="file" id="bot_avatar" name="bot_avatar" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+                                    <input type="hidden" id="bot_avatar_data" name="bot_avatar_data" value="">
+                                    <input type="hidden" id="remove_avatar_flag" name="remove_avatar" value="false">
+                                    <div class="avatar-btn-group">
+                                        <button type="button" class="btn-av choose" onclick="document.getElementById('bot_avatar').click()">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                                            </svg>
+                                            Choose
+                                        </button>
+                                        <button type="button" class="btn-av adjust" id="adjustAvatarBtn" onclick="openAvatarEditor()" style="display:none;">
+                                            Adjust
+                                        </button>
+                                        <button type="button" class="btn-av remove" id="removeAvatar" onclick="removeAvatarImage()" style="display:none;">
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <span class="avatar-hint">PNG or JPG · Max 2MB</span>
                                 </div>
-                                <span class="avatar-hint">PNG or JPG · Max 2MB</span>
-                            </div>
 
-                            <div class="colors-pane">
-                                <span class="colors-pane-label">Theme Colors</span>
+                                <!-- Colors panel -->
+                                <div class="colors-pane">
+                                    <span class="colors-pane-label">Theme Colors</span>
 
-                                <div class="theme-presets-container">
-                                    <div class="theme-presets-header">Preset Themes</div>
-                                    <div class="theme-presets-grid">
-                                          <button type="button" class="theme-btn" data-title="Indigo"
+                                    <!-- Preset themes -->
+                                    <div class="theme-presets-container">
+                                        <div class="theme-presets-header">Quick Themes</div>
+                                        <div class="theme-presets-grid">
+                                             <button type="button" class="theme-btn" data-title="Indigo"
                                                     style="background: linear-gradient(135deg, #4F46E5 50%, #F7FAFC 50%);"
                                                     onclick="applyTheme('#4F46E5', '#F7FAFC', '#FFFFFF', '#1A202C', '#FFFFFF')"></button>
 
@@ -196,135 +196,126 @@
                                             <button type="button" class="theme-btn" data-title="Glacier"
                                                     style="background: linear-gradient(135deg, #64748b 50%, #f8fafc 50%);"
                                                     onclick="applyTheme('#64748b', '#f8fafc', '#ffffff', '#0f172a', '#ffffff')"></button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <span class="colors-pane-label" style="margin-top: 10px;">Custom Colors</span>
-                                <input type="hidden" id="user_message_color" name="user_message_color" value="#4F46E5">
-                                <div class="color-grid">
-                                    <div class="color-item">
-                                        <span class="color-item-label">Theme</span>
-                                        <div class="color-picker-row">
-                                            <input type="color" id="theme_color" name="theme_color" value="#4F46E5" oninput="onColor('theme',this.value)">
-                                            <span class="color-hex-val" id="cv_theme">#4F46E5</span>
+                                    <!-- Custom color pickers -->
+                                    <span class="colors-pane-label" style="margin-top: 6px;">Custom</span>
+                                    <input type="hidden" id="user_message_color" name="user_message_color" value="#4F46E5">
+                                    <div class="color-grid">
+                                        <div class="color-item">
+                                            <span class="color-item-label">Theme</span>
+                                            <div class="color-picker-row">
+                                                <input type="color" id="theme_color" name="theme_color" value="#4F46E5" oninput="onColor('theme',this.value)">
+                                                <span class="color-hex-val" id="cv_theme">#4F46E5</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="color-item">
-                                        <span class="color-item-label">Chat BG</span>
-                                        <div class="color-picker-row">
-                                            <input type="color" id="chat_background_color" name="chat_background_color" value="#F7FAFC" oninput="onColor('chatBg',this.value)">
-                                            <span class="color-hex-val" id="cv_chatBg">#F7FAFC</span>
+                                        <div class="color-item">
+                                            <span class="color-item-label">Chat BG</span>
+                                            <div class="color-picker-row">
+                                                <input type="color" id="chat_background_color" name="chat_background_color" value="#F7FAFC" oninput="onColor('chatBg',this.value)">
+                                                <span class="color-hex-val" id="cv_chatBg">#F7FAFC</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="color-item">
-                                        <span class="color-item-label">Bot Bubble</span>
-                                        <div class="color-picker-row">
-                                            <input type="color" id="bot_message_color" name="bot_message_color" value="#FFFFFF" oninput="onColor('botBg',this.value)">
-                                            <span class="color-hex-val" id="cv_botBg">#FFFFFF</span>
+                                        <div class="color-item">
+                                            <span class="color-item-label">Bot Bubble</span>
+                                            <div class="color-picker-row">
+                                                <input type="color" id="bot_message_color" name="bot_message_color" value="#FFFFFF" oninput="onColor('botBg',this.value)">
+                                                <span class="color-hex-val" id="cv_botBg">#FFFFFF</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="color-item">
-                                        <span class="color-item-label">Bot Text</span>
-                                        <div class="color-picker-row">
-                                            <input type="color" id="bot_text_color" name="bot_text_color" value="#1A202C" oninput="onColor('botText',this.value)">
-                                            <span class="color-hex-val" id="cv_botText">#1A202C</span>
+                                        <div class="color-item">
+                                            <span class="color-item-label">Bot Text</span>
+                                            <div class="color-picker-row">
+                                                <input type="color" id="bot_text_color" name="bot_text_color" value="#1A202C" oninput="onColor('botText',this.value)">
+                                                <span class="color-hex-val" id="cv_botText">#1A202C</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="color-item">
-                                        <span class="color-item-label">User Text</span>
-                                        <div class="color-picker-row">
-                                            <input type="color" id="user_text_color" name="user_text_color" value="#FFFFFF" oninput="onColor('userText',this.value)">
-                                            <span class="color-hex-val" id="cv_userText">#FFFFFF</span>
+                                        <div class="color-item">
+                                            <span class="color-item-label">User Text</span>
+                                            <div class="color-picker-row">
+                                                <input type="color" id="user_text_color" name="user_text_color" value="#FFFFFF" oninput="onColor('userText',this.value)">
+                                                <span class="color-hex-val" id="cv_userText">#FFFFFF</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-<div class="form-section">
-                        <h2>Welcome Message &amp; Buttons</h2>
-                        <div class="welcome-section">
+
+                        <!-- Welcome Message + Buttons -->
+                        <div class="form-section">
+                            <h2>Welcome Message &amp; Quick Buttons</h2>
                             <div class="form-group">
                                 <label for="welcome_message">Welcome Message <span class="required">*</span></label>
                                 <textarea id="welcome_message" name="welcome_message" rows="3" required
-                                          placeholder="Hello! How can I help you?"
-                                          oninput="updatePreviewWelcome(this.value)">Hello! How can I help you?</textarea>
-                                <span class="field-hint">This is the first message users see when they open the chat</span>
+                                          placeholder="Hello! How can I help you today?"
+                                          oninput="updatePreviewWelcome(this.value)">Hello! How can I help you today?</textarea>
+                                <span class="field-hint">This message appears when the chat starts</span>
                             </div>
 
                         </div>
+
+
+
+                        <div class="form-actions">
+                            <a href="{{ url_for('bots') }}" class="btn-cancel">Cancel</a>
+                            <button type="submit" class="btn-submit" onclick="return validateForm()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Create Chatbot
+                            </button>
+                        </div>
                     </div>
 
-
-                </div><div class="preview-column">
-                    <div class="preview-sticky">
-                        <h2>Live Preview</h2>
-                        <div class="chatbot-preview">
-
-                            <div class="preview-header" id="previewHeader" style="background:#4F46E5;">
-                                <div class="preview-bot-icon" id="previewIcon">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                    </svg>
-                                </div>
-                                <span id="previewBotName">AI Assistant</span>
-                            </div>
-
-                            <div class="preview-body" id="previewBody" style="background:#F7FAFC;">
-                                <div class="preview-message bot">
-                                    <div class="message-avatar" id="previewAvatar"
-                                         style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #4F46E5;font-weight:600;">
-                                        A
+                    <!-- RIGHT COLUMN: LIVE PREVIEW -->
+                    <div class="preview-column">
+                        <div class="preview-sticky">
+                            <h2>Live Preview</h2>
+                            <div class="chatbot-preview">
+                                <div class="preview-header" id="previewHeader" style="background:#4F46E5;">
+                                    <div class="preview-bot-icon" id="previewIcon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                        </svg>
                                     </div>
-                                    <div class="message-wrapper">
-                                        <div class="message-content bot-message" id="previewWelcome"
-                                             style="background:#FFFFFF;color:#1A202C;">
-                                            Hello! How can I help you?
+                                    <span id="previewBotName">AI Assistant</span>
+                                </div>
+                                <div class="preview-body" id="previewBody" style="background:#F7FAFC;">
+                                    <div class="preview-message bot">
+                                        <div class="message-avatar" id="previewAvatar" style="display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #4F46E5;font-weight:600;">A</div>
+                                        <div class="message-wrapper">
+                                            <div class="message-content bot-message" id="previewWelcome" style="background:#FFFFFF;color:#1A202C;">Hello! How can I help you today?</div>
+                                            <div class="preview-buttons-container" id="previewButtonsContainer"></div>
                                         </div>
-                                        <div class="preview-buttons-container" id="previewButtonsContainer"></div>
+                                    </div>
+                                    <div class="preview-message user">
+                                        <div class="message-content user-message" id="previewUserMsg" style="background:#4F46E5;color:#FFFFFF;">This is how user messages look</div>
                                     </div>
                                 </div>
-                                <div class="preview-message user">
-                                    <div class="message-content user-message" id="previewUserMsg"
-                                         style="background:#4F46E5;color:#FFFFFF;">
-                                        This is how user messages look
-                                    </div>
+                                <div class="preview-footer">
+                                    <input type="text" placeholder="Type your message…" disabled>
+                                    <button type="button" disabled id="previewSendBtn" style="background:#4F46E5;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="22" y1="2" x2="11" y2="13"/>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-
-                            <div class="preview-footer">
-                                <label><input type="text" placeholder="Type your message…" disabled></label>
-                                <button type="button" disabled id="previewSendBtn" style="background:#4F46E5;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="22" y1="2" x2="11" y2="13"/>
-                                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                                    </svg>
-                                </button>
-                            </div>
-
                         </div>
                     </div>
                 </div>
 
-            </div><input type="hidden" id="welcome_buttons" name="welcome_buttons" value="[]">
-            <input type="hidden" name="use_ml_model" value="">
-
-            <div class="form-actions">
-                <a href="{{ url_for('bots') }}" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-submit" onclick="return validateForm()">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Create Chatbot
-                </button>
-            </div>
-
-        </form>
+                <!-- Hidden fields for JSON data -->
+                <input type="hidden" id="welcome_buttons" name="welcome_buttons" value="[]">
+            </form>
         </div>
     </main>
 </div>
 
+<!-- Avatar Editor Modal -->
 <div class="modal" id="avatarEditorModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -333,8 +324,8 @@
         </div>
         <div class="image-editor">
             <div class="preview-window">
-                <div class="preview-circle" id="previewCircle">
-                    <canvas id="previewCanvas" style="width:100%;height:100%;"></canvas>
+                <div class="preview-circle">
+                    <canvas id="previewCanvas" width="180" height="180"></canvas>
                 </div>
             </div>
             <div class="controls-group">
@@ -353,13 +344,12 @@
                     <input type="range" id="ySlider" min="-150" max="150" value="0" step="5">
                     <span class="value-display" id="yValue">0px</span>
                 </div>
-                <button class="btn-av choose" style="margin-top:8px;width:100%;justify-content:center;"
-                        type="button" onclick="resetEditorSliders()">Reset Position</button>
+                <button class="btn-av choose" style="margin-top:8px;width:100%;justify-content:center;" type="button" onclick="resetEditorSliders()">Reset Position</button>
             </div>
         </div>
         <div class="modal-actions">
             <button class="btn-cancel" type="button" onclick="closeAvatarEditor()">Cancel</button>
-            <button class="btn-save"   type="button" onclick="saveAvatarImage()">Apply Changes</button>
+            <button class="btn-save" type="button" onclick="saveAvatarImage()">Apply Changes</button>
         </div>
     </div>
 </div>
@@ -367,502 +357,398 @@
 <button class="mobile-menu-toggle" id="mobileMenuToggle">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
         <line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
 </button>
 
 <script>
-/* ── Sidebar ── */
-document.getElementById('mobileMenuToggle').addEventListener('click', function(){
-    document.getElementById('sidebar').classList.toggle('open');
-});
-document.getElementById('accountMenu').addEventListener('click', function(e){
-    e.preventDefault();
-    this.classList.toggle('expanded');
-    document.getElementById('accountSubmenu').classList.toggle('open');
-});
-
-/* ══ PRESET THEME APPLIER ══ */
-function applyTheme(themeColor, bgColor, botBubbleColor, botTextColor, userTextColor) {
-    document.getElementById('theme_color').value = themeColor;
-    document.getElementById('chat_background_color').value = bgColor;
-    document.getElementById('bot_message_color').value = botBubbleColor;
-    document.getElementById('bot_text_color').value = botTextColor;
-    document.getElementById('user_text_color').value = userTextColor;
-
-    onColor('theme', themeColor);
-    onColor('chatBg', bgColor);
-    onColor('botBg', botBubbleColor);
-    onColor('botText', botTextColor);
-    onColor('userText', userTextColor);
-}
-
-/* ══ COLOR STATE ══ */
-var clr = {theme:'#4F46E5', chatBg:'#F7FAFC', botBg:'#FFFFFF', botText:'#1A202C', userText:'#FFFFFF'};
-
-function onColor(key, val) {
-    clr[key] = val;
-    var hexMap = {theme:'cv_theme',chatBg:'cv_chatBg',botBg:'cv_botBg',botText:'cv_botText',userText:'cv_userText'};
-    var el = document.getElementById(hexMap[key]);
-    if (el) el.textContent = val.toUpperCase();
-    if (key === 'theme') document.getElementById('user_message_color').value = val;
-    applyPreview();
-}
-
-function applyPreview() {
-    document.getElementById('previewHeader').style.background  = clr.theme;
-    document.getElementById('previewSendBtn').style.background = clr.theme;
-    document.getElementById('previewBody').style.background    = clr.chatBg;
-    var wb = document.getElementById('previewWelcome');
-    wb.style.background = clr.botBg;
-    wb.style.color      = clr.botText;
-    var um = document.getElementById('previewUserMsg');
-    um.style.background = clr.theme;
-    um.style.color      = clr.userText;
-    if (!uploadedAvatarUrl) {
-        var pa = document.getElementById('previewAvatar');
-        if (pa) pa.style.border = '2px solid ' + clr.theme;
-    }
-    renderPreviewChips();
-}
-
-function updatePreviewBotName(v) { document.getElementById('previewBotName').textContent = v || 'AI Assistant'; }
-function updatePreviewWelcome(v) { document.getElementById('previewWelcome').textContent = v || 'Hello! How can I help you?'; }
-
-/* ══ AVATAR STATE ══ */
-var uploadedAvatarUrl = null;
-var originalAvatarUrl = null;
-var currentZoom = 100, currentX = 0, currentY = 0;
-var CIRCLE_SIZE = 180, OUTPUT_SIZE = 100;
-
-var DEFAULT_AVATAR_SVG = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-var DEFAULT_ICON_SVG   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-
-function setAllPreviews(src) {
-    var img = '<img src="' + src + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-    document.getElementById('avatarPreview').innerHTML = img;
-    var pi = document.getElementById('previewIcon');
-    pi.innerHTML   = img;
-    pi.style.background = 'white';
-    var pa = document.getElementById('previewAvatar');
-    pa.innerHTML   = img;
-    pa.style.border = '2px solid #e2e8f0';
-}
-
-function clearAllPreviews() {
-    document.getElementById('avatarPreview').innerHTML = DEFAULT_AVATAR_SVG;
-    document.getElementById('previewIcon').innerHTML   = DEFAULT_ICON_SVG;
-    var pa = document.getElementById('previewAvatar');
-    pa.textContent = (document.getElementById('bot_name').value.charAt(0) || 'A').toUpperCase();
-    pa.style.border = '2px solid ' + clr.theme;
-}
-
-function handleAvatarUpload(inp) {
-    var f = inp.files[0];
-    if (!f) return;
-    if (f.size > 2 * 1024 * 1024) { alert('File size must be less than 2MB'); inp.value = ''; return; }
-    var r = new FileReader();
-    r.onload = function(e) {
-        originalAvatarUrl = e.target.result;
-        var img = new Image();
-        img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-            var MAX_SIZE = 400;
-            var width = img.width, height = img.height;
-            if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-            else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-            canvas.width = width; canvas.height = height;
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, width, height);
-            ctx.drawImage(img, 0, 0, width, height);
-            var compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-            uploadedAvatarUrl = compressedBase64;
-            currentZoom = 100; currentX = 0; currentY = 0;
-            document.getElementById('bot_avatar_data').value = compressedBase64;
-            document.getElementById('remove_avatar_flag').value = 'false';
-            setAllPreviews(compressedBase64);
-            document.getElementById('adjustAvatarBtn').style.display = 'inline-flex';
-            document.getElementById('removeAvatar').style.display = 'inline-flex';
-        };
-        img.src = e.target.result;
-    };
-    r.readAsDataURL(f);
-}
-
-function removeAvatarImage() {
-    uploadedAvatarUrl = null; originalAvatarUrl = null;
-    document.getElementById('bot_avatar_data').value = '';
-    document.getElementById('remove_avatar_flag').value = 'true';
-    document.getElementById('bot_avatar').value = '';
-    document.getElementById('adjustAvatarBtn').style.display = 'none';
-    document.getElementById('removeAvatar').style.display = 'none';
-    clearAllPreviews();
-}
-
-/* ══ AVATAR EDITOR ══ */
-function openAvatarEditor()  { if (!uploadedAvatarUrl) return; document.getElementById('avatarEditorModal').classList.add('open'); renderEditorCanvas(); }
-function closeAvatarEditor() { document.getElementById('avatarEditorModal').classList.remove('open'); }
-
-function resetEditorSliders() {
-    currentZoom = 100; currentX = 0; currentY = 0;
-    document.getElementById('zoomSlider').value = 100;
-    document.getElementById('xSlider').value    = 0;
-    document.getElementById('ySlider').value    = 0;
-    updateSliderLabels(); renderEditorCanvas();
-}
-
-function updateSliderLabels() {
-    document.getElementById('zoomValue').textContent = document.getElementById('zoomSlider').value;
-    document.getElementById('xValue').textContent    = document.getElementById('xSlider').value + 'px';
-    document.getElementById('yValue').textContent    = document.getElementById('ySlider').value + 'px';
-}
-
-document.getElementById('zoomSlider').addEventListener('input', function(){ currentZoom = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
-document.getElementById('xSlider').addEventListener('input',    function(){ currentX    = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
-document.getElementById('ySlider').addEventListener('input',    function(){ currentY    = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
-
-function renderEditorCanvas() {
-    var canvas = document.getElementById('previewCanvas');
-    var ctx = canvas.getContext('2d');
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-        canvas.width = CIRCLE_SIZE; canvas.height = CIRCLE_SIZE;
-        ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE);
-        ctx.save();
-        ctx.beginPath(); ctx.arc(CIRCLE_SIZE/2, CIRCLE_SIZE/2, CIRCLE_SIZE/2, 0, Math.PI*2); ctx.clip();
-
-        // ★ NEW: Calculate base scale so it covers the entire circle by default
-        var baseScale = Math.max(CIRCLE_SIZE / img.width, CIRCLE_SIZE / img.height);
-        var finalScale = baseScale * (currentZoom / 100);
-
-        var sw = img.width * finalScale, sh = img.height * finalScale;
-        ctx.drawImage(img, (CIRCLE_SIZE - sw)/2 + currentX, (CIRCLE_SIZE - sh)/2 + currentY, sw, sh);
-        ctx.restore();
-    };
-    img.src = originalAvatarUrl || uploadedAvatarUrl;
-}
-
-function saveAvatarImage() {
-    var outCanvas = document.createElement('canvas');
-    outCanvas.width = OUTPUT_SIZE; outCanvas.height = OUTPUT_SIZE;
-    var ctx = outCanvas.getContext('2d');
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-        ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
-        ctx.save();
-        ctx.beginPath(); ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2); ctx.clip();
-        ctx.fillStyle = "#FFFFFF"; ctx.fill();
-
-        // ★ NEW: Calculate output scale
-        var baseScale = Math.max(OUTPUT_SIZE / img.width, OUTPUT_SIZE / img.height);
-        var finalScale = baseScale * (currentZoom / 100);
-
-        var sw = img.width * finalScale, sh = img.height * finalScale;
-        var ratio = OUTPUT_SIZE / CIRCLE_SIZE;
-        ctx.drawImage(img, (OUTPUT_SIZE - sw)/2 + (currentX * ratio), (OUTPUT_SIZE - sh)/2 + (currentY * ratio), sw, sh);
-        ctx.restore();
-
-        uploadedAvatarUrl = outCanvas.toDataURL('image/jpeg', 0.8);
-        document.getElementById('bot_avatar_data').value = uploadedAvatarUrl;
-        document.getElementById('remove_avatar_flag').value = 'false';
-        setAllPreviews(uploadedAvatarUrl);
-        closeAvatarEditor();
-    };
-    img.onerror = function(){ alert('Error processing image. Please try again.'); };
-    img.src = originalAvatarUrl || uploadedAvatarUrl;
-}
-/* ══ WELCOME BUTTONS ══ */
-var wbBtns = [];
-
-function addNewWbButton()       { wbBtns.push({text:'', type:'message', value:''}); renderWbList(); }
-function removeWbButton(i)      { wbBtns.splice(i, 1); renderWbList(); }
-function updateWbField(i, f, v) { if (wbBtns[i]) { wbBtns[i][f] = v; renderPreviewChips(); syncJson(); } }
-
-function renderWbList() {
-    var list  = document.getElementById('wbList');
-    var empty = document.getElementById('wbEmpty');
-    if (wbBtns.length === 0) { if (empty) empty.style.display = 'block'; list.querySelectorAll('.wb-item').forEach(function(el){el.remove();}); syncJson(); return; }
-    if (empty) empty.style.display = 'none';
-    list.innerHTML = '';
-    wbBtns.forEach(function(btn, i) {
-        var div = document.createElement('div');
-        div.className = 'wb-item';
-        div.innerHTML =
-            '<div class="wb-item-header">' +
-                '<div class="wb-item-num"><div class="wb-num-badge">'+(i+1)+'</div>Button '+(i+1)+'</div>' +
-                '<button type="button" class="btn-wb-remove" onclick="removeWbButton('+i+')">' +
-                '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove</button>' +
-            '</div>' +
-            '<div class="wb-item-body">' +
-                '<div class="wb-field"><label>Button Label</label>' +
-                '<input type="text" placeholder="e.g., Get Started" value="'+esc(btn.text)+'" oninput="updateWbField('+i+',\'text\',this.value)"></div>' +
-                '<div class="wb-field"><label>Action Type</label>' +
-                '<select onchange="updateWbField('+i+',\'type\',this.value)">' +
-                '<option value="message"'+(btn.type==='message'?' selected':'')+'>Send Message</option>' +
-                '<option value="url"'+(btn.type==='url'?' selected':'')+'>Open URL</option>' +
-                '</select></div>' +
-                '<div class="wb-field wb-full"><label>'+valLabel(btn.type)+'</label>' +
-                '<input type="text" placeholder="'+valPlaceholder(btn.type)+'" value="'+esc(btn.value)+'" oninput="updateWbField('+i+',\'value\',this.value)"></div>' +
-            '</div>';
-        list.appendChild(div);
-    });
-    renderPreviewChips(); syncJson();
-}
-
-function valLabel(t)       { return t==='url'?'URL':t==='intent'?'Intent Tag':'Message Text'; }
-function valPlaceholder(t) { return t==='url'?'https://example.com':t==='intent'?'e.g., pricing_info':'e.g., Tell me about pricing'; }
-
-function renderPreviewChips() {
-    var c = document.getElementById('previewButtonsContainer'); if (!c) return;
-    c.innerHTML = wbBtns.filter(function(b){return b.text.trim();}).map(function(b){
-        return '<button class="preview-button" type="button" style="border-color:'+clr.theme+';color:'+clr.theme+'">'+esc(b.text)+'</button>';
-    }).join('');
-}
-
-function syncJson() {
-    document.getElementById('welcome_buttons').value = JSON.stringify(
-        wbBtns.map(function(b){ return {text:b.text,type:b.type,value:b.value,has_submenu:false,submenu_items:[]}; })
-    );
-}
-
-function esc(s) { if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* ══════════════════════════════════════════════════════════
-   CONVERSATION FLOW BUILDER
-   ══════════════════════════════════════════════════════════ */
-var flowSteps = [];
-
-function genId() { return 'step_' + Math.random().toString(36).substr(2, 8); }
-
-function addFlowStep() {
-    flowSteps.push({ id: genId(), message: '', isFinal: false, buttons: [] });
-    renderFlowSteps();
-}
-
-function removeFlowStep(id) {
-    flowSteps = flowSteps.filter(function(s){ return s.id !== id; });
-    flowSteps.forEach(function(s){
-        s.buttons.forEach(function(b){ if (b.goToStepId === id) b.goToStepId = ''; });
-    });
-    renderFlowSteps();
-}
-
-function toggleFlowStep(id) {
-    var body = document.getElementById('fsb_' + id);
-    var btn  = document.getElementById('fst_' + id);
-    if (!body || !btn) return;
-    body.classList.toggle('collapsed');
-    btn.classList.toggle('collapsed');
-}
-
-function updateStepMessage(id, val) {
-    var s = flowSteps.find(function(s){ return s.id === id; });
-    if (s) { s.message = val; updateStepSubtitle(id); syncFlowJson(); }
-}
-
-function updateStepFinal(id, checked) {
-    var s = flowSteps.find(function(s){ return s.id === id; });
-    if (!s) return;
-    s.isFinal = checked;
-    var card = document.getElementById('fsc_' + id);
-    if (card) card.classList.toggle('is-final', checked);
-    // Update title inside header
-    var titleEl = document.getElementById('fstitle_' + id);
-    if (titleEl) {
-        var idx = flowSteps.indexOf(s);
-        titleEl.textContent = 'Step ' + (idx + 1) + (checked ? ' · Final' : '');
-    }
-    var btnSection = document.getElementById('fsbsec_' + id);
-    if (btnSection) btnSection.style.display = checked ? 'none' : '';
-    syncFlowJson();
-}
-
-function addStepButton(stepId) {
-    var s = flowSteps.find(function(s){ return s.id === stepId; });
-    if (!s) return;
-    s.buttons.push({ label: '', goToStepId: '' });
-    renderStepButtons(stepId);
-    syncFlowJson();
-}
-
-function removeStepButton(stepId, bi) {
-    var s = flowSteps.find(function(s){ return s.id === stepId; });
-    if (!s) return;
-    s.buttons.splice(bi, 1);
-    renderStepButtons(stepId);
-    syncFlowJson();
-}
-
-function updateStepButton(stepId, bi, field, val) {
-    var s = flowSteps.find(function(s){ return s.id === stepId; });
-    if (s && s.buttons[bi]) { s.buttons[bi][field] = val; syncFlowJson(); }
-}
-
-function updateStepSubtitle(id) {
-    var s = flowSteps.find(function(s){ return s.id === id; });
-    var el = document.getElementById('fssubtitle_' + id);
-    if (!el || !s) return;
-    var preview = s.message ? (s.message.length > 45 ? s.message.substr(0,45)+'…' : s.message) : 'No message yet';
-    el.textContent = preview;
-}
-
-function renderFlowSteps() {
-    var list  = document.getElementById('flowStepsList');
-    var empty = document.getElementById('flowEmpty');
-    if (!list) return;
-
-    if (flowSteps.length === 0) {
-        if (empty) empty.style.display = 'flex';
-        list.innerHTML = '';
-        syncFlowJson();
-        return;
-    }
-    if (empty) empty.style.display = 'none';
-
-    list.innerHTML = '';
-
-    flowSteps.forEach(function(step, idx) {
-        // Connector arrow
-        if (idx > 0) {
-            var conn = document.createElement('div');
-            conn.className = 'flow-step-connector';
-            conn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>';
-            list.appendChild(conn);
-        }
-
-        var card = document.createElement('div');
-        card.className = 'flow-step-card' + (step.isFinal ? ' is-final' : '');
-        card.id = 'fsc_' + step.id;
-
-        var msgPreview = step.message
-            ? (step.message.length > 45 ? step.message.substr(0,45)+'…' : step.message)
-            : 'No message yet';
-
-        card.innerHTML =
-            '<div class="flow-step-header" onclick="toggleFlowStep(\'' + step.id + '\')">' +
-                '<div class="flow-step-header-left">' +
-                    '<div class="flow-step-badge">' + (idx + 1) + '</div>' +
-                    '<div>' +
-                        '<div class="flow-step-title" id="fstitle_' + step.id + '">Step ' + (idx+1) + (step.isFinal?' · Final':'') + '</div>' +
-                        '<div class="flow-step-subtitle" id="fssubtitle_' + step.id + '">' + esc(msgPreview) + '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="flow-step-actions">' +
-                    '<button type="button" class="btn-step-remove" onclick="event.stopPropagation();removeFlowStep(\'' + step.id + '\')">' +
-                        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove' +
-                    '</button>' +
-                    '<button type="button" class="flow-step-toggle" id="fst_' + step.id + '" onclick="event.stopPropagation();toggleFlowStep(\'' + step.id + '\')">' +
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
-                    '</button>' +
-                '</div>' +
-            '</div>' +
-            '<div class="flow-step-body" id="fsb_' + step.id + '">' +
-                '<div class="flow-msg-field">' +
-                    '<label>Bot Message <span style="color:#e53e3e">*</span></label>' +
-                    '<textarea rows="3" placeholder="e.g., Great! What would you like to know?" ' +
-                        'oninput="updateStepMessage(\'' + step.id + '\',this.value)">' + esc(step.message) + '</textarea>' +
-                '</div>' +
-                '<label class="flow-final-toggle">' +
-                    '<input type="checkbox"' + (step.isFinal ? ' checked' : '') + ' ' +
-                        'onchange="updateStepFinal(\'' + step.id + '\',this.checked)">' +
-                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' +
-                    'This is a final message (ends the conversation, no buttons)' +
-                '</label>' +
-                '<div id="fsbsec_' + step.id + '"' + (step.isFinal ? ' style="display:none"' : '') + '>' +
-                    '<div class="flow-btn-section-label">' +
-                        '<span>Buttons</span>' +
-                        '<button type="button" class="btn-add-step-btn" onclick="addStepButton(\'' + step.id + '\')">' +
-                            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Button' +
-                        '</button>' +
-                    '</div>' +
-                    '<div id="fsblist_' + step.id + '"></div>' +
-                '</div>' +
-            '</div>';
-
-        list.appendChild(card);
-        renderStepButtons(step.id);
-    });
-
-    syncFlowJson();
-}
-
-function renderStepButtons(stepId) {
-    var s = flowSteps.find(function(s){ return s.id === stepId; });
-    var container = document.getElementById('fsblist_' + stepId);
-    if (!s || !container) return;
-
-    if (s.buttons.length === 0) {
-        container.innerHTML = '<div class="step-btn-empty">No buttons yet — add one to let users navigate forward</div>';
-        return;
-    }
-
-    // Build options from all OTHER steps
-    var stepOptions = flowSteps
-        .filter(function(fs){ return fs.id !== stepId; })
-        .map(function(fs){
-            var idx = flowSteps.indexOf(fs);
-            var label = 'Step ' + (idx + 1) + (fs.message ? ': ' + fs.message.substr(0, 28) + (fs.message.length > 28 ? '…' : '') : '');
-            return '<option value="' + fs.id + '"' + ('' === fs.id ? ' selected' : '') + '>' + esc(label) + '</option>';
-        }).join('');
-
-    container.innerHTML = '';
-    s.buttons.forEach(function(btn, bi) {
-        var item = document.createElement('div');
-        item.className = 'step-btn-item';
-
-        // Build select with correct selected option
-        var selectHtml = '<select onchange="updateStepButton(\'' + stepId + '\',' + bi + ',\'goToStepId\',this.value)">' +
-            '<option value="">— Go to step —</option>';
-        flowSteps.filter(function(fs){ return fs.id !== stepId; }).forEach(function(fs){
-            var idx = flowSteps.indexOf(fs);
-            var label = 'Step ' + (idx + 1) + (fs.message ? ': ' + fs.message.substr(0,28) + (fs.message.length>28?'…':'') : '');
-            selectHtml += '<option value="' + fs.id + '"' + (btn.goToStepId === fs.id ? ' selected' : '') + '>' + esc(label) + '</option>';
+    // ======================== SIDEBAR TOGGLE ========================
+    const toggleBtn = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 980 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
         });
-        selectHtml += '</select>';
+    }
 
-        item.innerHTML =
-            '<input type="text" placeholder="Button label" value="' + esc(btn.label) + '" ' +
-                'oninput="updateStepButton(\'' + stepId + '\',' + bi + ',\'label\',this.value)">' +
-            selectHtml +
-            '<button type="button" class="btn-remove-step-btn" onclick="removeStepButton(\'' + stepId + '\',' + bi + ')">' +
-                '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-            '</button>';
-        container.appendChild(item);
-    });
-}
+    // ======================== GLOBAL VARIABLES ========================
+    let clr = { theme: '#4F46E5', chatBg: '#F7FAFC', botBg: '#FFFFFF', botText: '#1A202C', userText: '#FFFFFF' };
+    let uploadedAvatarUrl = null, originalAvatarUrl = null;
+    let currentZoom = 100, currentX = 0, currentY = 0;
+    const CIRCLE_SIZE = 180, OUTPUT_SIZE = 100;
+    let wbBtns = [];
+    let flowSteps = [];
 
-function syncFlowJson() {
-    document.getElementById('flow_steps').value = JSON.stringify(flowSteps);
-}
+    // ======================== THEME & PREVIEW ========================
+    function applyTheme(themeColor, bgColor, botBubbleColor, botTextColor, userTextColor) {
+        document.getElementById('theme_color').value = themeColor;
+        document.getElementById('chat_background_color').value = bgColor;
+        document.getElementById('bot_message_color').value = botBubbleColor;
+        document.getElementById('bot_text_color').value = botTextColor;
+        document.getElementById('user_text_color').value = userTextColor;
+        onColor('theme', themeColor);
+        onColor('chatBg', bgColor);
+        onColor('botBg', botBubbleColor);
+        onColor('botText', botTextColor);
+        onColor('userText', userTextColor);
+    }
 
-/* ══ VALIDATION ══ */
-function validateForm() {
-    var n = document.getElementById('name').value.trim();
-    var b = document.getElementById('bot_name').value.trim();
-    var w = document.getElementById('welcome_message').value.trim();
-    if (!n) { showAlert('Please enter a Chatbot Name.', 'danger'); return false; }
-    if (!b) { showAlert('Please enter a Bot Display Name.', 'danger'); return false; }
-    if (!w) { showAlert('Please enter a Welcome Message.', 'danger'); return false; }
-    syncJson();
-    syncFlowJson();
-    return true;
-}
+    function onColor(key, val) {
+        clr[key] = val;
+        const hexMap = { theme:'cv_theme', chatBg:'cv_chatBg', botBg:'cv_botBg', botText:'cv_botText', userText:'cv_userText' };
+        const el = document.getElementById(hexMap[key]);
+        if (el) el.textContent = val.toUpperCase();
+        if (key === 'theme') document.getElementById('user_message_color').value = val;
+        applyPreview();
+    }
 
-function showAlert(msg, type) {
-    var d = document.createElement('div'); d.className = 'alert alert-'+type;
-    d.innerHTML = '<span>'+msg+'</span><button class="alert-close" type="button" onclick="this.closest(\'.alert\').remove()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
-    document.getElementById('alerts').prepend(d);
-    setTimeout(function(){ if (d.parentNode) d.remove(); }, 5000);
-}
+    function applyPreview() {
+        document.getElementById('previewHeader').style.background = clr.theme;
+        document.getElementById('previewSendBtn').style.background = clr.theme;
+        document.getElementById('previewBody').style.background = clr.chatBg;
+        const welcomeEl = document.getElementById('previewWelcome');
+        welcomeEl.style.background = clr.botBg;
+        welcomeEl.style.color = clr.botText;
+        const userMsgEl = document.getElementById('previewUserMsg');
+        userMsgEl.style.background = clr.theme;
+        userMsgEl.style.color = clr.userText;
+        if (!uploadedAvatarUrl) {
+            const pa = document.getElementById('previewAvatar');
+            if (pa) pa.style.border = `2px solid ${clr.theme}`;
+        }
+        renderPreviewChips();
+    }
 
-/* init */
-applyPreview();
+    function updatePreviewBotName(v) { document.getElementById('previewBotName').textContent = v || 'AI Assistant'; }
+    function updatePreviewWelcome(v) { document.getElementById('previewWelcome').textContent = v || 'Hello! How can I help you today?'; }
+
+    // ======================== AVATAR HANDLING ========================
+    const DEFAULT_AVATAR_SVG = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    const DEFAULT_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+    function setAllPreviews(src) {
+        const imgHtml = `<img src="${src}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        document.getElementById('avatarPreview').innerHTML = imgHtml;
+        const iconDiv = document.getElementById('previewIcon');
+        iconDiv.innerHTML = imgHtml;
+        iconDiv.style.background = 'white';
+        const avatarDiv = document.getElementById('previewAvatar');
+        avatarDiv.innerHTML = imgHtml;
+        avatarDiv.style.border = '2px solid #e2e8f0';
+    }
+
+    function clearAllPreviews() {
+        document.getElementById('avatarPreview').innerHTML = DEFAULT_AVATAR_SVG;
+        document.getElementById('previewIcon').innerHTML = DEFAULT_ICON_SVG;
+        const avatarDiv = document.getElementById('previewAvatar');
+        const firstLetter = (document.getElementById('bot_name').value.charAt(0) || 'A').toUpperCase();
+        avatarDiv.textContent = firstLetter;
+        avatarDiv.style.border = `2px solid ${clr.theme}`;
+    }
+
+    function handleAvatarUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size must be less than 2MB');
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            originalAvatarUrl = e.target.result;
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                let width = img.width, height = img.height;
+                const MAX_SIZE = 400;
+                if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                canvas.width = width; canvas.height = height;
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressed = canvas.toDataURL('image/jpeg', 0.8);
+                uploadedAvatarUrl = compressed;
+                currentZoom = 100; currentX = 0; currentY = 0;
+                document.getElementById('bot_avatar_data').value = compressed;
+                document.getElementById('remove_avatar_flag').value = 'false';
+                setAllPreviews(compressed);
+                document.getElementById('adjustAvatarBtn').style.display = 'inline-flex';
+                document.getElementById('removeAvatar').style.display = 'inline-flex';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeAvatarImage() {
+        uploadedAvatarUrl = originalAvatarUrl = null;
+        document.getElementById('bot_avatar_data').value = '';
+        document.getElementById('remove_avatar_flag').value = 'true';
+        document.getElementById('bot_avatar').value = '';
+        document.getElementById('adjustAvatarBtn').style.display = 'none';
+        document.getElementById('removeAvatar').style.display = 'none';
+        clearAllPreviews();
+    }
+
+    // ======================== AVATAR EDITOR ========================
+    function openAvatarEditor() { if (uploadedAvatarUrl) document.getElementById('avatarEditorModal').classList.add('open'); renderEditorCanvas(); }
+    function closeAvatarEditor() { document.getElementById('avatarEditorModal').classList.remove('open'); }
+    function resetEditorSliders() { currentZoom = 100; currentX = 0; currentY = 0; document.getElementById('zoomSlider').value = 100; document.getElementById('xSlider').value = 0; document.getElementById('ySlider').value = 0; updateSliderLabels(); renderEditorCanvas(); }
+    function updateSliderLabels() {
+        document.getElementById('zoomValue').textContent = document.getElementById('zoomSlider').value;
+        document.getElementById('xValue').textContent = document.getElementById('xSlider').value + 'px';
+        document.getElementById('yValue').textContent = document.getElementById('ySlider').value + 'px';
+    }
+    document.getElementById('zoomSlider').addEventListener('input', function(){ currentZoom = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
+    document.getElementById('xSlider').addEventListener('input', function(){ currentX = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
+    document.getElementById('ySlider').addEventListener('input', function(){ currentY = parseInt(this.value); updateSliderLabels(); renderEditorCanvas(); });
+    function renderEditorCanvas() {
+        const canvas = document.getElementById('previewCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = function() {
+            canvas.width = CIRCLE_SIZE; canvas.height = CIRCLE_SIZE;
+            ctx.clearRect(0, 0, CIRCLE_SIZE, CIRCLE_SIZE);
+            ctx.save();
+            ctx.beginPath(); ctx.arc(CIRCLE_SIZE/2, CIRCLE_SIZE/2, CIRCLE_SIZE/2, 0, Math.PI*2); ctx.clip();
+            const baseScale = Math.max(CIRCLE_SIZE / img.width, CIRCLE_SIZE / img.height);
+            const finalScale = baseScale * (currentZoom / 100);
+            const sw = img.width * finalScale, sh = img.height * finalScale;
+            ctx.drawImage(img, (CIRCLE_SIZE - sw)/2 + currentX, (CIRCLE_SIZE - sh)/2 + currentY, sw, sh);
+            ctx.restore();
+        };
+        img.src = originalAvatarUrl || uploadedAvatarUrl;
+    }
+    function saveAvatarImage() {
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = OUTPUT_SIZE; outCanvas.height = OUTPUT_SIZE;
+        const ctx = outCanvas.getContext('2d');
+        const img = new Image();
+        img.onload = function() {
+            ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+            ctx.save();
+            ctx.beginPath(); ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2); ctx.clip();
+            ctx.fillStyle = "#FFFFFF"; ctx.fill();
+            const baseScale = Math.max(OUTPUT_SIZE / img.width, OUTPUT_SIZE / img.height);
+            const finalScale = baseScale * (currentZoom / 100);
+            const sw = img.width * finalScale, sh = img.height * finalScale;
+            const ratio = OUTPUT_SIZE / CIRCLE_SIZE;
+            ctx.drawImage(img, (OUTPUT_SIZE - sw)/2 + (currentX * ratio), (OUTPUT_SIZE - sh)/2 + (currentY * ratio), sw, sh);
+            ctx.restore();
+            uploadedAvatarUrl = outCanvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('bot_avatar_data').value = uploadedAvatarUrl;
+            document.getElementById('remove_avatar_flag').value = 'false';
+            setAllPreviews(uploadedAvatarUrl);
+            closeAvatarEditor();
+        };
+        img.src = originalAvatarUrl || uploadedAvatarUrl;
+    }
+
+    // ======================== WELCOME BUTTONS ========================
+    function addNewWbButton() { wbBtns.push({ text: '', type: 'message', value: '' }); renderWbList(); }
+    function removeWbButton(i) { wbBtns.splice(i, 1); renderWbList(); }
+    function updateWbField(i, field, val) { if (wbBtns[i]) { wbBtns[i][field] = val; renderPreviewChips(); syncWbJson(); } }
+
+    function renderWbList() {
+        const list = document.getElementById('wbList');
+        const empty = document.getElementById('wbEmpty');
+        if (wbBtns.length === 0) {
+            if (empty) empty.style.display = 'block';
+            if (list) list.innerHTML = '';
+            syncWbJson();
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+        list.innerHTML = '';
+        wbBtns.forEach((btn, i) => {
+            const div = document.createElement('div');
+            div.className = 'wb-item';
+            div.innerHTML = `
+                <div class="wb-item-header">
+                    <div class="wb-item-num"><div class="wb-num-badge">${i+1}</div>Button ${i+1}</div>
+                    <button type="button" class="btn-wb-remove" onclick="removeWbButton(${i})">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove
+                    </button>
+                </div>
+                <div class="wb-item-body">
+                    <div class="wb-field"><label>Button Label</label><input type="text" placeholder="e.g., Get Started" value="${escapeHtml(btn.text)}" oninput="updateWbField(${i},'text',this.value)"></div>
+                    <div class="wb-field"><label>Action Type</label><select onchange="updateWbField(${i},'type',this.value)">
+                        <option value="message" ${btn.type==='message'?'selected':''}>Send Message</option>
+                        <option value="url" ${btn.type==='url'?'selected':''}>Open URL</option>
+                    </select></div>
+                    <div class="wb-field wb-full"><label>${btn.type==='url'?'URL':'Message Text'}</label>
+                    <input type="text" placeholder="${btn.type==='url'?'https://example.com':'e.g., Tell me about pricing'}" value="${escapeHtml(btn.value)}" oninput="updateWbField(${i},'value',this.value)"></div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+        renderPreviewChips();
+        syncWbJson();
+    }
+
+    function renderPreviewChips() {
+        const container = document.getElementById('previewButtonsContainer');
+        if (!container) return;
+        container.innerHTML = wbBtns.filter(b => b.text.trim()).map(b => `<button class="preview-button" type="button" style="border-color:${clr.theme};color:${clr.theme}">${escapeHtml(b.text)}</button>`).join('');
+    }
+
+    function syncWbJson() {
+        document.getElementById('welcome_buttons').value = JSON.stringify(wbBtns.map(b => ({ text: b.text, type: b.type, value: b.value, has_submenu: false, submenu_items: [] })));
+    }
+
+    // ======================== FLOW BUILDER ========================
+    function genId() { return 'step_' + Math.random().toString(36).substr(2, 8); }
+    function addFlowStep() { flowSteps.push({ id: genId(), message: '', isFinal: false, buttons: [] }); renderFlowSteps(); }
+    function removeFlowStep(id) { flowSteps = flowSteps.filter(s => s.id !== id); flowSteps.forEach(s => { s.buttons.forEach(b => { if (b.goToStepId === id) b.goToStepId = ''; }); }); renderFlowSteps(); }
+    function toggleFlowStep(id) { document.getElementById(`fsb_${id}`).classList.toggle('collapsed'); document.getElementById(`fst_${id}`).classList.toggle('collapsed'); }
+    function updateStepMessage(id, val) { const s = flowSteps.find(s => s.id === id); if (s) { s.message = val; updateStepSubtitle(id); syncFlowJson(); } }
+    function updateStepFinal(id, checked) {
+        const s = flowSteps.find(s => s.id === id); if (!s) return;
+        s.isFinal = checked;
+        const card = document.getElementById(`fsc_${id}`);
+        if (card) card.classList.toggle('is-final', checked);
+        const titleEl = document.getElementById(`fstitle_${id}`);
+        const idx = flowSteps.indexOf(s);
+        if (titleEl) titleEl.textContent = `Step ${idx+1}${checked ? ' · Final' : ''}`;
+        const btnSection = document.getElementById(`fsbsec_${id}`);
+        if (btnSection) btnSection.style.display = checked ? 'none' : '';
+        syncFlowJson();
+    }
+    function addStepButton(stepId) { const s = flowSteps.find(s => s.id === stepId); if (s) { s.buttons.push({ label: '', goToStepId: '' }); renderStepButtons(stepId); syncFlowJson(); } }
+    function removeStepButton(stepId, bi) { const s = flowSteps.find(s => s.id === stepId); if (s) { s.buttons.splice(bi, 1); renderStepButtons(stepId); syncFlowJson(); } }
+    function updateStepButton(stepId, bi, field, val) { const s = flowSteps.find(s => s.id === stepId); if (s && s.buttons[bi]) { s.buttons[bi][field] = val; syncFlowJson(); } }
+    function updateStepSubtitle(id) {
+        const s = flowSteps.find(s => s.id === id);
+        const el = document.getElementById(`fssubtitle_${id}`);
+        if (el && s) el.textContent = s.message ? (s.message.length > 45 ? s.message.substr(0,45)+'…' : s.message) : 'No message yet';
+    }
+    function renderFlowSteps() {
+        const list = document.getElementById('flowStepsList');
+        const empty = document.getElementById('flowEmpty');
+        if (!list) return;
+        if (flowSteps.length === 0) {
+            if (empty) empty.style.display = 'flex';
+            list.innerHTML = '';
+            syncFlowJson();
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+        list.innerHTML = '';
+        flowSteps.forEach((step, idx) => {
+            if (idx > 0) {
+                const conn = document.createElement('div');
+                conn.className = 'flow-step-connector';
+                conn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>';
+                list.appendChild(conn);
+            }
+            const card = document.createElement('div');
+            card.className = `flow-step-card${step.isFinal ? ' is-final' : ''}`;
+            card.id = `fsc_${step.id}`;
+            const msgPreview = step.message ? (step.message.length > 45 ? step.message.substr(0,45)+'…' : step.message) : 'No message yet';
+            card.innerHTML = `
+                <div class="flow-step-header" onclick="toggleFlowStep('${step.id}')">
+                    <div class="flow-step-header-left">
+                        <div class="flow-step-badge">${idx+1}</div>
+                        <div>
+                            <div class="flow-step-title" id="fstitle_${step.id}">Step ${idx+1}${step.isFinal ? ' · Final' : ''}</div>
+                            <div class="flow-step-subtitle" id="fssubtitle_${step.id}">${escapeHtml(msgPreview)}</div>
+                        </div>
+                    </div>
+                    <div class="flow-step-actions">
+                        <button type="button" class="btn-step-remove" onclick="event.stopPropagation();removeFlowStep('${step.id}')">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Remove
+                        </button>
+                        <button type="button" class="flow-step-toggle" id="fst_${step.id}" onclick="event.stopPropagation();toggleFlowStep('${step.id}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="flow-step-body" id="fsb_${step.id}">
+                    <div class="flow-msg-field">
+                        <label>Bot Message <span class="required">*</span></label>
+                        <textarea rows="3" placeholder="e.g., Great! What would you like to know?" oninput="updateStepMessage('${step.id}',this.value)">${escapeHtml(step.message)}</textarea>
+                    </div>
+                    <label class="flow-final-toggle">
+                        <input type="checkbox" ${step.isFinal ? 'checked' : ''} onchange="updateStepFinal('${step.id}',this.checked)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        This is a final message (ends the conversation, no buttons)
+                    </label>
+                    <div id="fsbsec_${step.id}" ${step.isFinal ? 'style="display:none"' : ''}>
+                        <div class="flow-btn-section-label">
+                            <span>Buttons</span>
+                            <button type="button" class="btn-add-step-btn" onclick="addStepButton('${step.id}')">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Button
+                            </button>
+                        </div>
+                        <div id="fsblist_${step.id}"></div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+            renderStepButtons(step.id);
+        });
+        syncFlowJson();
+    }
+    function renderStepButtons(stepId) {
+        const s = flowSteps.find(s => s.id === stepId);
+        const container = document.getElementById(`fsblist_${stepId}`);
+        if (!s || !container) return;
+        if (s.buttons.length === 0) { container.innerHTML = '<div class="step-btn-empty">No buttons yet — add one to let users navigate forward</div>'; return; }
+        container.innerHTML = '';
+        s.buttons.forEach((btn, bi) => {
+            const item = document.createElement('div');
+            item.className = 'step-btn-item';
+            let selectHtml = `<select onchange="updateStepButton('${stepId}',${bi},'goToStepId',this.value)"><option value="">— Go to step —</option>`;
+            flowSteps.filter(fs => fs.id !== stepId).forEach(fs => {
+                const idx = flowSteps.indexOf(fs);
+                const label = `Step ${idx+1}${fs.message ? ': ' + (fs.message.length>28?fs.message.substr(0,28)+'…':fs.message) : ''}`;
+                selectHtml += `<option value="${fs.id}" ${btn.goToStepId === fs.id ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+            });
+            selectHtml += '</select>';
+            item.innerHTML = `
+                <input type="text" placeholder="Button label" value="${escapeHtml(btn.label)}" oninput="updateStepButton('${stepId}',${bi},'label',this.value)">
+                ${selectHtml}
+                <button type="button" class="btn-remove-step-btn" onclick="removeStepButton('${stepId}',${bi})">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            `;
+            container.appendChild(item);
+        });
+    }
+    function syncFlowJson() { document.getElementById('flow_steps').value = JSON.stringify(flowSteps); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+    // ======================== VALIDATION ========================
+    function validateForm() {
+        const name = document.getElementById('name').value.trim();
+        const botName = document.getElementById('bot_name').value.trim();
+        const welcomeMsg = document.getElementById('welcome_message').value.trim();
+        if (!name) { showAlert('Please enter a Chatbot Name.', 'danger'); return false; }
+        if (!botName) { showAlert('Please enter a Bot Display Name.', 'danger'); return false; }
+        if (!welcomeMsg) { showAlert('Please enter a Welcome Message.', 'danger'); return false; }
+        syncWbJson();
+        syncFlowJson();
+        return true;
+    }
+    function showAlert(msg, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible`;
+        alertDiv.innerHTML = `<span>${msg}</span><button class="alert-close" type="button" onclick="this.closest('.alert').remove()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+        document.getElementById('alerts').prepend(alertDiv);
+        setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 5000);
+    }
+
+    // ======================== INIT ========================
+    applyPreview();
+    renderWbList();
+    renderFlowSteps();
 </script>
-
-<script src="{{ url_for('static', filename='js/create.js') }}"></script>
 </body>
 </html>

@@ -6,64 +6,7 @@
     <title>{{ chatbot.name }} — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/botdetails.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
-    <style>
-        /* ══ PRESET THEMES UI ══ */
-        .theme-presets-container {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        .theme-presets-header {
-            font-size: 13px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-        .theme-presets-grid {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .theme-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .theme-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .theme-btn::after {
-            content: attr(data-title);
-            position: absolute;
-            bottom: -24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            font-size: 10px;
-            padding: 4px 6px;
-            border-radius: 4px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-        .theme-btn:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-    </style>
+
 </head>
 <body>
 
@@ -132,7 +75,7 @@
             <div class="hero-avatar">
                 {% if chatbot.bot_avatar %}<img src="{{ chatbot.bot_avatar }}" alt="{{ chatbot.name }}">
                 {% else %}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="34" height="34">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="36" height="36">
                     <rect x="16" y="24" width="32" height="28" rx="6" fill="white" opacity="0.9"/>
                     <line x1="32" y1="16" x2="32" y2="24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
                     <circle cx="32" cy="14" r="3" fill="white"/>
@@ -146,11 +89,41 @@
             </div>
             <div class="hero-info">
                 <div class="hero-name">{{ chatbot.name }}</div>
+                <div class="hero-sub">{{ chatbot.description or 'No description set.' }}</div>
                 <div class="hero-meta">
-                    <span class="hero-badge {{ 'active' if chatbot.is_active else 'inactive' }}">{{ 'Active' if chatbot.is_active else 'Inactive' }}</span>
-                    <span class="hero-badge">{{ 'Trained' if chatbot.is_trained else 'Not Trained' }}</span>
-                    <span class="hero-badge">{{ chatbot.bot_name }}</span>
-                    <span class="hero-badge">{{ chatbot.created_at.strftime('%b %d, %Y') }}</span>
+                    <span class="hero-badge {{ 'active' if chatbot.is_active else 'inactive' }}">
+                        <span class="hero-badge-dot"></span>
+                        {{ 'Live' if chatbot.is_active else 'Offline' }}
+                    </span>
+                    <span class="hero-badge {% if chatbot.is_trained %}trained{% endif %}">
+                        {% if chatbot.is_trained %}
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        Trained
+                        {% else %}
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Not Trained
+                        {% endif %}
+                    </span>
+                    <span class="hero-badge">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        {{ chatbot.created_at.strftime('%b %d, %Y') }}
+                    </span>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-val">{{ chatbot.chat_sessions | length if chatbot.chat_sessions else 0 }}</div>
+                    <div class="hero-stat-lbl">Sessions</div>
+                </div>
+                <div class="hero-stat-div"></div>
+                <div class="hero-stat">
+                    <div class="hero-stat-val">{{ chatbot.chat_sessions | selectattr('is_live') | list | length if chatbot.chat_sessions else 0 }}</div>
+                    <div class="hero-stat-lbl">Live Chats</div>
+                </div>
+                <div class="hero-stat-div"></div>
+                <div class="hero-stat">
+                    <div class="hero-stat-val">{{ chatbot.qa_pairs | length if chatbot.qa_pairs else 0 }}</div>
+                    <div class="hero-stat-lbl">Q&amp;A Pairs</div>
                 </div>
             </div>
         </div>
@@ -187,43 +160,125 @@
 
         <div class="tab-panel active" id="panel-overview">
             <div class="overview-layout">
-                <div>
+
+                <!-- LEFT COLUMN -->
+                <div class="overview-left">
+
+                    <!-- Bot Info Card -->
                     <div class="info-card">
-                        <div class="info-card-head">Bot Information</div>
+                        <div class="info-card-head">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                            Bot Information
+                        </div>
                         <div class="info-card-body">
-                            <div class="info-row"><span class="ir-label">Chatbot Name</span><span class="ir-value">{{ chatbot.name }}</span></div>
-                            <div class="info-row"><span class="ir-label">Display Name</span><span class="ir-value">{{ chatbot.bot_name }}</span></div>
-                            <div class="info-row"><span class="ir-label">Status</span><span class="status-pill {{ 'active' if chatbot.is_active else 'inactive' }}">{{ 'Active' if chatbot.is_active else 'Inactive' }}</span></div>
-                            <div class="info-row"><span class="ir-label">Training</span><span class="status-pill {{ 'trained' if chatbot.is_trained else 'untrained' }}">{{ 'Trained' if chatbot.is_trained else 'Not Trained' }}</span></div>
-                            <div class="info-row"><span class="ir-label">Created</span><span class="ir-value">{{ chatbot.created_at.strftime('%B %d, %Y') }}</span></div>
+                            <div class="info-row">
+                                <span class="ir-label">Chatbot Name</span>
+                                <span class="ir-value">{{ chatbot.name }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="ir-label">Display Name</span>
+                                <span class="ir-value">{{ chatbot.bot_name }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="ir-label">Status</span>
+                                <span class="status-pill {{ 'active' if chatbot.is_active else 'inactive' }}">
+                                    {{ 'Active' if chatbot.is_active else 'Inactive' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="ir-label">Training</span>
+                                <span class="status-pill {{ 'trained' if chatbot.is_trained else 'untrained' }}">
+                                    {{ 'Trained' if chatbot.is_trained else 'Not Trained' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="ir-label">Created</span>
+                                <span class="ir-value">{{ chatbot.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="ir-label">Last Updated</span>
+                                <span class="ir-value">{{ chatbot.updated_at.strftime('%B %d, %Y') if chatbot.updated_at else '—' }}</span>
+                            </div>
                             {% if chatbot.description %}
-                            <div class="info-row" style="align-items:flex-start;">
-                                <span class="ir-label">Description</span>
-                                <span class="ir-value" style="font-weight:500;color:var(--text-mid);max-width:58%;line-height:1.5;">{{ chatbot.description }}</span>
+                            <div class="info-row" style="align-items:flex-start;padding-bottom:4px;">
+                                <span class="ir-label" style="padding-top:2px;">Description</span>
+                                <span class="ir-value" style="font-weight:500;color:var(--text-mid);max-width:60%;line-height:1.55;text-align:right;">{{ chatbot.description }}</span>
                             </div>
                             {% endif %}
                         </div>
                     </div>
+
+                    <!-- Welcome Message -->
                     <div class="info-card">
-                        <div class="info-card-head">Welcome Message</div>
-                        <div class="info-card-body">
-                            <div class="welcome-box">{{ chatbot.welcome_message or 'No welcome message set.' }}</div>
+                        <div class="info-card-head">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Welcome Message
                         </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="info-card">
-                        <div class="info-card-head">Theme Colors</div>
                         <div class="info-card-body">
-                            <div class="color-swatches">
-                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.theme_color }};"></div><div class="swatch-label">Theme</div></div>
-                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.chat_background_color }};"></div><div class="swatch-label">Chat BG</div></div>
-                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.bot_message_color }};"></div><div class="swatch-label">Bot Bubble</div></div>
-                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.bot_text_color }};"></div><div class="swatch-label">Bot Text</div></div>
-                                <div class="swatch-item"><div class="swatch-box" style="background:{{ chatbot.user_text_color }};"></div><div class="swatch-label">User Text</div></div>
+                            <div class="welcome-box">
+                                <div class="welcome-box-inner">
+                                    <div class="welcome-bot-dot"></div>
+                                    <p>{{ chatbot.welcome_message or 'No welcome message set.' }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+
+
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="overview-right">
+
+                    <!-- Theme Colors -->
+                    <div class="info-card">
+                        <div class="info-card-head">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>
+                            Theme Colors
+                        </div>
+                        <div class="info-card-body">
+                            <div class="color-swatches-v2">
+                                <div class="swatch-row">
+                                    <div class="swatch-box-v2" style="background:{{ chatbot.theme_color }};"></div>
+                                    <div class="swatch-meta">
+                                        <div class="swatch-name">Theme Color</div>
+                                        <div class="swatch-hex">{{ chatbot.theme_color }}</div>
+                                    </div>
+                                </div>
+                                <div class="swatch-row">
+                                    <div class="swatch-box-v2" style="background:{{ chatbot.chat_background_color }};border:1px solid #e8ecf4;"></div>
+                                    <div class="swatch-meta">
+                                        <div class="swatch-name">Chat Background</div>
+                                        <div class="swatch-hex">{{ chatbot.chat_background_color }}</div>
+                                    </div>
+                                </div>
+                                <div class="swatch-row">
+                                    <div class="swatch-box-v2" style="background:{{ chatbot.bot_message_color }};border:1px solid #e8ecf4;"></div>
+                                    <div class="swatch-meta">
+                                        <div class="swatch-name">Bot Bubble</div>
+                                        <div class="swatch-hex">{{ chatbot.bot_message_color }}</div>
+                                    </div>
+                                </div>
+                                <div class="swatch-row">
+                                    <div class="swatch-box-v2" style="background:{{ chatbot.bot_text_color }};border:1px solid #e8ecf4;"></div>
+                                    <div class="swatch-meta">
+                                        <div class="swatch-name">Bot Text</div>
+                                        <div class="swatch-hex">{{ chatbot.bot_text_color }}</div>
+                                    </div>
+                                </div>
+                                <div class="swatch-row">
+                                    <div class="swatch-box-v2" style="background:{{ chatbot.user_text_color }};border:1px solid #e8ecf4;"></div>
+                                    <div class="swatch-meta">
+                                        <div class="swatch-name">User Text</div>
+                                        <div class="swatch-hex">{{ chatbot.user_text_color }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -407,7 +462,7 @@
 
                                             <button type="button" class="theme-btn" data-title="Mint"
                                                     style="background: linear-gradient(135deg, #14b8a6 50%, #f0fdfa 50%);"
-                                                    onclick="applyTheme('#14b8a6', '#f0fdfa', '#ffffff', '#134e4a', '#ffffff')"></button>
+                                                      onclick="applyTheme('#14b8a6', '#f0fdfa', '#ffffff', '#134e4a', '#ffffff')"></button>
 
                                             <button type="button" class="theme-btn" data-title="Royal"
                                                     style="background: linear-gradient(135deg, #9333ea 50%, #faf5ff 50%);"
