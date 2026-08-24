@@ -336,6 +336,15 @@ def chat_api(embed_code):
 @app.route('/api/chat/<embed_code>/history', methods=['GET'])
 def get_chat_history(embed_code):
     """Fetches the past chat history for a widget session when the page reloads."""
+    from datetime import timezone
+
+    def to_epoch(dt):
+        if not dt:
+            return 0
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.timestamp()
+
     try:
         chatbot = get_chatbot_by_embed_code(embed_code)
         if not chatbot:
@@ -357,12 +366,12 @@ def get_chat_history(embed_code):
 
         history = []
 
-        # 1. Grab AI / Standard messages (FIXED: now uses m.timestamp)
+        # 1. Grab AI / Standard messages
         for m in ai_msgs:
             history.append({
                 'sender': m.sender,
                 'message': m.message,
-                'timestamp': m.timestamp.timestamp() if m.timestamp else 0
+                'timestamp': to_epoch(m.timestamp)
             })
 
         # 2. Grab Live Chat messages
@@ -372,7 +381,7 @@ def get_chat_history(embed_code):
             history.append({
                 'sender': sender,
                 'message': m.message,
-                'timestamp': m.timestamp.timestamp() if m.timestamp else 0
+                'timestamp': to_epoch(m.timestamp)
             })
 
         # Sort all messages chronologically

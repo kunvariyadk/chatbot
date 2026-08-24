@@ -6,42 +6,20 @@
     <title>Dashboard — ChatBot Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
-<body>
+<body{% if session.get('sub_status') in ['expired', 'cancelled', 'none'] %} class="no-scroll"{% endif %}>
 
 <div class="toast-container" id="toastContainer"></div>
 
 {% set sub_status = session.get('sub_status') %}
 {% if sub_status in ['expired', 'cancelled', 'none'] %}
-<style>
-    body { overflow: hidden !important; }
-    @keyframes subPopIn {
-        from { opacity: 0; transform: scale(0.88) translateY(20px); }
-        to   { opacity: 1; transform: scale(1)    translateY(0);     }
-    }
-</style>
-<div id="subExpiredOverlay" style="
-    position: fixed; inset: 0; z-index: 9999;
-    background: rgba(15, 23, 42, 0.72);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center; padding: 20px;">
+<div id="subExpiredOverlay" class="sub-overlay">
 
-    <div style="
-        background: #ffffff; border-radius: 20px;
-        padding: 48px 40px 40px; max-width: 460px; width: 100%;
-        text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.28);
-        animation: subPopIn 0.32s cubic-bezier(0.34,1.56,0.64,1) both;">
+    <div class="sub-overlay-card">
 
-        <div style="
-            width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 24px;
-            display: flex; align-items: center; justify-content: center;
-            {% if sub_status == 'none' %}background:#eff6ff; border: 3px solid #bfdbfe;
-            {% elif sub_status == 'cancelled' %}background:#fff1f2; border: 3px solid #fecdd3;
-            {% else %}background:#fef2f2; border: 3px solid #fecaca;{% endif %}">
+        <div class="sub-overlay-icon sub-overlay-icon--{{ 'none' if sub_status == 'none' else ('cancelled' if sub_status == 'cancelled' else 'expired') }}">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round"
-                 stroke="{% if sub_status == 'none' %}#3b82f6{% elif sub_status == 'cancelled' %}#f43f5e{% else %}#ef4444{% endif %}">
+                 stroke-linecap="round" stroke-linejoin="round">
                 {% if sub_status == 'none' %}
                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
                     <line x1="3" y1="6" x2="21" y2="6"/>
@@ -57,13 +35,13 @@
             </svg>
         </div>
 
-        <h2 style="margin: 0 0 10px; font-size: 22px; font-weight: 700; color: #0f172a; line-height: 1.3;">
+        <h2 class="sub-overlay-title">
             {% if sub_status == 'none' %}No Active Subscription
             {% elif sub_status == 'cancelled' %}Subscription Cancelled
             {% else %}Your Subscription Has Expired{% endif %}
         </h2>
 
-        <p style="margin: 0 0 32px; font-size: 15px; color: #64748b; line-height: 1.65;">
+        <p class="sub-overlay-desc">
             {% if sub_status == 'none' %}
                 You don't have an active plan yet.<br>Choose a plan to start using ChatBot Builder.
             {% elif sub_status == 'cancelled' %}
@@ -75,23 +53,14 @@
             {% endif %}
         </p>
 
-        <a href="{{ url_for('subscription_plans') }}" style="
-            display: inline-block;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: #fff; font-size: 15px; font-weight: 600;
-            padding: 14px 40px; border-radius: 10px; text-decoration: none;
-            letter-spacing: 0.2px; box-shadow: 0 4px 14px rgba(99,102,241,0.40);
-            transition: opacity 0.2s, transform 0.15s;"
-            onmouseover="this.style.opacity='.88';this.style.transform='translateY(-1px)'"
-            onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+        <a href="{{ url_for('subscription_plans') }}" class="sub-overlay-btn">
             {% if sub_status == 'none' %}Choose a Plan
             {% elif sub_status == 'cancelled' %}Reactivate Plan
             {% else %}Renew Subscription{% endif %}
         </a>
 
-        <div style="margin-top: 20px;">
-            <a href="{{ url_for('logout') }}" style="font-size: 13px; color: #94a3b8; text-decoration: none;"
-               onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">
+        <div class="sub-overlay-footer">
+            <a href="{{ url_for('logout') }}" class="sub-overlay-logout">
                 Log out instead
             </a>
         </div>
@@ -157,7 +126,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background:#fffaf0; color:#dd6b20;">
+                <div class="stat-icon leads">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
@@ -173,10 +142,10 @@
             <div class="dash-card">
                 <div class="dash-card-header">
                     <h3>Chatbot Activity Overview</h3>
-                    <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="chart-header-actions">
                         <div class="chart-legend-inline">
-                            <span class="cli-dot" style="background:#6366f1;"></span><span class="cli-lbl">AI Chats</span>
-                            <span class="cli-dot" style="background:#38bdf8;margin-left:8px;"></span><span class="cli-lbl">Live Sessions</span>
+                            <span class="cli-dot ai"></span><span class="cli-lbl">AI Chats</span>
+                            <span class="cli-dot live"></span><span class="cli-lbl">Live Sessions</span>
                         </div>
                         <div class="chart-tabs">
                             <button class="chart-tab active" data-chart="bar">Bar</button>
@@ -186,6 +155,7 @@
                 <div class="dash-card-body">
                     <div class="chart-wrapper" id="chartWrapper">
                         <canvas id="activityChart"></canvas>
+                        <div id="chartTooltip" class="native-chart-tooltip"></div>
                     </div>
                     <div class="chart-summary">
                         <div class="chart-summary-item">
@@ -220,22 +190,22 @@
                         </div>
                         <div class="donut-legend">
                             <div class="legend-item">
-                                <div class="legend-dot" style="background:#48bb78;"></div>
+                                <div class="legend-dot active"></div>
                                 <span class="legend-label">Active</span>
                                 <span class="legend-val">{{ active_chatbots }}</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-dot" style="background:#fc8181;"></div>
+                                <div class="legend-dot inactive"></div>
                                 <span class="legend-label">Inactive</span>
                                 <span class="legend-val">{{ total_chatbots - active_chatbots }}</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-dot" style="background:#667eea;"></div>
+                                <div class="legend-dot trained"></div>
                                 <span class="legend-label">Trained</span>
                                 <span class="legend-val" id="trainedCount">—</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-dot" style="background:#fbb040;"></div>
+                                <div class="legend-dot untrained"></div>
                                 <span class="legend-label">Untrained</span>
                                 <span class="legend-val" id="untrainedCount">—</span>
                             </div>
@@ -250,9 +220,9 @@
             <div class="dash-card full-height-card">
                 <div class="dash-card-header">
                     <h3>Recent Captured Leads</h3>
-                    <a href="{{ url_for('live_chat_dashboard') }}" style="font-size:12px;color:#4F46E5;text-decoration:none;font-weight:600;">Live Chat Dashboard →</a>
+                    <a href="{{ url_for('live_chat_dashboard') }}" class="card-link">Live Chat Dashboard →</a>
                 </div>
-                <div class="dash-card-body" style="background: #f8fafc; padding: 16px;">
+                <div class="dash-card-body dash-card-body--leads">
                     {% if recent_sessions %}
                     <div class="visitor-list">
                         {% for session in recent_sessions %}
@@ -282,7 +252,7 @@
                     </div>
                     {% else %}
                     <div class="activity-empty">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:12px;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                         </svg>
                         <p>No leads captured yet.<br>When a visitor fills out the pre-chat form, they will appear here.</p>
@@ -294,9 +264,9 @@
             <div class="dash-card full-height-card">
                 <div class="dash-card-header">
                     <h3>Recent Bot Activity</h3>
-                    <a href="{{ url_for('bots') }}" style="font-size:12px;color:#4F46E5;text-decoration:none;font-weight:600;">View all →</a>
+                    <a href="{{ url_for('bots') }}" class="card-link">View all →</a>
                 </div>
-                <div class="dash-card-body" style="padding:0;">
+                <div class="dash-card-body dash-card-body--flush">
                     {% if chatbots %}
                     <div class="activity-list" id="activityList">
                         {% for chatbot in chatbots[:5] %}
@@ -435,21 +405,7 @@ function removeToast(toast) {
 }
 
 /* ══════════════════════════════════════
-   UI INTERACTIONS
-══════════════════════════════════════ */
-document.getElementById('mobileMenuToggle').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.toggle('open');
-});
-document.getElementById('accountMenu').addEventListener('click', function (e) {
-    e.preventDefault();
-    this.classList.toggle('expanded');
-    document.getElementById('accountSubmenu').classList.toggle('open');
-});
-
-/* ══════════════════════════════════════
    FLASK FLASH MESSAGES → TOASTS
-   subscription_warning fires first,
-   then any flashed messages
 ══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -476,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ══════════════════════════════════════
-   CHART DATA — per-bot AI + Live chats from DB
+   CHART DATA & ZERO-DEPENDENCY RENDERERS
 ══════════════════════════════════════ */
 const totalBots  = {{ total_chatbots }};
 const activeBots = {{ active_chatbots }};
@@ -499,98 +455,244 @@ const untrainedCount = totalBots - trainedCount;
 document.getElementById('trainedCount').textContent   = trainedCount;
 document.getElementById('untrainedCount').textContent = untrainedCount;
 
-/* ── Per-bar colours — green if live, purple if offline ── */
-const barColorsAi = botIsActive.map(live =>
-    live ? 'rgba(102,126,234,0.85)' : 'rgba(102,126,234,0.45)'
-);
-const barColorsLive = botIsActive.map(live =>
-    live ? 'rgba(72,187,120,0.90)' : 'rgba(72,187,120,0.35)'
-);
+/* ── Custom Native Canvas Bar Chart Renderer with Animation & Hover ── */
+let barAnimFrame = null;
+let currentProgress = 0;
+let barBoxes = []; // Array to hold bounding boxes for hover detection
 
-/* ── Shared tooltip ── */
-const tooltipConfig = {
-    backgroundColor: 'rgba(15,23,42,0.92)',
-    titleFont: { size: 12, family: 'Inter', weight: '700' },
-    bodyFont:  { size: 11, family: 'Inter' },
-    padding: 12, cornerRadius: 10,
-    displayColors: true, boxPadding: 4,
-    borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1,
-    callbacks: {
-        title: items => items[0].label,
-        label: item => {
-            const icon = item.datasetIndex === 0 ? '🤖' : '💬';
-            return `  ${icon} ${item.dataset.label}: ${item.raw}`;
-        },
-        afterBody: items => {
-            const i = items[0].dataIndex;
-            return ['', botIsActive[i] ? '  🟢 Currently Live' : '  ⚫ Offline'];
-        }
+function drawNativeBarChart(progress = 1) {
+    currentProgress = progress;
+    const canvas = document.getElementById('activityChart');
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    canvas.width = parent.clientWidth || 600;
+    canvas.height = parent.clientHeight || 260;
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const paddingBottom = 30;
+    const paddingLeft = 35;
+    const paddingTop = 20;
+    const paddingRight = 15;
+
+    const chartW = W - paddingLeft - paddingRight;
+    const chartH = H - paddingTop - paddingBottom;
+
+    const maxVal = Math.max(...botAiChats, ...botLiveSess, 1) + 2;
+
+    // Draw background grid lines & Y-axis labels
+    ctx.font = '11px Inter, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = 'right';
+    const gridSteps = 4;
+    for (let i = 0; i <= gridSteps; i++) {
+        const val = Math.round((maxVal / gridSteps) * i);
+        const y = H - paddingBottom - (i / gridSteps) * chartH;
+
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(W - paddingRight, y);
+        ctx.strokeStyle = 'rgba(226,232,240,0.7)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillText(val, paddingLeft - 8, y + 4);
     }
-};
 
-/* ── BAR options: tight, centered bars per bot ── */
-const barOpts = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { display: false }, tooltip: tooltipConfig },
-    layout: { padding: { top: 8, left: 0, right: 0, bottom: 0 } },
-    scales: {
-        x: {
-            grid: { display: false },
-            border: { display: false },
-            ticks: {
-                font: { size: 12, family: 'Inter', weight: '600' },
-                color: '#64748b', maxRotation: 0, padding: 8
+    if (botNames.length === 0) return;
+
+    // Clear hover hitboxes
+    barBoxes = [];
+
+    const groupWidth = chartW / botNames.length;
+    const barWidth = Math.min(18, (groupWidth * 0.35));
+
+    botNames.forEach((name, i) => {
+        const centerX = paddingLeft + (i * groupWidth) + (groupWidth / 2);
+        const origAiVal = botAiChats[i] || 0;
+        const origLiveVal = botLiveSess[i] || 0;
+
+        const aiVal = origAiVal * progress;
+        const liveVal = origLiveVal * progress;
+
+        const aiHeight = (aiVal / maxVal) * chartH;
+        const liveHeight = (liveVal / maxVal) * chartH;
+
+        const aiX = centerX - barWidth - 2;
+        const aiY = H - paddingBottom - aiHeight;
+
+        const liveX = centerX + 2;
+        const liveY = H - paddingBottom - liveHeight;
+
+        // Draw AI Chats Bar
+        if (aiHeight > 0) {
+            ctx.fillStyle = '#6366f1';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(aiX, aiY, barWidth, aiHeight, [4, 4, 0, 0]);
+            } else {
+                ctx.rect(aiX, aiY, barWidth, aiHeight);
             }
-        },
-        y: {
-            beginAtZero: true,
-            suggestedMax: Math.max(...botAiChats, ...botLiveSess, 1) + 2,
-            border: { display: false },
-            grid: { color: 'rgba(226,232,240,0.7)', lineWidth: 1 },
-            ticks: {
-                font: { size: 11, family: 'Inter' },
-                color: '#94a3b8', stepSize: 1, precision: 0, padding: 10
-            }
+            ctx.fill();
         }
-    }
-};
 
-function makeBarData() {
-    /* Use very tight barPercentage so bars are compact regardless of
-       how many bots exist — avoids the "spread too far apart" problem */
-    const pct = Math.min(0.38, 0.75 / Math.max(botNames.length, 1));
-    return {
-        labels: botNames,
-        datasets: [
-            {
-                label: 'AI Chats',
-                data: botAiChats,
-                backgroundColor: 'rgba(99,102,241,0.82)',
-                hoverBackgroundColor: 'rgba(99,102,241,1)',
-                borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
-                borderSkipped: false,
-                barPercentage: pct,
-                categoryPercentage: 0.65
-            },
-            {
-                label: 'Live Sessions',
-                data: botLiveSess,
-                backgroundColor: 'rgba(56,189,248,0.82)',
-                hoverBackgroundColor: 'rgba(56,189,248,1)',
-                borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
-                borderSkipped: false,
-                barPercentage: pct,
-                categoryPercentage: 0.65
+        // Save AI Bar Hitbox
+        barBoxes.push({
+            x: aiX, y: aiY, w: barWidth, h: aiHeight,
+            botName: name, label: 'AI Chats', value: origAiVal,
+            isActive: botIsActive[i], type: 'ai'
+        });
+
+        // Draw Live Sessions Bar
+        if (liveHeight > 0) {
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(liveX, liveY, barWidth, liveHeight, [4, 4, 0, 0]);
+            } else {
+                ctx.rect(liveX, liveY, barWidth, liveHeight);
             }
-        ]
-    };
+            ctx.fill();
+        }
+
+        // Save Live Bar Hitbox
+        barBoxes.push({
+            x: liveX, y: liveY, w: barWidth, h: liveHeight,
+            botName: name, label: 'Live Sessions', value: origLiveVal,
+            isActive: botIsActive[i], type: 'live'
+        });
+
+        // X-axis bot label
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(name, centerX, H - 10);
+    });
 }
 
-/* ── Init bar chart ── */
-let activityChart = new Chart(document.getElementById('activityChart'), {
-    type: 'bar', data: makeBarData(), options: barOpts
+function animateBarChart() {
+    if (barAnimFrame) cancelAnimationFrame(barAnimFrame);
+    const duration = 750; // ms
+    const startTime = performance.now();
+
+    function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        let p = Math.min(elapsed / duration, 1);
+        p = 1 - Math.pow(1 - p, 3); // Ease out cubic
+
+        drawNativeBarChart(p);
+
+        if (elapsed < duration) {
+            barAnimFrame = requestAnimationFrame(step);
+        }
+    }
+    barAnimFrame = requestAnimationFrame(step);
+}
+
+/* ── Interactive Hover Handler ── */
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('activityChart');
+    const tooltip = document.getElementById('chartTooltip');
+    if (!canvas || !tooltip) return;
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        let hit = null;
+        for (let b of barBoxes) {
+            // Give hitboxes a minimum touch height so tiny bars are still hoverable
+            const effectiveH = Math.max(b.h, 15);
+            const effectiveY = b.h < 15 ? b.y - (15 - b.h) : b.y;
+
+            if (mouseX >= b.x && mouseX <= b.x + b.w && mouseY >= effectiveY && mouseY <= b.y + b.h) {
+                hit = b;
+                break;
+            }
+        }
+
+        if (hit) {
+            canvas.style.cursor = 'pointer';
+            const icon = hit.type === 'ai' ? '🤖' : '💬';
+            const statusDot = hit.isActive ? '🟢 Currently Live' : '⚫ Offline';
+
+            tooltip.innerHTML = `
+                <div class="tt-title">${hit.botName}</div>
+                <div class="tt-row"><span>${icon}</span> <span>${hit.label}:</span> <strong>${hit.value}</strong></div>
+                <div class="tt-status">${statusDot}</div>
+            `;
+            tooltip.style.left = `${hit.x + (hit.w / 2)}px`;
+            tooltip.style.top = `${hit.y}px`;
+            tooltip.classList.add('visible');
+        } else {
+            canvas.style.cursor = 'default';
+            tooltip.classList.remove('visible');
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        canvas.style.cursor = 'default';
+        tooltip.classList.remove('visible');
+    });
+});
+
+/* ── Custom Native Canvas Donut Chart Renderer ── */
+function drawNativeDonutChart() {
+    const canvas = document.getElementById('donutChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const data = [
+        activeBots,
+        Math.max(0, totalBots - activeBots),
+        trainedCount,
+        Math.max(0, untrainedCount)
+    ];
+    const colors = ['#48bb78', '#fc8181', '#667eea', '#fbb040'];
+    const total = data.reduce((a, b) => a + b, 0);
+
+    const centerX = W / 2;
+    const centerY = H / 2;
+    const outerRadius = Math.min(W, H) / 2 - 4;
+    const innerRadius = outerRadius * 0.72;
+
+    if (total === 0) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2, true);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fill();
+        return;
+    }
+
+    let startAngle = -Math.PI / 2;
+
+    data.forEach((val, i) => {
+        if (val === 0) return;
+        const sliceAngle = (val / total) * (Math.PI * 2);
+        const endAngle = startAngle + sliceAngle;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+        ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+
+        startAngle = endAngle;
+    });
+}
+
+// Draw charts on page load and window resize
+document.addEventListener('DOMContentLoaded', () => {
+    animateBarChart();
+    drawNativeDonutChart();
+    window.addEventListener('resize', () => drawNativeBarChart(1));
 });
 
 /* ── Sparkline mini-charts in bot activity rows ── */
@@ -645,56 +747,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ── Donut chart ── */
-new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Active','Inactive','Trained','Untrained'],
-        datasets: [{
-            data: [activeBots, Math.max(0,totalBots-activeBots), trainedCount, Math.max(0,untrainedCount)],
-            backgroundColor: ['#48bb78','#fc8181','#667eea','#fbb040'],
-            borderWidth:0, hoverOffset:6
-        }]
-    },
-    options: {
-        responsive: false, cutout:'72%',
-        plugins: {
-            legend: { display:false },
-            tooltip: { backgroundColor:'#1a202c', titleFont:{size:10,family:'Inter'}, bodyFont:{size:10,family:'Inter'}, padding:8, cornerRadius:6 }
-        }
+/* ══════════════════════════════════════
+   UI INTERACTIONS
+══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function () {
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuToggle');
+    const sidebarEl = document.getElementById('sidebar');
+    if (mobileMenuBtn && sidebarEl) {
+        mobileMenuBtn.addEventListener('click', () => sidebarEl.classList.toggle('open'));
+    }
+
+    // Account Dropdown Toggle
+    const accMenuBtn = document.getElementById('accountMenu');
+    const accSubMenu = document.getElementById('accountSubmenu');
+
+    if (accMenuBtn && accSubMenu) {
+        accMenuBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            this.classList.toggle('expanded');
+            accSubMenu.classList.toggle('open');
+
+            const chevron = this.querySelector('.chevron');
+            if (accSubMenu.classList.contains('open')) {
+                accSubMenu.style.maxHeight = accSubMenu.scrollHeight + 'px';
+                if (chevron) chevron.style.transform = 'rotate(90deg)';
+            } else {
+                accSubMenu.style.maxHeight = '0';
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+        });
     }
 });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuToggle');
-        const sidebarEl = document.getElementById('sidebar');
-        if (mobileMenuBtn && sidebarEl) {
-            mobileMenuBtn.addEventListener('click', () => sidebarEl.classList.toggle('open'));
-        }
-
-        // Account Dropdown Toggle
-        const accMenuBtn = document.getElementById('accountMenu');
-        const accSubMenu = document.getElementById('accountSubmenu');
-
-        if (accMenuBtn && accSubMenu) {
-            accMenuBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                this.classList.toggle('expanded');
-                accSubMenu.classList.toggle('open');
-
-                const chevron = this.querySelector('.chevron');
-                if (accSubMenu.classList.contains('open')) {
-                    accSubMenu.style.maxHeight = accSubMenu.scrollHeight + 'px';
-                    if (chevron) chevron.style.transform = 'rotate(90deg)';
-                } else {
-                    accSubMenu.style.maxHeight = '0';
-                    if (chevron) chevron.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-    });
 </script>
 
 </body>

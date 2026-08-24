@@ -159,8 +159,8 @@
 }
 
 .user-bubble {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
+    background: #f1f5f9;
+    color: #1e293b;
     border-bottom-left-radius: 4px;
 }
 

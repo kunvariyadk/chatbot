@@ -3,7 +3,20 @@ Base Package Initialization
 Flask application factory with all configuration
 """
 import os
+import sys
 import warnings
+
+# Ensure UTF-8 output encoding on Windows consoles
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+if hasattr(sys.stderr, 'reconfigure'):
+    try:
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 from datetime import timedelta
 from pathlib import Path
 from flask import Flask

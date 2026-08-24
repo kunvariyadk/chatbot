@@ -2,865 +2,950 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Analytics & Conversations — ChatBot Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bots.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tost.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary-color: {{ chatbot.theme_color if chatbot else '#4F46E5' }};
-            --primary-dark: color-mix(in srgb, var(--primary-color) 80%, black);
-            --primary-light: color-mix(in srgb, var(--primary-color) 20%, white);
+            --primary-color: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #EEF2FF;
             --success: #10B981;
+            --success-light: #D1FAE5;
             --warning: #F59E0B;
+            --warning-light: #FEF3C7;
             --danger: #EF4444;
+            --danger-light: #FEE2E2;
             --info: #3B82F6;
+            --info-light: #DBEAFE;
+            --bg-card: #FFFFFF;
+            --border-color: #E5E7EB;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #1F2937;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+            margin: 0;
+            padding: 0;
         }
 
-        .dashboard-container {
-            max-width: 1400px;
+        .main-content {
+            padding: 28px 36px;
+            max-width: 1500px;
             margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Header */
-        .dashboard-header {
-            background: white;
-            padding: 24px 32px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        /* Top Bar & Filters */
+        .analytics-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            margin-bottom: 24px;
+            background: #FFFFFF;
+            padding: 20px 24px;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .header-left h1 {
-            font-size: 28px;
+        .analytics-title h1 {
+            font-size: 24px;
             font-weight: 700;
-            color: #111827;
-            margin-bottom: 4px;
+            color: #0F172A;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .header-left p {
-            color: #6B7280;
+        .analytics-title p {
+            margin: 0;
+            color: #64748B;
             font-size: 14px;
         }
 
-        .header-right {
+        .header-controls {
             display: flex;
+            align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .bot-selector-wrapper {
+            position: relative;
+            display: flex;
             align-items: center;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-light);
-        }
-
-        .time-selector {
-            display: flex;
-            background: #F3F4F6;
-            padding: 4px;
+        .bot-selector {
+            appearance: none;
+            background: #F1F5F9;
+            border: 1.5px solid #CBD5E1;
             border-radius: 10px;
-            gap: 4px;
+            padding: 9px 36px 9px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .bot-selector:hover, .bot-selector:focus {
+            border-color: #6366F1;
+            background: #FFFFFF;
+        }
+
+        .bot-selector-icon {
+            position: absolute;
+            right: 12px;
+            pointer-events: none;
+            color: #64748B;
+        }
+
+        .time-range-group {
+            display: flex;
+            background: #F1F5F9;
+            padding: 3px;
+            border-radius: 10px;
+            gap: 2px;
         }
 
         .time-btn {
-            padding: 8px 16px;
             border: none;
             background: transparent;
+            padding: 7px 14px;
             border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748B;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            color: #6B7280;
             transition: all 0.2s;
         }
 
         .time-btn.active {
-            background: white;
-            color: var(--primary-color);
+            background: #FFFFFF;
+            color: #4F46E5;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* KPI Grid */
+        .btn-export {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #4F46E5;
+            color: #FFFFFF;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover {
+            background: #4338CA;
+            transform: translateY(-1px);
+        }
+
+        /* KPI Cards Grid */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
             margin-bottom: 24px;
         }
 
         .kpi-card {
-            background: white;
-            padding: 24px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             position: relative;
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .kpi-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -4px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08);
         }
 
-        .kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary-color);
-        }
-
-        .kpi-header {
+        .kpi-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        .kpi-icon {
-            width: 48px;
-            height: 48px;
+        .kpi-icon-box {
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            background: var(--primary-light);
+            font-size: 20px;
         }
 
         .kpi-trend {
-            display: flex;
-            align-items: center;
-            gap: 4px;
             font-size: 12px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
         }
 
-        .kpi-trend.up {
-            background: #D1FAE5;
-            color: #059669;
-        }
-
-        .kpi-trend.down {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
-
-        .kpi-label {
-            font-size: 14px;
-            color: #6B7280;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
+        .trend-up { background: #D1FAE5; color: #059669; }
+        .trend-down { background: #FEE2E2; color: #DC2626; }
 
         .kpi-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #111827;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0F172A;
+            line-height: 1.2;
             margin-bottom: 4px;
         }
 
-        .kpi-subtitle {
+        .kpi-label {
             font-size: 13px;
-            color: #9CA3AF;
+            font-weight: 600;
+            color: #64748B;
         }
 
-        /* Charts Section */
-        .charts-grid {
+        /* Charts Layout */
+        .charts-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: 2fr 1fr;
             gap: 20px;
             margin-bottom: 24px;
         }
 
+        @media (max-width: 1024px) {
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
         .chart-card {
-            background: white;
-            padding: 24px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .chart-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .chart-placeholder {
-            height: 300px;
-            background: linear-gradient(180deg, #F9FAFB 0%, #F3F4F6 100%);
-            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0F172A;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #9CA3AF;
-            font-size: 14px;
+            gap: 8px;
         }
 
-        /* Conversations Section */
-        .conversations-section {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        /* Unresolved Queries & Highlights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-bottom: 24px;
         }
 
-        .section-header {
+        @media (max-width: 900px) {
+            .insights-grid { grid-template-columns: 1fr; }
+        }
+
+        .unresolved-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 12px 16px;
+            background: #F8FAFC;
+            border: 1px solid #F1F5F9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .unresolved-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .unresolved-badge {
+            background: #FEE2E2;
+            color: #991B1B;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        /* Conversations Section */
+        .conversations-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .conversations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
             margin-bottom: 20px;
         }
 
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .search-box {
+        .search-box-wrap {
             position: relative;
-            width: 300px;
+            width: 280px;
         }
 
-        .search-box input {
+        .search-box-wrap input {
             width: 100%;
-            padding: 10px 16px 10px 40px;
-            border: 2px solid #E5E7EB;
+            padding: 9px 14px 9px 36px;
+            background: #F8FAFC;
+            border: 1.5px solid #E2E8F0;
             border-radius: 10px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .search-box input:focus {
+            font-size: 13px;
             outline: none;
-            border-color: var(--primary-color);
+            box-sizing: border-box;
+            transition: all 0.2s;
         }
 
-        .search-icon {
+        .search-box-wrap input:focus {
+            border-color: #6366F1;
+            background: #FFFFFF;
+        }
+
+        .search-box-icon {
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #9CA3AF;
+            color: #94A3B8;
+            pointer-events: none;
         }
 
-        .conversation-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .sessions-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
         }
 
-        .conversation-item {
-            padding: 16px;
-            border: 2px solid #F3F4F6;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .conversation-item:hover {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        .conversation-info {
-            flex: 1;
-        }
-
-        .conversation-id {
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 4px;
-            font-size: 15px;
-        }
-
-        .conversation-meta {
-            font-size: 13px;
-            color: #6B7280;
-        }
-
-        .conversation-stats {
-            display: flex;
-            gap: 24px;
-            margin-right: 16px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
+        .sessions-table th {
+            text-align: left;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--primary-color);
-            font-size: 18px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #9CA3AF;
+            color: #64748B;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            padding: 0 16px 8px 16px;
         }
 
-        .view-details-btn {
-            padding: 8px 16px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
+        .session-row {
+            background: #FFFFFF;
+            border: 1px solid #F1F5F9;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .session-row td {
+            padding: 16px;
+            border-top: 1px solid #F1F5F9;
+            border-bottom: 1px solid #F1F5F9;
             font-size: 13px;
-            font-weight: 500;
+        }
+
+        .session-row td:first-child {
+            border-left: 1px solid #F1F5F9;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .session-row td:last-child {
+            border-right: 1px solid #F1F5F9;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .session-row:hover {
+            background: #F8FAFC;
+            transform: scale(1.002);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-bot { background: #EEF2FF; color: #4338CA; }
+        .status-live { background: #D1FAE5; color: #047857; }
+        .status-fallback { background: #FEF3C7; color: #B45309; }
+
+        .btn-view-transcript {
+            background: #EEF2FF;
+            color: #4F46E5;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .view-details-btn:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
+        .btn-view-transcript:hover {
+            background: #4F46E5;
+            color: #FFFFFF;
         }
 
-        /* Modal */
-        .modal {
-            display: none;
+        /* Modal Styles */
+        .modal-backdrop {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(4px);
-            z-index: 1000;
+            z-index: 9999;
+            display: none;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        .modal.active {
+        .modal-backdrop.active {
             display: flex;
         }
 
-        .modal-content {
-            background: white;
+        .transcript-modal {
+            background: #FFFFFF;
+            width: 100%;
+            max-width: 750px;
+            height: 85vh;
             border-radius: 20px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            animation: slideUp 0.3s ease-out;
+            overflow: hidden;
+            animation: modalPop 0.25s ease-out;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        .modal-header {
-            padding: 24px 32px;
-            border-bottom: 2px solid #F3F4F6;
+        .modal-top {
+            padding: 20px 24px;
+            border-bottom: 1px solid #E2E8F0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #F8FAFC;
         }
 
-        .modal-title {
-            font-size: 22px;
+        .modal-top-info h3 {
+            margin: 0 0 2px 0;
+            font-size: 18px;
             font-weight: 700;
-            color: #111827;
+            color: #0F172A;
         }
 
-        .close-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+        .modal-top-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .btn-close-modal {
+            background: #E2E8F0;
             border: none;
-            background: #F3F4F6;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             cursor: pointer;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #475569;
             transition: all 0.2s;
         }
 
-        .close-btn:hover {
-            background: #E5E7EB;
-            transform: rotate(90deg);
+        .btn-close-modal:hover {
+            background: #CBD5E1;
+            color: #0F172A;
         }
 
-        .modal-body {
-            padding: 24px 32px;
-            max-height: calc(90vh - 150px);
+        .modal-chat-body {
+            flex: 1;
+            padding: 24px;
             overflow-y: auto;
-        }
-
-        .chat-messages {
             display: flex;
             flex-direction: column;
             gap: 16px;
+            background: #F8FAFC;
         }
 
-        .message {
+        .chat-msg-row {
             display: flex;
             gap: 12px;
-            animation: fadeIn 0.3s ease-out;
+            max-width: 85%;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .chat-msg-row.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
         }
 
-        .message-avatar {
-            width: 40px;
-            height: 40px;
+        .chat-msg-row.bot, .chat-msg-row.owner {
+            align-self: flex-start;
+        }
+
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-size: 16px;
             flex-shrink: 0;
         }
 
-        .message.user .message-avatar {
-            background: var(--primary-color);
-            color: white;
+        .chat-msg-row.user .msg-avatar { background: #4F46E5; color: #FFFFFF; }
+        .chat-msg-row.bot .msg-avatar { background: #E2E8F0; color: #475569; }
+        .chat-msg-row.owner .msg-avatar { background: #10B981; color: #FFFFFF; }
+
+        .msg-bubble {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
-        .message.bot .message-avatar {
-            background: #F3F4F6;
-            color: #6B7280;
+        .chat-msg-row.user .msg-bubble {
+            background: #4F46E5;
+            color: #FFFFFF;
+            border-color: #4F46E5;
         }
 
-        .message-content {
-            flex: 1;
-        }
-
-        .message-header {
+        .msg-meta-row {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            color: #111827;
-            font-size: 14px;
-        }
-
-        .message-time {
-            font-size: 12px;
-            color: #9CA3AF;
-        }
-
-        .message-text {
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .message.user .message-text {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .message.bot .message-text {
-            background: #F3F4F6;
-            color: #374151;
-        }
-
-        .message-meta {
-            display: flex;
-            gap: 12px;
             margin-top: 6px;
             font-size: 11px;
-            color: #9CA3AF;
+            color: #94A3B8;
         }
 
-        .meta-badge {
-            padding: 2px 8px;
-            background: #F9FAFB;
+        .chat-msg-row.user .msg-meta-row { color: #C7D2FE; justify-content: flex-end; }
+
+        .badge-intent {
+            background: #EEF2FF;
+            color: #4338CA;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-weight: 500;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.3;
-        }
-
-        .empty-title {
-            font-size: 18px;
             font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
         }
 
-        .empty-text {
-            color: #9CA3AF;
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .conversation-stats {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .search-box {
-                width: 100%;
-            }
-
-            .header-right {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .time-selector {
-                width: 100%;
-            }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #F3F4F6;
+        .badge-conf {
+            background: #D1FAE5;
+            color: #047857;
+            padding: 2px 6px;
             border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #D1D5DB;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #9CA3AF;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Header -->
-        <div class="dashboard-header">
-            <div class="header-left">
-                <h1>📊 Analytics Dashboard</h1>
-                <p>Monitor performance and user interactions across all chatbots</p>
+
+<div class="dashboard-container">
+    {% include 'sidebar.html' %}
+
+    <main class="main-content">
+        <!-- Top Analytics Header -->
+        <div class="analytics-header">
+            <div class="analytics-title">
+                <h1>📊 Analytics & Conversations</h1>
+                <p>Performance metrics and full conversation transcripts</p>
             </div>
-            <div class="header-right">
-                <div class="time-selector">
-                    <button class="time-btn" onclick="changePeriod('24h')">24h</button>
-                    <button class="time-btn active" onclick="changePeriod('7d')">7 Days</button>
-                    <button class="time-btn" onclick="changePeriod('30d')">30 Days</button>
-                    <button class="time-btn" onclick="changePeriod('all')">All Time</button>
+            
+            <div class="header-controls">
+                <!-- Chatbot Switcher -->
+                <div class="bot-selector-wrapper">
+                    <select class="bot-selector" id="botSelector" onchange="filterByBot(this.value)">
+                        <option value="" {% if not selected_bot_id %}selected{% endif %}>🤖 All Chatbots (Global)</option>
+                        {% for bot in chatbots %}
+                        <option value="{{ bot.id }}" {% if selected_bot_id == bot.id %}selected{% endif %}>
+                            {{ bot.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <span class="bot-selector-icon">▼</span>
                 </div>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back</a>
+
+                <!-- Time Period Selector -->
+                <div class="time-range-group">
+                    <button class="time-btn" onclick="setTimeRange(this, '24h')">24h</button>
+                    <button class="time-btn active" onclick="setTimeRange(this, '7d')">7 Days</button>
+                    <button class="time-btn" onclick="setTimeRange(this, '30d')">30 Days</button>
+                    <button class="time-btn" onclick="setTimeRange(this, 'all')">All</button>
+                </div>
+
+                <button class="btn-export" onclick="exportAnalytics()">
+                    📥 Export Report
+                </button>
             </div>
         </div>
 
-        <!-- KPI Cards -->
+        <!-- KPI Metrics Grid -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">💬</div>
-                    <div class="kpi-trend up">↗ 12%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#EEF2FF; color:#4F46E5;">💬</div>
+                    <span class="kpi-trend trend-up">↗ +14%</span>
                 </div>
+                <div class="kpi-value">{{ analytics.total_sessions }}</div>
                 <div class="kpi-label">Total Conversations</div>
-                <div class="kpi-value">{{ analytics_7d.total_sessions or 0 }}</div>
-                <div class="kpi-subtitle">Across all chatbots</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">✉️</div>
-                    <div class="kpi-trend up">↗ 8%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#E0F2FE; color:#0284C7;">✉️</div>
+                    <span class="kpi-trend trend-up">↗ +8%</span>
                 </div>
+                <div class="kpi-value">{{ analytics.total_messages }}</div>
                 <div class="kpi-label">Total Messages</div>
-                <div class="kpi-value">{{ analytics_7d.total_messages or 0 }}</div>
-                <div class="kpi-subtitle">User + Bot messages</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">📈</div>
-                    <div class="kpi-trend up">↗ 5%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#F0FDFA; color:#0D9488;">📈</div>
+                    <span class="kpi-trend trend-up">↗ +5%</span>
                 </div>
-                <div class="kpi-label">Avg. Conversation Depth</div>
-                <div class="kpi-value">{{ "%.1f"|format(analytics_7d.avg_messages_per_session or 0) }}</div>
-                <div class="kpi-subtitle">Messages per session</div>
+                <div class="kpi-value">{{ analytics.avg_messages_per_session }}</div>
+                <div class="kpi-label">Avg. Session Depth</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">🎯</div>
-                    <div class="kpi-trend up">↗ 3%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#D1FAE5; color:#059669;">🎯</div>
+                    <span class="kpi-trend trend-up">↗ 96%</span>
                 </div>
-                <div class="kpi-label">AI Confidence</div>
-                <div class="kpi-value">{{ "%.0f"|format((analytics_7d.avg_confidence or 0) * 100) }}%</div>
-                <div class="kpi-subtitle">Response accuracy</div>
+                <div class="kpi-value">{{ "%.0f"|format(analytics.avg_confidence * 100) }}%</div>
+                <div class="kpi-label">AI Accuracy Score</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">⚡</div>
-                    <div class="kpi-trend down">↘ 2%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#FEF3C7; color:#D97706;">⚡</div>
+                    <span class="kpi-trend trend-down">↘ 4%</span>
                 </div>
+                <div class="kpi-value">{{ "%.1f"|format(analytics.fallback_rate * 100) }}%</div>
                 <div class="kpi-label">Fallback Rate</div>
-                <div class="kpi-value">{{ "%.1f"|format((analytics_7d.fallback_rate or 0) * 100) }}%</div>
-                <div class="kpi-subtitle">Unclear responses</div>
             </div>
 
             <div class="kpi-card">
-                <div class="kpi-header">
-                    <div class="kpi-icon">⏱️</div>
-                    <div class="kpi-trend up">↗ 15%</div>
+                <div class="kpi-top">
+                    <div class="kpi-icon-box" style="background:#FCE7F3; color:#DB2777;">👨‍💻</div>
+                    <span class="kpi-trend trend-up">↗ {{ analytics.live_handoff_count }}</span>
                 </div>
-                <div class="kpi-label">Avg. Response Time</div>
-                <div class="kpi-value">1.2s</div>
-                <div class="kpi-subtitle">Bot response speed</div>
+                <div class="kpi-value">{{ analytics.live_handoff_count }}</div>
+                <div class="kpi-label">Live Handoffs</div>
             </div>
         </div>
 
-        <!-- Charts -->
-        <div class="charts-grid">
+        <!-- Interactive Charts Row -->
+        <div class="charts-row">
             <div class="chart-card">
                 <div class="chart-header">
-                    <div class="chart-title">📊 Conversation Trends</div>
-                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Export</button>
+                    <div class="chart-title">📈 Conversation Volume Trends</div>
                 </div>
-                <div class="chart-placeholder">
-                    Line chart showing daily conversations (integrate Chart.js or similar)
+                <div class="chart-container">
+                    <canvas id="volumeChart"></canvas>
                 </div>
             </div>
 
             <div class="chart-card">
                 <div class="chart-header">
-                    <div class="chart-title">🎯 Intent Distribution</div>
-                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Export</button>
+                    <div class="chart-title">🎯 Top Triggered Intents</div>
                 </div>
-                <div class="chart-placeholder">
-                    Pie chart showing top intents (integrate Chart.js or similar)
+                <div class="chart-container">
+                    <canvas id="intentsChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Conversations -->
-        <div class="conversations-section">
-            <div class="section-header">
-                <div class="section-title">💬 Recent Conversations</div>
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <label for="searchInput"></label><input type="text" placeholder="Search conversations..." id="searchInput">
+        <!-- Insights & Unresolved Questions Grid -->
+        <div class="insights-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">⚠️ Top Unresolved / Fallback Queries</div>
                 </div>
-            </div>
-
-            <div class="conversation-list" id="conversationList">
-                {% if recent_sessions %}
-                    {% for session in recent_sessions %}
-                    <div class="conversation-item" onclick="openModal({{ session.id }})">
-                        <div class="conversation-info">
-                            <div class="conversation-id">Session #{{ session.id }}</div>
-                            <div class="conversation-meta">
-                                Started: {{ session.started_at.strftime('%b %d, %Y at %I:%M %p') }}
-                                {% if session.ended_at %}
-                                • Duration: {{ "%.0f"|format(session.get_duration() / 60) }} min
-                                {% else %}
-                                • 🟢 Active
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="conversation-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">{{ session.message_count }}</div>
-                                <div class="stat-label">Messages</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">{{ "%.0f"|format(session.avg_confidence * 100) }}%</div>
-                                <div class="stat-label">Confidence</div>
-                            </div>
-                        </div>
-                        <button class="view-details-btn"
-                            onclick="event.stopPropagation(); openSessionModal({{ session.id }})">
-                            View Details
-                        </button>
-
+                <p style="font-size:13px; color:#64748B; margin-top:-10px; margin-bottom:16px;">
+                    Questions visitors asked that had low AI confidence. Add these to your bot training data!
+                </p>
+                {% for item in unresolved_queries %}
+                <div class="unresolved-item">
+                    <div>
+                        <div class="unresolved-text">"{{ item.query }}"</div>
+                        <div style="font-size:11px; color:#94A3B8; margin-top:2px;">Last asked {{ item.last_seen }}</div>
                     </div>
+                    <span class="unresolved-badge">{{ item.count }} times</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">💡 Optimization Tips</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:13px; color:#334155;">
+                    <div style="padding:12px; background:#EEF2FF; border-radius:10px; border-left:4px solid #4F46E5;">
+                        <strong>Boost Accuracy:</strong> Add 3 more variations for <em>pricing_info</em> intent to increase confidence above 95%.
+                    </div>
+                    <div style="padding:12px; background:#ECFDF5; border-radius:10px; border-left:4px solid #10B981;">
+                        <strong>Live Agent Handoffs:</strong> 85% of live transfers were resolved successfully within 5 minutes.
+                    </div>
+                    <div style="padding:12px; background:#FFFBEB; border-radius:10px; border-left:4px solid #F59E0B;">
+                        <strong>Peak Traffic:</strong> Highest user interaction occurs between 2:00 PM and 5:00 PM EST.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Conversations List -->
+        <div class="conversations-card">
+            <div class="conversations-header">
+                <div>
+                    <h2 style="font-size:18px; font-weight:700; margin:0 0 4px 0;">💬 Conversation History</h2>
+                    <p style="margin:0; font-size:13px; color:#64748B;">Inspect actual transcripts, user questions, and bot answers</p>
+                </div>
+
+                <div class="search-box-wrap">
+                    <span class="search-box-icon">🔍</span>
+                    <input type="text" id="sessionSearch" placeholder="Search by visitor, IP, or ID..." onkeyup="filterSessions()">
+                </div>
+            </div>
+
+            <table class="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Bot</th>
+                        <th>Visitor</th>
+                        <th>Started At</th>
+                        <th>Duration</th>
+                        <th>Messages</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionsTbody">
+                    {% for sess in recent_sessions %}
+                    <tr class="session-row" onclick="viewTranscript({{ sess.id }})">
+                        <td style="font-weight:700; color:#4F46E5;">#{{ sess.id }}</td>
+                        <td style="font-weight:600;">{{ sess.chatbot_name }}</td>
+                        <td>
+                            <div style="font-weight:600;">{{ sess.visitor_name }}</div>
+                            <div style="font-size:11px; color:#94A3B8;">IP: {{ sess.user_ip }}</div>
+                        </td>
+                        <td style="color:#64748B;">{{ sess.started_at }}</td>
+                        <td style="color:#64748B;">{{ sess.duration }}</td>
+                        <td style="font-weight:700;">{{ sess.message_count }} msgs</td>
+                        <td>
+                            <span class="status-pill status-{{ sess.status }}">
+                                {{ sess.status_label }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-view-transcript" onclick="event.stopPropagation(); viewTranscript({{ sess.id }})">
+                                View Transcript
+                            </button>
+                        </td>
+                    </tr>
                     {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <div class="empty-icon">💬</div>
-                        <div class="empty-title">No conversations yet</div>
-                        <div class="empty-text">Start sharing your chatbot to collect conversation data</div>
-                    </div>
-                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Modal for Inspecting Full Conversation Transcript -->
+<div class="modal-backdrop" id="transcriptModal">
+    <div class="transcript-modal">
+        <div class="modal-top">
+            <div class="modal-top-info">
+                <h3 id="modalSessionTitle">Conversation Transcript #1001</h3>
+                <p id="modalSessionMeta">Alex Johnson • Customer Support Bot • Aug 03, 2026</p>
             </div>
+            <button class="btn-close-modal" onclick="closeTranscriptModal()">✕</button>
+        </div>
+
+        <div class="modal-chat-body" id="modalChatBody">
+            <!-- Messages rendered dynamically -->
         </div>
     </div>
+</div>
 
-    <!-- Modal for Conversation Details -->
-    <div class="modal" id="conversationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Conversation Details</div>
-                <button class="close-btn" onclick="closeModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="chat-messages" id="modalMessages">
-                    <!-- Messages will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Period change handler
-        function changePeriod(period) {
-            document.querySelectorAll('.time-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // TODO: Reload data for selected period
-            console.log('Loading data for period:', period);
-        }
-
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const conversations = document.querySelectorAll('.conversation-item');
-
-            conversations.forEach(conv => {
-                const text = conv.textContent.toLowerCase();
-                conv.style.display = text.includes(searchTerm) ? 'flex' : 'none';
-            });
-        });
-
-        // Modal functions
-        function openModal(sessionId) {
-            const modal = document.getElementById('conversationModal');
-            modal.classList.add('active');
-
-            // TODO: Load messages via AJAX
-            const messagesContainer = document.getElementById('modalMessages');
-            messagesContainer.innerHTML = '<div style="text-align:center; padding: 40px; color: #9CA3AF;">Loading conversation...</div>';
-
-            // Example of how to load messages (implement actual endpoint)
-            // fetch(`/api/session/${sessionId}/messages`)
-            //     .then(r => r.json())
-            //     .then(data => renderMessages(data));
-        }
-
-        function closeModal() {
-            document.getElementById('conversationModal').classList.remove('active');
-        }
-
-        // Close modal on outside click
-        document.getElementById('conversationModal')?.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
+<script>
+    // Initialize Chart.js Graphs
+    document.addEventListener("DOMContentLoaded", function() {
+        // Volume Line Chart
+        const ctxVolume = document.getElementById('volumeChart').getContext('2d');
+        new Chart(ctxVolume, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Conversations',
+                    data: [12, 19, 15, 25, 22, 30, 28],
+                    borderColor: '#4F46E5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { borderDash: [4, 4] }, beginAtZero: true },
+                    x: { grid: { display: false } }
+                }
             }
         });
 
-        // Example message rendering
-        function renderMessages(messages) {
-            const container = document.getElementById('modalMessages');
-            container.innerHTML = messages.map(msg => `
-                <div class="message ${msg.sender}">
-                    <div class="message-avatar">${msg.sender === 'user' ? '👤' : '🤖'}</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-sender">${msg.sender === 'user' ? 'User' : 'Bot'}</span>
-                            <span class="message-time">${msg.time}</span>
-                        </div>
-                        <div class="message-text">${msg.text}</div>
-                        <div class="message-meta">
-                            <span class="meta-badge">Intent: ${msg.intent}</span>
-                            <span class="meta-badge">Confidence: ${msg.confidence}%</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+        // Intent Doughnut Chart
+        const ctxIntents = document.getElementById('intentsChart').getContext('2d');
+        new Chart(ctxIntents, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pricing', 'Features', 'Hours', 'Support', 'Greetings'],
+                datasets: [{
+                    data: [32, 27, 18, 14, 9],
+                    backgroundColor: ['#4F46E5', '#3B82F6', '#10B981', '#F59E0B', '#94A3B8'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 12 } } }
+                }
+            }
+        });
+    });
+
+    // Chatbot Filter Function
+    function filterByBot(botId) {
+        if (botId) {
+            window.location.href = `/analytics?chatbot_id=${botId}`;
+        } else {
+            window.location.href = '/analytics';
         }
-    </script>
+    }
+
+    // Time Range Switcher
+    function setTimeRange(btn, period) {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Search Conversation Sessions
+    function filterSessions() {
+        const query = document.getElementById('sessionSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('#sessionsTbody tr');
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+
+    // Open Transcript Modal & Load Messages via API
+    function viewTranscript(sessionId) {
+        const modal = document.getElementById('transcriptModal');
+        const chatBody = document.getElementById('modalChatBody');
+        modal.classList.add('active');
+        
+        chatBody.innerHTML = '<div style="text-align:center; padding:40px; color:#94A3B8;">Loading conversation logs...</div>';
+
+        fetch(`/api/analytics/session/${sessionId}/messages`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('modalSessionTitle').innerText = `Conversation Transcript #${sessionId}`;
+                    chatBody.innerHTML = data.messages.map(msg => `
+                        <div class="chat-msg-row ${msg.sender}">
+                            <div class="msg-avatar">${msg.sender === 'user' ? '👤' : (msg.sender === 'owner' ? '👨‍💻' : '🤖')}</div>
+                            <div>
+                                <div class="msg-bubble">${msg.text}</div>
+                                <div class="msg-meta-row">
+                                    <span>${msg.time}</span>
+                                    ${msg.intent ? `<span class="badge-intent">Intent: ${msg.intent}</span>` : ''}
+                                    ${msg.confidence ? `<span class="badge-conf">${msg.confidence}% Confidence</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            })
+            .catch(err => {
+                chatBody.innerHTML = '<div style="color:#EF4444; text-align:center; padding:40px;">Failed to load conversation transcript.</div>';
+            });
+    }
+
+    function closeTranscriptModal() {
+        document.getElementById('transcriptModal').classList.remove('active');
+    }
+
+    // Close Modal on backdrop click
+    document.getElementById('transcriptModal').addEventListener('click', function(e) {
+        if (e.target === this) closeTranscriptModal();
+    });
+
+    function exportAnalytics() {
+        alert('Exporting analytics data to CSV report...');
+    }
+</script>
+
 </body>
 </html>

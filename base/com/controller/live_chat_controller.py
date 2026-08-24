@@ -444,7 +444,7 @@ def handle_owner_typing(data):
     """Broadcasts a typing indicator from the owner to the user."""
     sid = data.get('session_id')
     if sid:
-        emit('owner_is_typing', {}, room=f'session_{sid}', include_self=False)
+        emit('owner_typing', {}, room=f'session_{sid}', include_self=False)
 
 
 @socketio.on('owner_stopped_typing')
